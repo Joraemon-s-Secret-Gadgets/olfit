@@ -118,7 +118,7 @@ def fill_detail_info(perfume_data):
 # 🚀 실행 메인 블록
 # ==========================================
 if __name__ == "__main__":
-    print("🤖 4th의 'Persona-L' 초고속 크롤러 가동을 시작합니다!\n")
+    print("🤖 4th의 'Olfit' 초고속 크롤러 가동을 시작합니다!\n")
     
     # 1. 리스트 페이지에서 100ml 데이터 일괄 수집
     base_data_list = get_perfume_base_data()

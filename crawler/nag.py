@@ -176,7 +176,7 @@ def crawl_nagchampa_detail(driver, url):
 # 🚀 실행 메인 블록
 # ==========================================
 if __name__ == "__main__":
-    print("🤖 4th의 'Persona-L' 나그참파 크롤러 가동!\n")
+    print("🤖 4th의 'Olfit' 나그참파 크롤러 가동!\n")
     
     urls = get_nagchampa_urls()
     

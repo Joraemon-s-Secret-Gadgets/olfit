@@ -203,7 +203,7 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
                         "당신이 지향하는 {results.fashionStyle} 스타일과 {results.personalMood} 분위기를 현대적인 후각 언어로 치환했습니다. 
                         선택하신 무드가 어우러진 잔향은 당신의 아우라를 더욱 선명하게 완성할 것입니다."
                       </p>
-                      <p className="text-[10px] uppercase tracking-widest text-wood/40 mt-4 not-italic">— Senior Perfumer L</p>
+                      <p className="text-[10px] uppercase tracking-widest text-wood/40 mt-4 not-italic">— Senior Perfumer Olfit</p>
                     </div>
                   </div>
                 </div>

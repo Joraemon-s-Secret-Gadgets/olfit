@@ -153,7 +153,7 @@ def crawl_byredo_detail(driver, url):
 # 🚀 실행 메인 블록
 # ==========================================
 if __name__ == "__main__":
-    print("🤖 4th의 'Persona-L' 바이레도 크롤러 최종 가동!\n")
+    print("🤖 4th의 'Olfit' 바이레도 크롤러 최종 가동!\n")
     
     # 1. 주소 싹쓸이
     urls = get_byredo_urls()
