@@ -24,22 +24,14 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
 
   // 다이내믹 데이터 계산
   const layeringData = useMemo(() => getLayeringRecommendation(results), [results]);
-  const recommendedProducts = useMemo(() => getRecommendedProducts(results), [results]);
 
   // 사용자의 선택에 따른 가변적인 로직 생성
-  const dynamicLogicSteps = results?.type === "personal" ? [
-    `${results.fashionStyle} 스타일 → 그에 어울리는 현대적 텍스처 치환`,
-    `${results.personalMood} → 해당 분위기를 극대화하는 향기 노트 배합`,
+  const dynamicLogicSteps = [
+    `${results?.fashionStyle || 'Minimal'} 스타일 → 그에 어울리는 현대적 텍스처 치환`,
+    `${results?.personalMood || 'Casual'} → 해당 분위기를 극대화하는 향기 노트 배합`,
     `추천 베이스: ${layeringData?.main.name} (${layeringData?.main.family})`,
     "도시의 금속 질감과 자연의 조화로운 레이어링 완성",
-  ] : [];
-
-  const dynamicSpaceLogicSteps = results?.type === "space" ? [
-    `${results.spaceColor} 공간 → 해당 색감을 시각화하는 향기 입자 배합`,
-    `${results.spaceTexture} 소재 → 소재의 물성을 보완하는 노트 구성`,
-    `${results.spaceLight} 분위기 → 빛의 밀도를 닮은 잔향의 농도 조절`,
-    `최적의 향: ${recommendedProducts[0]?.name || "시그니처 나그참파"}`,
-  ] : [];
+  ];
 
   // 인터뷰 결과에 따른 레이더 차트 데이터 동적 계산
   const getDynamicRadarData = () => {
@@ -54,35 +46,19 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
       { axis: "구르망", value: 0.2 },
     ];
 
-    if (results.type === "personal") {
-      // Mood mapping
-      const mood = results.personalMood || "";
-      if (mood.includes("로맨틱")) baseData[0].value += 0.5;
-      if (mood.includes("단정한")) baseData[1].value += 0.4;
-      if (mood.includes("자유로운")) baseData[3].value += 0.5;
-      if (mood.includes("시그니처")) baseData[2].value += 0.5;
+    // Mood mapping
+    const mood = results.personalMood || "";
+    if (mood.includes("로맨틱")) baseData[0].value += 0.5;
+    if (mood.includes("단정한")) baseData[1].value += 0.4;
+    if (mood.includes("자유로운")) baseData[3].value += 0.5;
+    if (mood.includes("시그니처")) baseData[2].value += 0.5;
 
-      // Fashion mapping
-      const fashion = results.fashionStyle || "";
-      if (fashion.includes("미니멀")) { baseData[1].value += 0.3; baseData[3].value += 0.2; }
-      if (fashion.includes("고프코어")) { baseData[3].value += 0.4; baseData[1].value += 0.2; }
-      if (fashion.includes("빈티지")) { baseData[2].value += 0.4; baseData[1].value += 0.2; }
-      if (fashion.includes("아방가르드")) { baseData[4].value += 0.5; baseData[2].value += 0.2; }
-    } else if (results.type === "space") {
-      // Color mapping
-      const color = results.spaceColor || "";
-      if (color.includes("화이트")) baseData[3].value += 0.4;
-      if (color.includes("우드")) baseData[1].value += 0.5;
-      if (color.includes("블랙")) baseData[2].value += 0.5;
-      if (color.includes("컬러포인트")) baseData[0].value += 0.4;
-
-      // Texture mapping
-      const texture = results.spaceTexture || "";
-      if (texture.includes("원목")) baseData[1].value += 0.3;
-      if (texture.includes("금속")) baseData[3].value += 0.3;
-      if (texture.includes("패브릭")) baseData[0].value += 0.3;
-      if (texture.includes("스톤")) baseData[2].value += 0.3;
-    }
+    // Fashion mapping
+    const fashion = results.fashionStyle || "";
+    if (fashion.includes("미니멀")) { baseData[1].value += 0.3; baseData[3].value += 0.2; }
+    if (fashion.includes("고프코어")) { baseData[3].value += 0.4; baseData[1].value += 0.2; }
+    if (fashion.includes("빈티지")) { baseData[2].value += 0.4; baseData[1].value += 0.2; }
+    if (fashion.includes("아방가르드")) { baseData[4].value += 0.5; baseData[2].value += 0.2; }
 
     // 값 제한 (0.1 ~ 0.95)
     return baseData.map(d => ({
@@ -125,7 +101,7 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
       const image = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = image;
-      link.download = `Persona_L_Report.png`;
+      link.download = `Olfit_Report.png`;
       link.click();
     } catch (err) {
       console.error("이미지 저장 실패:", err);
@@ -164,7 +140,7 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
             <div ref={ref1} className={`flex flex-col items-center mb-20 transition-all duration-800 ${vis1 || results ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <p className="label-upper text-wood/40 mb-4">Diagnosis Report</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight break-keep text-wood mb-8">
-                {results.type === "personal" ? "당신의 아우라 진단" : "당신의 공간 진단"}
+                당신의 아우라 진단
               </h2>
               
               <button 
@@ -178,126 +154,65 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
 
             <div ref={reportRef} className="p-4 md:p-8 rounded-lg">
               {/* 01. Personal Aura Section */}
-              {results.type === "personal" && (
-                <div className="mb-32 animate-in fade-in duration-1000">
-                  <div className="flex items-center gap-4 mb-12">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-wood/30">Personal Analysis</span>
-                    <h3 className={`text-xl font-light tracking-widest uppercase ${theme.accent}`}>Personal Aura</h3>
-                    <div className="h-px bg-wood/10 flex-1" />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-                    {/* 좌측: 레이더 차트 및 상세 수치 */}
-                    <div ref={ref2} className={`transition-all duration-800 delay-100 ${vis2 || results ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                      <p className="text-[11px] font-medium uppercase tracking-widest text-wood/40 mb-12 text-center">
-                        Olfactory Silhouette
-                      </p>
-                      <RadarChart data={currentRadarData} forceDraw={!!results} />
-                      <div className="flex justify-center gap-6 sm:gap-8 mt-12">
-                        {currentRadarData.map((d) => (
-                          <div key={d.axis} className="text-center">
-                            <p className={`text-base sm:text-lg font-light ${theme.accent}`}>{Math.round(d.value * 100)}%</p>
-                            <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-wood/40 mt-1">{d.axis}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* 우측: 개인 번역 로직 및 조향사 노트 */}
-                    <div ref={ref3} className={`transition-all duration-800 delay-200 ${vis3 || results ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                      <p className="text-[11px] font-medium uppercase tracking-widest text-wood/40 mb-8">
-                        Personal Translation Logic
-                      </p>
-                      <div className="space-y-0 mb-12">
-                        {dynamicLogicSteps.map((step, i) => (
-                          <div
-                            key={i}
-                            className={`group py-5 border-b ${theme.border} flex items-start gap-4 hover:bg-wood/[0.01] transition-colors duration-300 px-2 -mx-2`}
-                          >
-                            <span className="text-[11px] font-medium text-wood/30 mt-0.5 font-mono">
-                              0{i + 1}
-                            </span>
-                            <p className="text-[15px] leading-relaxed text-wood/70 group-hover:text-wood transition-colors duration-300 break-keep">
-                              {renderText(step)}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div className={`p-6 bg-wood/5 border-l-2 ${theme.border.replace('border-b', 'border-l')} italic`}>
-                        <p className="text-[13px] text-wood/70 leading-relaxed break-keep">
-                          "당신이 지향하는 {results.fashionStyle} 스타일과 {results.personalMood} 분위기를 현대적인 후각 언어로 치환했습니다. 
-                          선택하신 무드가 어우러진 잔향은 당신의 아우라를 더욱 선명하게 완성할 것입니다."
-                        </p>
-                        <p className="text-[10px] uppercase tracking-widest text-wood/40 mt-4 not-italic">— Senior Perfumer L</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <LayeringRecipe fashionStyle={results.fashionStyle || "Minimal"} data={layeringData} />
-                  
-                  <SimilarAuras auras={auras} />
+              <div className="mb-32 animate-in fade-in duration-1000">
+                <div className="flex items-center gap-4 mb-12">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-wood/30">Personal Analysis</span>
+                  <h3 className={`text-xl font-light tracking-widest uppercase ${theme.accent}`}>Personal Aura</h3>
+                  <div className="h-px bg-wood/10 flex-1" />
                 </div>
-              )}
-
-              {/* 02. Space Atmosphere Section */}
-              {results.type === "space" && (
-                <div className="mb-32 animate-in fade-in duration-1000">
-                  <div className="flex items-center gap-4 mb-12">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-wood/30">Space Analysis</span>
-                    <h3 className={`text-xl font-light tracking-widest uppercase ${theme.accent}`}>Space Atmosphere</h3>
-                    <div className="h-px bg-wood/10 flex-1" />
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+                  {/* 좌측: 레이더 차트 및 상세 수치 */}
+                  <div ref={ref2} className={`transition-all duration-800 delay-100 ${vis2 || results ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <p className="text-[11px] font-medium uppercase tracking-widest text-wood/40 mb-12 text-center">
+                      Olfactory Silhouette
+                    </p>
+                    <RadarChart data={currentRadarData} forceDraw={!!results} />
+                    <div className="flex justify-center gap-6 sm:gap-8 mt-12">
+                      {currentRadarData.map((d) => (
+                        <div key={d.axis} className="text-center">
+                          <p className={`text-base sm:text-lg font-light ${theme.accent}`}>{Math.round(d.value * 100)}%</p>
+                          <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-wood/40 mt-1">{d.axis}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-                    {/* 좌측: 공간 번역 로직 */}
-                    <div ref={ref4} className={`transition-all duration-800 ${vis4 || results ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                      <p className="text-[11px] font-medium uppercase tracking-widest text-wood/40 mb-8">
-                        Space Translation Logic
-                      </p>
-                      <div className="space-y-0 mb-12 lg:mb-0">
-                        {dynamicSpaceLogicSteps.map((step, i) => (
-                          <div
-                            key={i}
-                            className={`group py-5 border-b ${theme.border} flex items-start gap-4 hover:bg-wood/[0.01] transition-colors duration-300 px-2 -mx-2`}
-                          >
-                            <span className="text-[11px] font-medium text-wood/30 mt-0.5 font-mono">
-                              0{i + 1}
-                            </span>
-                            <p className="text-[15px] leading-relaxed text-wood/70 group-hover:text-wood transition-colors duration-300 break-keep">
-                              {renderText(step)}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                  {/* 우측: 개인 번역 로직 및 조향사 노트 */}
+                  <div ref={ref3} className={`transition-all duration-800 delay-200 ${vis3 || results ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <p className="text-[11px] font-medium uppercase tracking-widest text-wood/40 mb-8">
+                      Personal Translation Logic
+                    </p>
+                    <div className="space-y-0 mb-12">
+                      {dynamicLogicSteps.map((step, i) => (
+                        <div
+                          key={i}
+                          className={`group py-5 border-b ${theme.border} flex items-start gap-4 hover:bg-wood/[0.01] transition-colors duration-300 px-2 -mx-2`}
+                        >
+                          <span className="text-[11px] font-medium text-wood/30 mt-0.5 font-mono">
+                            0{i + 1}
+                          </span>
+                          <p className="text-[15px] leading-relaxed text-wood/70 group-hover:text-wood transition-colors duration-300 break-keep">
+                            {renderText(step)}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-
-                    {/* 우측: 공간 진단 코멘트 */}
-                    <div className={`transition-all duration-800 delay-200 ${vis4 || results ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                      <div className="p-8 md:p-12 bg-wood text-cream rounded-sm shadow-editorial">
-                        <p className="text-[11px] uppercase tracking-[0.3em] text-cream/40 mb-6">Space Recommendation</p>
-                        <h4 className="text-xl sm:text-2xl font-light mb-6 leading-tight break-keep text-cream">
-                          {results.spaceLight} <span className="hidden sm:inline"><br/></span>
-                          {results.spaceColor} {results.spaceTexture} 스튜디오
-                        </h4>
-                        <div className="text-[14px] leading-relaxed text-cream/70 mb-8 break-keep">
-                          당신의 공간에서 느껴지는 {results.spaceColor}과 {results.spaceTexture}의 질감, 그리고 {results.spaceLight}은 
-                          심리적인 안정감과 지적인 평온함을 동시에 제공합니다. <br/><br/>
-                          이 공간의 공기를 정화하고 분위기를 완성하기 위해, 
-                          **{recommendedProducts[0]?.name}** (이)가 포함된 인센스 라인을 제안합니다. 
-                          {recommendedProducts[1] && (
-                            <>추가적으로 **{recommendedProducts[1].name}**을(를) 함께 사용하면 더욱 입체적인 공간감을 연출할 수 있습니다.</>
-                          )}
-                        </div>
-                        <div className="pt-6 border-t border-cream/10">
-                          <p className="text-[10px] uppercase tracking-widest text-cream/40 mb-2 text-cream">Recommended Category</p>
-                          <p className="text-sm font-medium text-cream">Nag Champa Incense Stick</p>
-                        </div>
-                      </div>
+                    
+                    <div className={`p-6 bg-wood/5 border-l-2 ${theme.border.replace('border-b', 'border-l')} italic`}>
+                      <p className="text-[13px] text-wood/70 leading-relaxed break-keep">
+                        "당신이 지향하는 {results.fashionStyle} 스타일과 {results.personalMood} 분위기를 현대적인 후각 언어로 치환했습니다. 
+                        선택하신 무드가 어우러진 잔향은 당신의 아우라를 더욱 선명하게 완성할 것입니다."
+                      </p>
+                      <p className="text-[10px] uppercase tracking-widest text-wood/40 mt-4 not-italic">— Senior Perfumer L</p>
                     </div>
                   </div>
                 </div>
-              )}
+
+                <LayeringRecipe fashionStyle={results.fashionStyle || "Minimal"} data={layeringData} />
+                
+                <SimilarAuras auras={auras} />
+              </div>
             </div>
           </>
         )}

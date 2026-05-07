@@ -25,9 +25,9 @@ const values = [
   },
   {
     icon: Clock,
-    title: "TPO 기반 큐레이션",
+    title: "TPO 기반 스타일링",
     description:
-      "시간, 장소, 상황(Time, Place, Occasion)을 고려하여 당일 컨텍스트에 최적화된 향기를 제안합니다.",
+      "사용자의 일상과 상황(Time, Context, Occasion)을 고려하여 현재의 무드에 최적화된 향기 스타일을 제안합니다.",
   },
 ];
 

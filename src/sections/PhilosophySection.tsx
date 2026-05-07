@@ -23,7 +23,7 @@ export default function PhilosophySection() {
             <div ref={ref1} className={`transition-all duration-800 delay-100 ${vis1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <p className="label-upper text-wood/40 mb-6 md:mb-8">Our Philosophy</p>
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-light leading-[1.4] md:leading-[1.15] tracking-tight mb-6 md:mb-8 break-keep text-wood">
-                당신의 스타일과 공간은
+                당신의 스타일은
                 <span className="hidden md:inline"><br /></span> 이미 향기를 말하고 있습니다
               </h2>
             </div>
@@ -31,9 +31,9 @@ export default function PhilosophySection() {
             {/* 본문 및 지표 영역: 제목보다 약간 늦게 나타나는 애니메이션 */}
             <div ref={ref2} className={`transition-all duration-800 delay-200 ${vis2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <p className="text-sm md:text-[15px] leading-[1.8] text-wood/60 mb-8 md:mb-12 max-w-xl break-keep">
-                단순 상품 검색을 넘어, 사용자가 추구하는 패션 스타일과 머무는 공간의 인테리어를 분석하여
+                단순 상품 검색을 넘어, 사용자가 추구하는 패션 스타일을 분석하여
                 최적의 향기를 논리적으로 연결해 주는 토탈 향기 컨설팅 경험을 제공합니다.<br className="hidden md:block" />
-                AI는 전문 조향 지식과 환경 심리학을 결합하여 당신만의 완벽한 향기 세계관을 완성합니다.
+                AI는 전문 조향 지식과 심리학을 결합하여 당신만의 완벽한 향기 세계관을 완성합니다.
               </p>
               
               {/* 핵심 지표 (Stats) 리스트 */}
@@ -45,7 +45,7 @@ export default function PhilosophySection() {
                 <div className="hidden sm:block w-px h-8 bg-wood/10" />
                 <div>
                   <p className="text-xl md:text-2xl font-light tracking-tight text-wood">320+</p>
-                  <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-wood/40 mt-1">스타일 & 공간 아우라</p>
+                  <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-wood/40 mt-1">스타일 아우라</p>
                 </div>
                 <div className="hidden sm:block w-px h-8 bg-wood/10" />
                 <div>

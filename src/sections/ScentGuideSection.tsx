@@ -27,7 +27,7 @@ export default function ScentGuideSection() {
             <p className="text-wood/60 leading-relaxed text-[15px] sm:text-lg break-keep max-w-3xl text-wood">
               복잡한 용어 대신 향기가 가진 고유의 성격에 집중해 보세요. <br className="hidden lg:inline" />
               당신의 분위기를 완성하는 마지막 퍼즐 조각을 찾는 과정입니다. <br className="hidden lg:inline" />
-              개인이 입는 향수부터 공간을 채우는 디퓨저까지 모든 향기를 아우릅니다.
+              개인의 스타일을 완성하는 향수학의 기초부터 심화까지 모든 향기를 아우릅니다.
             </p>
           </div>
 

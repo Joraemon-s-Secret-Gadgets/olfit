@@ -50,7 +50,7 @@ export default function AIInterviewSection({ onComplete }: { onComplete?: (resul
 
     setTimeout(() => {
       if (!activeTrack) {
-        const track = option === "나의 퍼스널 향수" ? "personal" : "space";
+        const track = "personal";
         setActiveTrack(track);
         setCurrentStep(0);
         const nextAi: Message = {
@@ -85,11 +85,7 @@ export default function AIInterviewSection({ onComplete }: { onComplete?: (resul
             },
           ]);
           if (onComplete) {
-            if (activeTrack === "personal") {
-              onComplete({ type: "personal", personalMood: updatedAnswers[0], fashionStyle: updatedAnswers[1] });
-            } else {
-              onComplete({ type: "space", spaceColor: updatedAnswers[0], spaceTexture: updatedAnswers[1], spaceLight: updatedAnswers[2] });
-            }
+            onComplete({ type: "personal", personalMood: updatedAnswers[0], fashionStyle: updatedAnswers[1] });
           }
           setCurrentStep(nextStep);
         }
@@ -113,7 +109,7 @@ export default function AIInterviewSection({ onComplete }: { onComplete?: (resul
           <div className="text-center mb-12 md:mb-16">
             <p className="label-upper text-cream/40 mb-4">AI Interview</p>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-light tracking-tight break-keep text-cream">
-              {activeTrack === "personal" ? "Personal Scent Style" : activeTrack === "space" ? "Space Atmosphere Scent" : "당신의 취향을 들려주세요"}
+              {activeTrack === "personal" ? "Personal Scent Style" : "당신의 취향을 들려주세요"}
             </h2>
           </div>
 
