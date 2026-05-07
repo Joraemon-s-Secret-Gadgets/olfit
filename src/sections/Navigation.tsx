@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { Menu, X, Search, Heart } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useIsScrolled } from "@/hooks/useIntersectionObserver";
 
 export default function Navigation() {
@@ -14,6 +14,18 @@ export default function Navigation() {
   
   // 전체 화면 메뉴의 열림/닫힘 상태 관리
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // 메뉴 열림 시 바디 스크롤 차단
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [menuOpen]);
 
   // 워터마킹: 개발자 도구 콘솔에 시그니처 출력
   useEffect(() => {
@@ -43,8 +55,8 @@ export default function Navigation() {
         }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-8 h-full flex items-center justify-between relative">
-          {/* 왼쪽 영역: 메뉴 버튼 및 검색 */}
-          <div className="flex items-center gap-4 md:gap-6">
+          {/* 왼쪽 영역: 메뉴 버튼 */}
+          <div className="flex items-center">
             <button
               onClick={() => setMenuOpen(true)}
               aria-label="메뉴 열기"
@@ -54,14 +66,6 @@ export default function Navigation() {
             >
               <Menu size={18} strokeWidth={1.5} />
               <span className="hidden sm:inline">Menu</span>
-            </button>
-            <button 
-              aria-label="검색"
-              className={`hover:opacity-60 transition-all duration-300 ${
-                isScrolled ? "text-wood" : "text-cream"
-              }`}
-            >
-              <Search size={18} strokeWidth={1.5} />
             </button>
           </div>
 
@@ -77,18 +81,9 @@ export default function Navigation() {
             Olfit
           </a>
 
-          {/* 오른쪽 영역: 위시리스트 */}
-          <div className="flex items-center gap-4 md:gap-6">
-            <button
-              aria-label="위시리스트"
-              className={`flex items-center gap-2 text-[10px] md:text-[11px] font-medium uppercase tracking-widest hover:opacity-60 transition-all duration-300 ${
-                isScrolled ? "text-wood" : "text-cream"
-              }`}
-            >
-              <span className="hidden sm:inline">Wishlist</span>
-              <span className="text-[9px] md:text-[10px] opacity-60">(0)</span>
-              <Heart size={18} strokeWidth={1.5} />
-            </button>
+          {/* 오른쪽 영역: 빈 공간 (비율 유지용) */}
+          <div className="flex items-center invisible pointer-events-none">
+            <div className="w-[50px]"></div>
           </div>
         </div>
       </header>
@@ -112,19 +107,19 @@ export default function Navigation() {
           </div>
 
           {/* 메뉴 중앙: 링크 리스트 */}
-          <nav className="flex-1 flex flex-col justify-center px-6 md:px-16 lg:px-24">
+          <nav className="flex-1 flex flex-col justify-center px-6 md:px-16 lg:px-32 max-w-4xl mx-auto w-full">
             {navLinks.map((link, i) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="group py-4 md:py-6 border-b border-wood/10 flex items-center justify-between"
+                className="group py-3 md:py-4 border-b border-wood/10 flex items-center justify-between"
                 style={{
                   transitionDelay: menuOpen ? `${i * 50}ms` : "0ms",
                 }}
               >
                 <span
-                  className={`text-3xl sm:text-4xl md:text-6xl font-light tracking-tight transition-all duration-700 ${
+                  className={`text-2xl sm:text-3xl md:text-4xl font-light tracking-tight transition-all duration-700 ${
                     menuOpen
                       ? "translate-x-0 opacity-100"
                       : "-translate-x-8 opacity-0"
