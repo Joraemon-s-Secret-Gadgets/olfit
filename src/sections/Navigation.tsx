@@ -90,8 +90,8 @@ export default function Navigation() {
 
       {/* 전체 화면 메뉴 오버레이 */}
       <div
-        className={`fixed inset-0 z-[60] bg-cream/98 backdrop-blur-md transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-          menuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+        className={`fixed inset-0 z-[60] bg-cream transition-transform duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+          menuOpen ? "translate-y-0" : "-translate-y-full"
         }`}
       >
         <div className="h-full flex flex-col overflow-y-auto">
@@ -107,34 +107,34 @@ export default function Navigation() {
           </div>
 
           {/* 메뉴 중앙: 링크 리스트 */}
-          <nav className="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full px-6 py-12">
-            <div className="space-y-2 md:space-y-4">
+          <nav className="flex-1 flex flex-col justify-center max-w-3xl mx-auto w-full px-6 py-12">
+            <div className="space-y-1 md:space-y-2">
               {navLinks.map((link, i) => (
                 <a
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="group py-4 md:py-6 border-b border-wood/10 flex items-center justify-between hover:border-wood/30 transition-colors"
+                  className="group py-3 md:py-5 border-b border-wood/5 flex items-center justify-between hover:border-wood/20 transition-colors"
                   style={{
                     transitionDelay: menuOpen ? `${i * 50}ms` : "0ms",
                   }}
                 >
                   <span
-                    className={`text-3xl sm:text-4xl md:text-5xl font-light tracking-tight transition-all duration-700 ${
+                    className={`text-2xl sm:text-4xl md:text-5xl font-light tracking-tight transition-all duration-700 ${
                       menuOpen
                         ? "translate-x-0 opacity-100"
-                        : "translate-x-4 opacity-0"
+                        : "-translate-x-8 opacity-0"
                     }`}
                   >
                     {link.label}
                   </span>
                   <div className="flex items-center gap-4">
-                    <span className={`text-[10px] md:text-[11px] font-mono text-wood/20 group-hover:text-wood/50 transition-colors duration-500 ${
+                    <span className={`hidden sm:inline text-[9px] md:text-[10px] font-mono text-wood/10 group-hover:text-wood/40 transition-colors duration-500 ${
                       menuOpen ? "opacity-100" : "opacity-0"
                     }`}>
                       VIEW SECTION
                     </span>
-                    <span className="text-[10px] md:text-[12px] font-mono text-wood/30 group-hover:text-wood transition-colors duration-300">
+                    <span className="text-[10px] md:text-[12px] font-mono text-wood/20 group-hover:text-wood transition-colors duration-300">
                       0{i + 1}
                     </span>
                   </div>
@@ -144,8 +144,8 @@ export default function Navigation() {
           </nav>
 
           {/* 메뉴 하단: 카피라이트 */}
-          <div className="max-w-2xl mx-auto w-full px-6 pb-12 flex-shrink-0">
-            <p className="text-[10px] md:text-[11px] text-wood/40 tracking-widest uppercase">
+          <div className="max-w-3xl mx-auto w-full px-6 pb-12 flex-shrink-0">
+            <p className="text-[10px] md:text-[11px] text-wood/30 tracking-[0.3em] uppercase">
               © 2026 Olfit. AI Scent Stylist.
             </p>
           </div>
