@@ -19,6 +19,7 @@ export default function CuratedSelectionSection({ results }: { results: Analysis
   const { ref, isVisible } = useIntersectionObserver();
   const [activeCategory, setActiveCategory] = useState<"Personal" | "Space">("Personal");
   const [activeFilter, setActiveFilter] = useState<Filter>("All");
+  const [activeBrand, setActiveBrand] = useState<string>("All");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -32,13 +33,19 @@ export default function CuratedSelectionSection({ results }: { results: Analysis
   const handleCategoryChange = (cat: "Personal" | "Space") => {
     setActiveCategory(cat);
     setActiveFilter("All");
+    setActiveBrand("All");
   };
 
+  // 현재 카테고리에 존재하는 브랜드 목록 추출
+  const availableBrands = ["All", ...new Set(products.filter(p => p.category === activeCategory).map(p => p.brand))];
+
   const categoryFiltered = products.filter((p) => p.category === activeCategory);
-  const filtered =
-    activeFilter === "All"
-      ? categoryFiltered
-      : categoryFiltered.filter((p) => p.tags.includes(activeFilter as string));
+  
+  const filtered = categoryFiltered.filter((p) => {
+    const matchFilter = activeFilter === "All" || p.tags.includes(activeFilter);
+    const matchBrand = activeBrand === "All" || p.brand === activeBrand;
+    return matchFilter && matchBrand;
+  });
 
   return (
     <section id="curated" className="bg-[#F7F7F7] py-24 md:py-40">
@@ -74,21 +81,46 @@ export default function CuratedSelectionSection({ results }: { results: Analysis
             </button>
           </div>
 
-          <div className="flex items-center gap-4 md:gap-8 overflow-x-auto no-scrollbar pb-2">
-            {filters.map((f) => (
-              <button
-                key={f}
-                onClick={() => setActiveFilter(f)}
-                className={`relative text-[10px] md:text-[11px] font-medium uppercase tracking-widest transition-colors duration-300 pb-2 whitespace-nowrap ${
-                  activeFilter === f ? "text-wood" : "text-wood/40 hover:text-wood/70"
-                }`}
-              >
-                {f === "All" ? "전체" : f === "For You" ? "맞춤" : f === "Vegan" ? "비건" : "에코"}
-                {activeFilter === f && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-wood rounded-full" />
-                )}
-              </button>
-            ))}
+          <div className="flex flex-col gap-6">
+            {/* 태그 필터 */}
+            <div className="flex items-center gap-4 md:gap-8 overflow-x-auto no-scrollbar pb-2">
+              <span className="text-[10px] uppercase tracking-widest text-wood/30 mr-2 shrink-0">Mood</span>
+              {filters.map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setActiveFilter(f)}
+                  className={`relative text-[10px] md:text-[11px] font-medium uppercase tracking-widest transition-colors duration-300 pb-2 whitespace-nowrap ${
+                    activeFilter === f ? "text-wood" : "text-wood/40 hover:text-wood/70"
+                  }`}
+                >
+                  {f === "All" ? "전체" : f === "For You" ? "맞춤" : f === "Vegan" ? "비건" : "에코"}
+                  {activeFilter === f && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-wood rounded-full" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* 브랜드 필터 (Personal 카테고리일 때만 노출하거나 혹은 전체 노출 가능) */}
+            {activeCategory === "Personal" && (
+              <div className="flex items-center gap-4 md:gap-8 overflow-x-auto no-scrollbar pb-2">
+                <span className="text-[10px] uppercase tracking-widest text-wood/30 mr-2 shrink-0">Brand</span>
+                {availableBrands.map((b) => (
+                  <button
+                    key={b}
+                    onClick={() => setActiveBrand(b)}
+                    className={`relative text-[10px] md:text-[11px] font-medium uppercase tracking-widest transition-colors duration-300 pb-2 whitespace-nowrap ${
+                      activeBrand === b ? "text-wood" : "text-wood/40 hover:text-wood/70"
+                    }`}
+                  >
+                    {b === "All" ? "전체" : b}
+                    {activeBrand === b && (
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-wood rounded-full" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
