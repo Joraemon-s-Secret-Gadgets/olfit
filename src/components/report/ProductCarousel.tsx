@@ -16,7 +16,7 @@ interface ProductCarouselProps {
 
 export default function ProductCarousel({ products, onProductClick }: ProductCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ delay: 8000, stopOnInteraction: false })
+    Autoplay({ delay: 30000, stopOnInteraction: false })
   ]);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
@@ -111,7 +111,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
       </div>
       
       <p className="text-[9px] text-wood/20 mt-12 text-center uppercase tracking-[0.3em] italic animate-pulse">
-        Automatic rotation every 8 seconds
+        Automatic rotation every 30 seconds
       </p>
     </div>
   );
