@@ -6,7 +6,7 @@
 import { useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { Product } from "@/data/productData";
 
 interface ProductCarouselProps {
@@ -23,18 +23,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
   return (
-    <div className="mt-24 pt-24 border-t border-wood/10">
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-wood text-cream rounded-full mb-6">
-          <Sparkles size={14} />
-          <span className="text-[10px] uppercase tracking-[0.2em] font-medium">Top Matches</span>
-        </div>
-        <h3 className="text-3xl sm:text-4xl font-light tracking-tight text-wood">당신의 스타일을 닮은 향기</h3>
-        <p className="text-sm text-wood/40 mt-4 max-w-lg mx-auto break-keep">
-          이미지 무드와 선택하신 원료를 기반으로 도출된 고도로 매칭된 향기 컬렉션입니다.
-        </p>
-      </div>
-
+    <div>
       <div className="relative max-w-4xl mx-auto px-12">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
@@ -68,7 +57,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                           {item.notes}
                         </p>
                       </div>
-                      <div className="flex gap-8">
+                      <div className="flex flex-wrap gap-x-8 gap-y-4">
                         <div>
                           <span className="text-[10px] uppercase tracking-widest text-wood/30 group-hover:text-cream/30 block mb-1 transition-colors">Family</span>
                           <p className="text-sm font-medium text-wood group-hover:text-cream transition-colors">{item.family}</p>
@@ -76,6 +65,10 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                         <div>
                           <span className="text-[10px] uppercase tracking-widest text-wood/30 group-hover:text-cream/30 block mb-1 transition-colors">Size</span>
                           <p className="text-sm font-medium text-wood group-hover:text-cream transition-colors">{item.size}</p>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase tracking-widest text-wood/30 group-hover:text-cream/30 block mb-1 transition-colors">Price</span>
+                          <p className="text-sm font-medium text-wood group-hover:text-cream transition-colors">{item.price}</p>
                         </div>
                       </div>
                     </div>
