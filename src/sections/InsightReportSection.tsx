@@ -6,11 +6,11 @@
 
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import RadarChart from "@/components/common/RadarChart";
-import LayeringRecipe from "@/components/report/LayeringRecipe";
+import ProductCarousel from "@/components/report/ProductCarousel";
 import ProductModal from "@/components/curated/ProductModal";
 import { radarData } from "@/data/reportData";
-import { getLayeringRecommendation, getRecommendedProducts } from "@/data/recommendationEngine";
-import { Download, Sparkles, ArrowRight } from "lucide-react";
+import { getRecommendedProducts } from "@/data/recommendationEngine";
+import { Download } from "lucide-react";
 import html2canvas from "html2canvas";
 import { useRef, useMemo, useState } from "react";
 import type { AnalysisResults } from "@/types";
@@ -24,15 +24,14 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // 다이내믹 데이터 계산
-  const layeringData = useMemo(() => getLayeringRecommendation(results), [results]);
   const recommendations = useMemo(() => getRecommendedProducts(results), [results]);
 
   // 사용자의 선택에 따른 가변적인 로직 생성
   const dynamicLogicSteps = [
     `업로드된 이미지에서 추출된 #현대적 #시크 무드 분석`,
     `사용자가 선택한 원료(${results?.analysisMetadata?.selectedNotes.join(", ") || "선택 없음"})와의 조화 계산`,
-    `추천 베이스: ${layeringData?.main.name} (${layeringData?.main.family})`,
-    "시각적 무드와 후각적 취향의 완벽한 레이어링 완성",
+    `최적의 향기 아우라 매칭: ${recommendations[0]?.name || "분석 중"}`,
+    "시각적 무드와 후각적 취향의 완벽한 밸런스 완성",
   ];
 
   // 인터뷰 결과에 따른 레이더 차트 데이터 동적 계산
@@ -141,44 +140,10 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
                   </div>
                 </div>
 
-                <LayeringRecipe fashionStyle={results.fashionStyle || "Visual Styling"} data={layeringData} />
-              </div>
-
-              {/* 02. Final Recommendations (Scent Family Style) */}
-              <div className="mt-32 border-t border-wood/10 pt-24">
-                <div className="flex flex-col items-center mb-16 text-center">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-wood text-cream rounded-full mb-6">
-                    <Sparkles size={14} />
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-medium">Top 5 Matches</span>
-                  </div>
-                  <h3 className="text-3xl sm:text-4xl font-light tracking-tight text-wood">당신의 스타일을 닮은 향기</h3>
-                  <p className="text-sm text-wood/40 mt-4 max-w-lg break-keep">이미지 무드와 선택하신 원료를 기반으로 도출된 고도로 매칭된 향기 컬렉션입니다.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  {recommendations.map((item) => (
-                    <div 
-                      key={item.id} 
-                      onClick={() => setSelectedProduct(item)}
-                      className="group cursor-pointer bg-white/40 border border-wood/5 p-6 hover:bg-wood hover:border-wood transition-all duration-500 overflow-hidden relative"
-                    >
-                      <div className="absolute top-4 right-4 text-[10px] font-mono text-wood/30 group-hover:text-cream/40">
-                        {item.similarity}% Match
-                      </div>
-                      <div className="mb-8 aspect-square overflow-hidden bg-cream/50 rounded-sm">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      </div>
-                      <div>
-                        <p className="text-[9px] uppercase tracking-widest text-wood/40 group-hover:text-cream/40 mb-1">{item.brand}</p>
-                        <h4 className="text-[14px] font-medium text-wood group-hover:text-cream mb-4 break-keep line-clamp-2 min-h-[40px]">{item.name}</h4>
-                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-wood/60 group-hover:text-cream/80 pt-4 border-t border-wood/10 group-hover:border-cream/10">
-                          <span>View Detail</span>
-                          <ArrowRight size={10} className="group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <ProductCarousel 
+                  products={recommendations} 
+                  onProductClick={setSelectedProduct} 
+                />
               </div>
             </div>
           </>
