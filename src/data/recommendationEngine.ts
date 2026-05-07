@@ -5,7 +5,6 @@
 
 import type { AnalysisResults } from "@/types";
 import { personalProducts } from "../../crawler/personalData";
-import { nagChampaProducts } from "./nagChampaData";
 import type { Product } from "./productData";
 
 /**
