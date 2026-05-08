@@ -123,65 +123,72 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
         </div>
 
         {/* 비주얼 피라미드 슬롯 */}
-        <div className="relative w-72 h-64 md:w-80 md:h-72 flex flex-col items-center order-1 lg:order-2 group">
-          {/* 피라미드 가이드 라인 (SVG) */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-sm" viewBox="0 0 100 90">
+        <div className="relative w-80 h-80 md:w-96 md:h-96 flex flex-col items-center order-1 lg:order-2 group">
+          {/* 피라미드 가이드 라인 및 베이스 쉐이프 (SVG) */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-sm" viewBox="0 0 100 100">
+            {/* 전체 피라미드 베이스 (연한 반투명 배경) */}
             <path 
-              d="M50 5 L95 85 L5 85 Z" 
+              d="M50 5 L95 90 L5 90 Z" 
+              fill="currentColor" 
+              className="text-wood/[0.03]"
+            />
+            {/* 외곽선 */}
+            <path 
+              d="M50 5 L95 90 L5 90 Z" 
               fill="none" 
               stroke="currentColor" 
-              strokeWidth="0.3" 
+              strokeWidth="0.2" 
               className="text-wood/20"
             />
             {/* 수평 분할선 */}
-            <line x1="33" y1="31.5" x2="67" y2="31.5" stroke="currentColor" strokeWidth="0.2" className="text-wood/10" />
-            <line x1="16.5" y1="58.5" x2="83.5" y2="58.5" stroke="currentColor" strokeWidth="0.2" className="text-wood/10" />
+            <line x1="33" y1="33" x2="67" y2="33" stroke="currentColor" strokeWidth="0.15" className="text-wood/10" />
+            <line x1="16" y1="62" x2="84" y2="62" stroke="currentColor" strokeWidth="0.15" className="text-wood/10" />
           </svg>
 
-          {/* 슬롯 레이어들 */}
-          <div className="w-full h-full flex flex-col items-center py-1">
+          {/* 슬롯 레이어들 (높이를 더 확보함) */}
+          <div className="w-full h-full flex flex-col items-center pt-2 pb-8">
             
-            {/* TOP SLOT */}
+            {/* TOP SLOT (약 33%) */}
             <div 
               onClick={() => handleTabChange('Top')}
-              className={`relative z-10 w-1/3 h-[30%] flex flex-col items-center justify-end pb-3 cursor-pointer transition-all duration-700 ${
+              className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-end pb-4 cursor-pointer transition-all duration-700 ${
                 slots.Top ? 'text-wood' : 'text-wood/20'
-              } ${activeTab === 'Top' ? 'scale-110' : 'hover:scale-105'}`}
+              } ${activeTab === 'Top' ? 'scale-105' : 'hover:scale-102'}`}
             >
-              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Top ? 'bg-wood/10 opacity-100 shadow-[0_0_20px_rgba(var(--wood-rgb),0.05)]' : 'opacity-0'}`} 
-                   style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }} />
-              <span className="text-[7px] uppercase tracking-[0.2em] mb-1 font-bold">Top</span>
-              <span className="text-[10px] md:text-[11px] font-medium tracking-tight truncate max-w-[60px] text-center">
+              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Top ? 'bg-wood/15 opacity-100 shadow-[0_0_30px_rgba(var(--wood-rgb),0.1)]' : 'opacity-0'}`} 
+                   style={{ clipPath: 'polygon(50% 0%, 67% 100%, 33% 100%)' }} />
+              <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Top</span>
+              <span className="text-[11px] md:text-[12px] font-medium tracking-tight truncate max-w-[80px] text-center px-2">
                 {slots.Top ? slots.Top.name : "Select"}
               </span>
             </div>
 
-            {/* MIDDLE SLOT */}
+            {/* MIDDLE SLOT (약 33%) */}
             <div 
               onClick={() => handleTabChange('Middle')}
-              className={`relative z-10 w-2/3 h-[30%] flex flex-col items-center justify-center cursor-pointer transition-all duration-700 ${
+              className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-center cursor-pointer transition-all duration-700 ${
                 slots.Middle ? 'text-wood' : 'text-wood/20'
-              } ${activeTab === 'Middle' ? 'scale-110' : 'hover:scale-105'}`}
+              } ${activeTab === 'Middle' ? 'scale-105' : 'hover:scale-102'}`}
             >
-              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Middle ? 'bg-wood/10 opacity-100' : 'opacity-0'}`}
-                   style={{ clipPath: 'polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%)' }} />
-              <span className="text-[7px] uppercase tracking-[0.2em] mb-1 font-bold">Middle</span>
-              <span className="text-[10px] md:text-[11px] font-medium tracking-tight text-center">
+              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Middle ? 'bg-wood/15 opacity-100' : 'opacity-0'}`}
+                   style={{ clipPath: 'polygon(33% 0%, 67% 0%, 84% 100%, 16% 100%)' }} />
+              <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Middle</span>
+              <span className="text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2">
                 {slots.Middle ? slots.Middle.name : "Select"}
               </span>
             </div>
 
-            {/* BASE SLOT */}
+            {/* BASE SLOT (약 34%) */}
             <div 
               onClick={() => handleTabChange('Base')}
-              className={`relative z-10 w-full h-[30%] flex flex-col items-center justify-start pt-4 cursor-pointer transition-all duration-700 ${
+              className={`relative z-10 w-full h-[34%] flex flex-col items-center justify-start pt-6 cursor-pointer transition-all duration-700 ${
                 slots.Base ? 'text-wood' : 'text-wood/20'
-              } ${activeTab === 'Base' ? 'scale-110' : 'hover:scale-105'}`}
+              } ${activeTab === 'Base' ? 'scale-105' : 'hover:scale-102'}`}
             >
-              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Base ? 'bg-wood/10 opacity-100' : 'opacity-0'}`}
-                   style={{ clipPath: 'polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)' }} />
-              <span className="text-[7px] uppercase tracking-[0.2em] mb-1 font-bold">Base</span>
-              <span className="text-[10px] md:text-[11px] font-medium tracking-tight text-center">
+              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Base ? 'bg-wood/15 opacity-100' : 'opacity-0'}`}
+                   style={{ clipPath: 'polygon(16% 0%, 84% 0%, 95% 100%, 5% 100%)' }} />
+              <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Base</span>
+              <span className="text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2">
                 {slots.Base ? slots.Base.name : "Select"}
               </span>
             </div>
