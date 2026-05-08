@@ -143,36 +143,36 @@ export default function FooterSection() {
         </div>
       </div>
 
-      {/* 푸터 전용 미니 모달 오버레이 - 시인성 및 레이어링 극대화 */}
+      {/* 푸터 전용 미니 모달 오버레이 - 안정성 최우선 레이어링 */}
       {modalContent && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
-          {/* 백드롭: 별도 레이어로 분리하여 투명도 및 블러 조절 */}
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          {/* 백드롭: 어두운 투명 배경 */}
           <div 
-            className="absolute inset-0 bg-wood/80 backdrop-blur-md transition-opacity duration-300"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setModalContent(null)} 
           />
 
-          {/* 모달 컨텐츠: 명시적 z-index와 불투명 배경 보장 */}
-          <div className="relative z-50 bg-[#FDFCF0] border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-editorial-lg rounded-sm opacity-100">
+          {/* 모달 컨텐츠: 명시적 최상위 레이어 및 불투명 배경 강제 */}
+          <div className="relative z-[10001] bg-white border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-2xl rounded-sm">
             <button 
               onClick={() => setModalContent(null)}
-              className="absolute top-6 right-6 p-2 text-wood/40 hover:text-wood transition-colors z-[60]"
-              aria-label="닫기"
+              className="absolute top-4 right-4 p-2 text-wood/40 hover:text-wood transition-colors"
+              aria-label="Close"
             >
               <X size={24} />
             </button>
 
-            <h3 className="text-2xl font-light tracking-tight text-wood mb-8 uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h3 className="text-xl md:text-2xl font-light tracking-tight text-wood mb-6 uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
               {modalContent.title}
             </h3>
 
-            <div className="text-wood relative z-50">
+            <div className="text-wood">
               {modalContent.body}
             </div>
 
             <button
               onClick={() => setModalContent(null)}
-              className="w-full mt-10 py-4 bg-wood text-cream text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-wood/90 transition-all active:scale-[0.98] relative z-50"
+              className="w-full mt-8 py-4 bg-wood text-cream text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-wood/90 transition-all active:scale-[0.98]"
             >
               Close
             </button>
