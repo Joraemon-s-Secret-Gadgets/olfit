@@ -10,17 +10,24 @@ import Autoplay from "embla-carousel-autoplay";
 import { ArrowRight, ThumbsUp, ThumbsDown } from "lucide-react";
 import { toast } from "sonner";
 import type { Product } from "@/data/productData";
+import type { ScentNote } from "@/data/noteData";
 
 interface ProductCarouselProps {
   /** 추천된 제품 리스트 (유사도 점수 포함) */
   products: (Product & { similarity: number })[];
   /** 제품 선택 시 호출되는 핸들러 */
   onProductClick: (product: Product) => void;
+  /** 사용자가 선택한 노트 정보 */
+  slots: {
+    Top: ScentNote | null;
+    Middle: ScentNote | null;
+    Base: ScentNote | null;
+  };
 }
 
 type Feedback = "like" | "dislike" | null;
 
-export default function ProductCarousel({ products, onProductClick }: ProductCarouselProps) {
+export default function ProductCarousel({ products, onProductClick, slots }: ProductCarouselProps) {
   /** 캐러셀 엔진 및 자동 재생 설정 (30초 간격) */
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 30000, stopOnInteraction: false })
@@ -134,6 +141,13 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                           <p className="text-sm font-medium text-wood group-hover:text-cream transition-colors">{item.price}</p>
                         </div>
                       </div>
+                    </div>
+
+                    {/* 추가 블록 2: 매칭 근거 텍스트 (Why This Scent) */}
+                    <div className="mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
+                      <p className="text-cream/60 text-xs italic break-keep">
+                        당신이 설계한 '{slots.Base?.name || "선택된"}' 베이스가 이 향수의 {item.family} 분위기를 완성해 줍니다
+                      </p>
                     </div>
 
                     <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-wood group-hover:text-cream pt-6 border-t border-wood/10 group-hover:border-cream/20 transition-all">

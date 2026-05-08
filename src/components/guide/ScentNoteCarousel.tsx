@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Check, RefreshCw, Info } from 'lucide-react';
 import { scentNotes } from "@/data/noteData";
+import ScentPyramid from "@/components/common/ScentPyramid";
 import type { ScentNote } from "@/data/noteData";
 
 interface ScentNoteCarouselProps {
@@ -57,7 +58,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
       const newSlots = {
         ...prev,
         [note.category]: isAlreadySelected ? null : note
-      };
+      } as Record<string, ScentNote | null>;
 
       if (onNotesChange) {
         const selectedNames = Object.values(newSlots)
@@ -121,61 +122,13 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
           </div>
         </div>
 
-        {/* 비주얼 피라미드 슬롯 (텍스트 온리 버전) */}
-        <div className="relative w-80 h-80 md:w-96 md:h-96 flex flex-col items-center order-1 lg:order-2 group">
-          
-          <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-sm" viewBox="0 0 100 100">
-            {/* 전체 피라미드 베이스 (배경색 제거) */}
-            
-            {/* 외곽선 및 수평 분할선 (정교한 좌표 교정으로 벗어남 방지) */}
-            <path d="M50 5 L95 90 L5 90 Z" fill="none" stroke="currentColor" strokeWidth="0.2" className="text-wood/20" />
-            <line x1="35.2" y1="33" x2="64.8" y2="33" stroke="currentColor" strokeWidth="0.15" className="text-wood/10" />
-            <line x1="19.8" y1="62" x2="80.2" y2="62" stroke="currentColor" strokeWidth="0.15" className="text-wood/10" />
-          </svg>
-
-          {/* 슬롯 레이어들 (하이라이트 없이 텍스트만 표시) */}
-          <div className="w-full h-full flex flex-col items-center pt-2 pb-8">
-            
-            {/* TOP SLOT */}
-            <div 
-              onClick={() => handleTabChange('Top')}
-              className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-end pb-4 cursor-pointer transition-all duration-700 ${
-                slots.Top ? 'text-wood' : 'text-wood/20'
-              } ${activeTab === 'Top' ? 'scale-105' : 'hover:scale-102'}`}
-            >
-              <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Top</span>
-              <span className={`text-[11px] md:text-[12px] font-medium tracking-tight truncate max-w-[80px] text-center px-2 transition-colors duration-500 ${slots.Top ? 'text-wood' : 'text-wood/40 italic opacity-50'}`}>
-                {slots.Top ? slots.Top.name : "Select"}
-              </span>
-            </div>
-
-            {/* MIDDLE SLOT */}
-            <div 
-              onClick={() => handleTabChange('Middle')}
-              className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-center cursor-pointer transition-all duration-700 ${
-                slots.Middle ? 'text-wood' : 'text-wood/20'
-              } ${activeTab === 'Middle' ? 'scale-105' : 'hover:scale-102'}`}
-            >
-              <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Middle</span>
-              <span className={`text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2 transition-colors duration-500 ${slots.Middle ? 'text-wood' : 'text-wood/40 italic opacity-50'}`}>
-                {slots.Middle ? slots.Middle.name : "Select"}
-              </span>
-            </div>
-
-            {/* BASE SLOT */}
-            <div 
-              onClick={() => handleTabChange('Base')}
-              className={`relative z-10 w-full h-[34%] flex flex-col items-center justify-start pt-6 cursor-pointer transition-all duration-700 ${
-                slots.Base ? 'text-wood' : 'text-wood/20'
-              } ${activeTab === 'Base' ? 'scale-105' : 'hover:scale-102'}`}
-            >
-              <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Base</span>
-              <span className={`text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2 transition-colors duration-500 ${slots.Base ? 'text-wood' : 'text-wood/40 italic opacity-50'}`}>
-                {slots.Base ? slots.Base.name : "Select"}
-              </span>
-            </div>
-          </div>
-        </div>
+        {/* 비주얼 피라미드 슬롯 (공통 컴포넌트 재사용) */}
+        <ScentPyramid 
+          slots={slots as any} 
+          activeTab={activeTab} 
+          onTabChange={handleTabChange}
+          className="w-80 h-80 md:w-96 md:h-96 order-1 lg:order-2"
+        />
       </div>
 
       {/* 1. 탭 네비게이션 */}
