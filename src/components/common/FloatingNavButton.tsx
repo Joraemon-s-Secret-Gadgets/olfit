@@ -9,13 +9,22 @@ import { ArrowUp } from "lucide-react";
 
 export default function FloatingNavButton() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isAtFooter, setIsAtFooter] = useState(false);
   const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 스크롤 위치에 따라 버튼 표시 여부 결정
+  // 스크롤 위치에 따라 버튼 표시 여부 및 위치 결정
   useEffect(() => {
     const handleScroll = () => {
-      // 300px 이상 스크롤되었을 때 버튼 노출
-      setIsVisible(window.scrollY > 300);
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      // 1. 300px 이상 스크롤되었을 때 버튼 노출
+      setIsVisible(scrollY > 300);
+
+      // 2. 푸터 도달 시 위치 상향 조정 (바닥에서 120px 이내로 접근 시)
+      const distanceFromBottom = documentHeight - (scrollY + windowHeight);
+      setIsAtFooter(distanceFromBottom < 120);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -76,8 +85,10 @@ export default function FloatingNavButton() {
   return (
     <button
       onClick={handleClick}
-      className={`fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full bg-wood text-cream shadow-lg flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-95 group ${
+      className={`fixed right-6 sm:right-8 z-40 w-12 h-12 rounded-full bg-wood text-cream shadow-editorial flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-95 group ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
+      } ${
+        isAtFooter ? "bottom-24 sm:bottom-32" : "bottom-8 sm:bottom-10"
       }`}
       aria-label="이동 버튼"
     >
