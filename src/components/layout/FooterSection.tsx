@@ -143,35 +143,43 @@ export default function FooterSection() {
         </div>
       </div>
 
-      {/* 푸터 전용 미니 모달 오버레이 - z-index 상향 및 안정성 강화 */}
+      {/* 푸터 전용 미니 모달 오버레이 - 시인성 및 레이어링 극대화 */}
       {modalContent && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-wood/60 backdrop-blur-sm transition-all duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
+          {/* 백드롭: 별도 레이어로 분리하여 투명도 및 블러 조절 */}
           <div 
-            className="absolute inset-0" 
+            className="absolute inset-0 bg-wood/80 backdrop-blur-md transition-opacity duration-300"
             onClick={() => setModalContent(null)} 
           />
-          <div className="relative bg-[#FDFCF0] border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-2xl rounded-sm animate-in fade-in zoom-in-95 duration-300">
+
+          {/* 모달 컨텐츠: 명시적 z-index와 불투명 배경 보장 */}
+          <div className="relative z-50 bg-[#FDFCF0] border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-editorial-lg rounded-sm opacity-100">
             <button 
               onClick={() => setModalContent(null)}
-              className="absolute top-6 right-6 p-2 text-wood/40 hover:text-wood transition-colors"
+              className="absolute top-6 right-6 p-2 text-wood/40 hover:text-wood transition-colors z-[60]"
+              aria-label="닫기"
             >
               <X size={24} />
             </button>
+
             <h3 className="text-2xl font-light tracking-tight text-wood mb-8 uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
               {modalContent.title}
             </h3>
-            <div className="text-wood">
+
+            <div className="text-wood relative z-50">
               {modalContent.body}
             </div>
+
             <button
               onClick={() => setModalContent(null)}
-              className="w-full mt-10 py-4 bg-wood text-cream text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-wood/90 transition-all active:scale-[0.98]"
+              className="w-full mt-10 py-4 bg-wood text-cream text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-wood/90 transition-all active:scale-[0.98] relative z-50"
             >
               Close
             </button>
           </div>
         </div>
       )}
+
     </footer>
   );
 }
