@@ -41,6 +41,9 @@
     --sidebar-accent-foreground: 24 33% 18%;
     --sidebar-border: 34 20% 91%;
     --sidebar-ring: 24 33% 60%;
+
+    /* RGB 변수 (JS/Dynamic Shadow용) */
+    --wood-rgb: 61, 43, 31;         /* #3D2B1F */
   }
 
   /* 글로벌 박스 모델링 및 보더 컬러 고정 */

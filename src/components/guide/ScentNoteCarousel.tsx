@@ -148,7 +148,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
           {/* 슬롯 레이어들 (높이를 더 확보함) */}
           <div className="w-full h-full flex flex-col items-center pt-2 pb-8">
             
-            {/* TOP SLOT (약 33%) */}
+            {/* TOP SLOT (약 32%) */}
             <div 
               onClick={() => handleTabChange('Top')}
               className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-end pb-4 cursor-pointer transition-all duration-700 ${
@@ -156,14 +156,14 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
               } ${activeTab === 'Top' ? 'scale-105' : 'hover:scale-102'}`}
             >
               <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Top ? 'bg-wood/15 opacity-100 shadow-[0_0_30px_rgba(var(--wood-rgb),0.1)]' : 'opacity-0'}`} 
-                   style={{ clipPath: 'polygon(50% 0%, 67% 100%, 33% 100%)' }} />
+                   style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }} />
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Top</span>
               <span className="text-[11px] md:text-[12px] font-medium tracking-tight truncate max-w-[80px] text-center px-2">
                 {slots.Top ? slots.Top.name : "Select"}
               </span>
             </div>
 
-            {/* MIDDLE SLOT (약 33%) */}
+            {/* MIDDLE SLOT (약 32%) */}
             <div 
               onClick={() => handleTabChange('Middle')}
               className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-center cursor-pointer transition-all duration-700 ${
@@ -171,7 +171,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
               } ${activeTab === 'Middle' ? 'scale-105' : 'hover:scale-102'}`}
             >
               <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Middle ? 'bg-wood/15 opacity-100' : 'opacity-0'}`}
-                   style={{ clipPath: 'polygon(33% 0%, 67% 0%, 84% 100%, 16% 100%)' }} />
+                   style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%, 50% 100%)' }} />
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Middle</span>
               <span className="text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2">
                 {slots.Middle ? slots.Middle.name : "Select"}
@@ -186,7 +186,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
               } ${activeTab === 'Base' ? 'scale-105' : 'hover:scale-102'}`}
             >
               <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Base ? 'bg-wood/15 opacity-100' : 'opacity-0'}`}
-                   style={{ clipPath: 'polygon(16% 0%, 84% 0%, 95% 100%, 5% 100%)' }} />
+                   style={{ clipPath: 'polygon(50% 0%, 50% 0%, 100% 100%, 0% 100%)' }} />
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Base</span>
               <span className="text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2">
                 {slots.Base ? slots.Base.name : "Select"}
