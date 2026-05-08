@@ -4,7 +4,7 @@
  * 브랜드 정보, 주요 메뉴 링크, 소셜 미디어 링크 및 법적 고지 정보를 포함합니다.
  */
 
-import { useState } from "react";
+import React, { useState } from "react";
 import OlfitLogo from "@/components/common/OlfitLogo";
 import { X } from "lucide-react";
 
@@ -122,27 +122,29 @@ export default function FooterSection() {
         </div>
       </div>
 
-      {/* 푸터 전용 미니 모달 오버레이 */}
+      {/* 푸터 전용 미니 모달 오버레이 - z-index 상향 및 안정성 강화 */}
       {modalContent && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-wood/40 backdrop-blur-[2px] animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-wood/60 backdrop-blur-sm transition-all duration-300">
           <div 
             className="absolute inset-0" 
             onClick={() => setModalContent(null)} 
           />
-          <div className="relative bg-cream border border-wood/10 p-8 md:p-10 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="relative bg-[#FDFCF0] border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-2xl rounded-sm animate-in fade-in zoom-in-95 duration-300">
             <button 
               onClick={() => setModalContent(null)}
-              className="absolute top-4 right-4 p-2 text-wood/30 hover:text-wood transition-colors"
+              className="absolute top-6 right-6 p-2 text-wood/40 hover:text-wood transition-colors"
             >
-              <X size={20} />
+              <X size={24} />
             </button>
-            <h3 className="text-lg font-light tracking-tight text-wood mb-6 uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h3 className="text-2xl font-light tracking-tight text-wood mb-8 uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
               {modalContent.title}
             </h3>
-            {modalContent.body}
+            <div className="text-wood">
+              {modalContent.body}
+            </div>
             <button
               onClick={() => setModalContent(null)}
-              className="w-full mt-8 py-3 bg-wood text-cream text-[10px] uppercase tracking-widest hover:bg-wood/90 transition-all"
+              className="w-full mt-10 py-4 bg-wood text-cream text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-wood/90 transition-all active:scale-[0.98]"
             >
               Close
             </button>
