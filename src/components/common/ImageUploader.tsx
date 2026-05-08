@@ -1,61 +1,94 @@
 /**
  * @file ImageUploader.tsx
  * @description 이미지를 업로드하고 리사이징하여 Base64로 변환하는 컴포넌트입니다.
+ * 사용자의 OOTD 사진을 받아 AI 분석이 가능한 형태로 전처리합니다.
  */
 
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
-import { Upload, X, ImageIcon, Loader2 } from "lucide-react";
+import { Upload, X, ImageIcon, Loader2, AlertCircle } from "lucide-react";
 
 interface ImageUploaderProps {
+  /** 이미지 처리가 완료되었을 때 호출되는 콜백 (Base64 문자열 전달) */
   onImageProcessed: (base64: string) => void;
+  /** 현재 AI 분석이 진행 중인지 여부 */
   isAnalyzing: boolean;
 }
 
 export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   /**
    * 이미지 리사이징 및 Base64 변환 로직
+   * 브라우저 성능을 위해 캔버스를 이용하여 적정 해상도로 리사이징합니다.
    */
   const processImage = (file: File) => {
+    // 이미지 파일 형식 검증
+    if (!file.type.startsWith("image/")) {
+      setError("이미지 파일만 업로드 가능합니다.");
+      return;
+    }
+
+    setError(null);
     const reader = new FileReader();
-    reader.readAsDataURL(file);
+    
+    reader.onerror = () => {
+      setError("파일을 읽는 중 오류가 발생했습니다.");
+    };
+
     reader.onload = (event) => {
       const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 1200; // 해상도 상향 (800 -> 1200)
-        const MAX_HEIGHT = 1200;
-        
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0, width, height);
-        
-        // JPEG 포맷 품질 상향 (0.7 -> 0.9)
-        const base64 = canvas.toDataURL("image/jpeg", 0.9);
-        setPreview(base64);
-        onImageProcessed(base64);
+      img.onerror = () => {
+        setError("이미지를 로드할 수 없습니다.");
       };
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 1200; 
+          const MAX_HEIGHT = 1200;
+          
+          let width = img.width;
+          let height = img.height;
+
+          // 가로/세로 비율 유지하며 리사이징
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          
+          if (!ctx) {
+            setError("캔버스 컨텍스트를 생성할 수 없습니다.");
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // JPEG 포맷 품질 0.9로 변환
+          const base64 = canvas.toDataURL("image/jpeg", 0.9);
+          setPreview(base64);
+          onImageProcessed(base64);
+        } catch (err) {
+          console.error("Image processing error:", err);
+          setError("이미지 처리 중 오류가 발생했습니다.");
+        }
+      };
+      img.src = event.target?.result as string;
     };
+    reader.readAsDataURL(file);
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -83,11 +116,19 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
 
   const removeImage = () => {
     setPreview(null);
+    setError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
     <div className="w-full max-w-xl mx-auto">
+      {error && (
+        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-sm flex items-center gap-2 text-red-400 text-[12px]">
+          <AlertCircle size={14} />
+          {error}
+        </div>
+      )}
+
       {!preview ? (
         <div
           onDragOver={handleDragOver}
@@ -156,3 +197,5 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     </div>
   );
 }
+
+// EOF: ImageUploader.tsx

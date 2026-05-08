@@ -187,3 +187,5 @@ export const scentNotes: ScentNote[] = [
     origin: "유향 및 나무 수지"
   }
 ];
+
+// EOF: noteData.ts

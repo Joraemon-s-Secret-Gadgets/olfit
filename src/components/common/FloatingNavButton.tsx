@@ -1,7 +1,7 @@
 /**
  * @file FloatingNavButton.tsx
  * @description 페이지 탐색을 돕는 플로팅 버튼 컴포넌트입니다.
- * 시나리오 B: 단일 클릭 시 이전 섹션으로, 더블 클릭 시 최상단으로 이동합니다.
+ * 단일 클릭 시 이전 섹션으로, 더블 클릭 시 최상단으로 이동하는 하이브리드 기능을 제공합니다.
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -12,17 +12,19 @@ export default function FloatingNavButton() {
   const [isAtFooter, setIsAtFooter] = useState(false);
   const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 스크롤 위치에 따라 버튼 표시 여부 및 위치 결정
+  /**
+   * 스크롤 위치 감지 및 UI 상태 업데이트
+   */
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
 
-      // 1. 300px 이상 스크롤되었을 때 버튼 노출
+      // 1. 일정 거리(300px) 이상 스크롤 시 버튼 노출
       setIsVisible(scrollY > 300);
 
-      // 2. 푸터 도달 시 위치 상향 조정 (바닥에서 120px 이내로 접근 시)
+      // 2. 푸터 영역 도달 시 버튼 위치를 위로 밀어올림 (레이아웃 겹침 방지)
       const distanceFromBottom = documentHeight - (scrollY + windowHeight);
       setIsAtFooter(distanceFromBottom < 120);
     };
@@ -32,53 +34,50 @@ export default function FloatingNavButton() {
   }, []);
 
   /**
-   * 이전 섹션으로 이동하는 로직
+   * 이전 섹션(현재 위치보다 위쪽의 가장 가까운 <section>)으로 스무스 스크롤
    */
   const scrollToPreviousSection = () => {
-    // 모든 섹션 요소를 가져옴 (main 태그 내부의 자식들)
     const sections = Array.from(document.querySelectorAll("main > section"));
     const currentScroll = window.scrollY;
     
-    // 현재 스크롤 위치보다 위쪽에 있는 섹션들 중 가장 가까운 섹션 찾기
     const prevSection = [...sections]
       .reverse()
       .find((section) => {
         const rect = section.getBoundingClientRect();
         const absoluteTop = rect.top + window.scrollY;
-        // 현재 위치보다 최소 100px 위에 있는 섹션을 찾음 (현재 섹션의 시작점으로 가는 것 방지)
+        // 현재 위치보다 최소 100px 위에 있는 섹션을 타겟팅
         return absoluteTop < currentScroll - 100;
       });
 
     if (prevSection) {
       prevSection.scrollIntoView({ behavior: "smooth" });
     } else {
-      // 이전 섹션이 없으면 최상단으로
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   /**
-   * 최상단으로 이동하는 로직
+   * 페이지 최상단으로 즉시 스무스 스크롤
    */
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   /**
-   * 단일 클릭과 더블 클릭을 구분하는 핸들러 (시나리오 B)
+   * 클릭 이벤트 처리 (단일/더블 클릭 분기)
    */
   const handleClick = () => {
     if (clickTimeoutRef.current) {
-      // 더블 클릭으로 판단
+      // 250ms 내 재발생 시 더블 클릭으로 간주
       clearTimeout(clickTimeoutRef.current);
       clickTimeoutRef.current = null;
       scrollToTop();
     } else {
-      // 단일 클릭 가능성 - 타이머 시작
+      // 단일 클릭 타이머 설정
       clickTimeoutRef.current = setTimeout(() => {
         scrollToPreviousSection();
         clickTimeoutRef.current = null;
-      }, 250); // 250ms 이내에 다시 클릭하면 더블 클릭
+      }, 250);
     }
   };
 
@@ -90,7 +89,7 @@ export default function FloatingNavButton() {
       } ${
         isAtFooter ? "bottom-16 sm:bottom-20" : "bottom-8 sm:bottom-10"
       }`}
-      aria-label="이동 버튼"
+      aria-label="Navigate upwards"
     >
       <div className="relative">
         <ArrowUp 
@@ -100,10 +99,12 @@ export default function FloatingNavButton() {
         />
       </div>
       
-      {/* 툴팁/힌트 (호버 시 노출) */}
+      {/* 사용자 가이드 툴팁 */}
       <div className="absolute right-full mr-4 px-3 py-1.5 bg-wood text-cream text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded tracking-wider">
         CLICK: PREV / DBL CLICK: TOP
       </div>
     </button>
   );
 }
+
+// EOF: FloatingNavButton.tsx

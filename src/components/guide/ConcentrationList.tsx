@@ -1,6 +1,7 @@
 /**
  * @file ConcentrationList.tsx
- * @description 향수의 농도(부향률)에 따른 분류와 지속시간 정보를 리스트 형태로 표시하는 컴포넌트입니다.
+ * @description 향수의 부향률(Concentration) 정보를 체계적으로 리스트업하여 사용자에게 정보를 제공하는 컴포넌트입니다.
+ * 농도별 향수 타입, 비율, 지속시간 및 특징을 시각화합니다.
  */
 
 interface Concentration {
@@ -12,7 +13,7 @@ interface Concentration {
 }
 
 interface ConcentrationListProps {
-  /** 표시할 농도 정보 리스트 */
+  /** 표시할 농도 정보 데이터 리스트 */
   concentrations: Concentration[];
 }
 
@@ -44,3 +45,5 @@ export default function ConcentrationList({ concentrations }: ConcentrationListP
     </div>
   );
 }
+
+// EOF: ConcentrationList.tsx

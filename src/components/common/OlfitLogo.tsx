@@ -1,14 +1,19 @@
 /**
  * @file OlfitLogo.tsx
  * @description Olfit 브랜드의 SVG 로고 컴포넌트입니다.
- * 벡터 포맷을 사용하여 어떠한 해상도에서도 선명하게 렌더링됩니다.
+ * 벡터 포맷을 사용하여 어떠한 해상도에서도 선명하게 렌더링되며, 프로젝트 전역에서 브랜딩 요소로 사용됩니다.
  */
 
 interface OlfitLogoProps {
+  /** 추가적인 CSS 클래스 */
   className?: string;
+  /** 로고의 너비 (기본값: "auto") */
   width?: number | string;
+  /** 로고의 높이 (기본값: "1.2em") */
   height?: number | string;
+  /** 로고 텍스트 및 라인의 색상 (기본값: "currentColor") */
   color?: string;
+  /** 하단 데코레이션 라인 표시 여부 */
   showLine?: boolean;
 }
 
@@ -56,3 +61,5 @@ export default function OlfitLogo({
     </svg>
   );
 }
+
+// EOF: OlfitLogo.tsx

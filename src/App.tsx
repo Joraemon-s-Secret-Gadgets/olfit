@@ -1,7 +1,7 @@
 /**
  * @file App.tsx
- * @description 애플리케이션의 전체 레이아웃과 섹션 구성을 정의하는 메인 컴포넌트입니다.
- * 사이트의 전역 테마(배경색, 텍스트 색상)를 설정하고 각 섹션을 순서대로 배치합니다.
+ * @description 애플리케이션의 전체 레이아웃과 상태 관리를 담당하는 메인 컴포넌트입니다.
+ * 개인정보 동의 프로세스, AI 분석 결과 브릿징, 그리고 각 섹션의 배치를 제어합니다.
  */
 
 import { useState } from "react";
@@ -21,13 +21,16 @@ import type { AnalysisResults } from "@/types";
 import type { Product } from "@/data/productData";
 
 export default function App() {
-  // 인터뷰 결과를 저장할 상태
+  /** AI 인터뷰 분석 최종 결과 상태 */
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
   
-  // 사용자가 선택한 향기 노트들
+  /** 사용자가 가이드 섹션에서 선택한 향기 원료 리스트 */
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
   
-  // 개인정보 동의 및 세션 상태 관리
+  /** 
+   * 개인정보 동의 여부 및 세션 유지 상태 
+   * 로컬 스토리지를 참조하여 초기값 설정
+   */
   const [hasConsented, setHasConsented] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     const consented = localStorage.getItem("olfit_consent") === "true";
@@ -35,14 +38,17 @@ export default function App() {
     return !!(consented && sessionId);
   });
 
-  // 모달 관리를 위한 전역 상태
+  /** 제품 상세 모달에 표시될 제품 정보 상태 */
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  /**
+   * 사용자가 개인정보 수집에 동의했을 때 실행되는 핸들러
+   */
   const handleAgree = () => {
-    // 고유 세션 ID 생성 (UUID v4 유사)
+    // 고유 익명 세션 ID 생성
     const newSessionId = crypto.randomUUID();
     
-    // 로컬 스토리지 저장
+    // 영속성 유지를 위한 로컬 스토리지 저장
     localStorage.setItem("olfit_consent", "true");
     localStorage.setItem("olfit_session_id", newSessionId);
     
@@ -51,58 +57,50 @@ export default function App() {
 
   return (
     /**
-     * 전체 페이지 컨테이너
-     * hasConsented 가 false 일 때 overflow-hidden 을 적용하여 스크롤 차단
+     * 최상위 컨테이너
+     * 미동의 시 스크롤을 원천 차단하여 필수 단계를 강조함
      */
     <div className={`min-h-screen bg-cream text-wood font-sans ${!hasConsented ? "overflow-hidden h-screen" : ""}`}>
-      {/* 개인정보 동의 모달 (필수) */}
+      {/* 00. 개인정보 동의 모달 (레이어 최상단) */}
       {!hasConsented && <PrivacyConsentModal onAgree={handleAgree} />}
 
-      {/* 상단 네비게이션 바: 트랜스폼 컨테이너 외부에 배치하여 fixed 포지션 유지 */}
+      {/* 01. 글로벌 네비게이션 헤더 */}
       <Navigation />
 
       {/* 
-        메인 콘텐츠 영역 
-        동의 전까지 블러 처리 및 상호작용 방지
+        02. 메인 서비스 레이어 
+        미동의 시 블러 및 상호작용 방지 효과 적용
       */}
       <div className={`transition-all duration-700 ${!hasConsented ? "blur-xl scale-[1.02] pointer-events-none select-none" : "blur-0"}`}>
-        {/* 메인 콘텐츠 영역 */}
         <main>
-          {/* 히어로 섹션: 첫 화면 및 인트로 */}
+          {/* 섹션별 순차 배치 */}
           <HeroSection />
-          
-          {/* 철학 섹션: 브랜드 가치 및 철학 설명 */}
           <PhilosophySection />
-          
-          {/* 향기 가이드 섹션: 향수 사용법 및 팁 */}
           <ScentGuideSection onNotesChange={setSelectedNotes} />
           
-          {/* AI 인터뷰 섹션: 사용자 취향 분석을 위한 이미지 업로드 및 로직 */}
           <AIInterviewSection 
             onComplete={(results: AnalysisResults) => setAnalysisResults(results)} 
             selectedNotes={selectedNotes}
           />
           
-          {/* 분석 리포트 섹션: 인터뷰 결과에 따른 개인화된 분석 결과 */}
           <InsightReportSection 
             results={analysisResults} 
             onProductClick={setSelectedProduct}
           />
           
-          {/* 안전성 섹션: 제품의 원료 및 안전성 강조 */}
           <SafetyValuesSection />
         </main>
         
-        {/* 하단 푸터 영역 */}
+        {/* 글로벌 푸터 */}
         <FooterSection />
 
-        {/* 플로팅 내비게이션 버튼 (클릭: 이전 섹션 / 더블클릭: 맨 위로) */}
+        {/* 퀵 내비게이션 플로팅 버튼 */}
         <FloatingNavButton />
       </div>
 
       {/* 
-        제품 상세 모달 (루트 레벨)
-        컨텐츠 블러의 영향을 받지 않도록 외부에 배치
+        03. 개별 제품 상세 레이어 (Portal-like 배치)
+        메인 콘텐츠의 블러 필터 영향을 피하기 위해 외부에 독립적으로 배치
       */}
       {selectedProduct && (
         <ProductModal 
@@ -113,3 +111,5 @@ export default function App() {
     </div>
   );
 }
+
+// EOF: App.tsx

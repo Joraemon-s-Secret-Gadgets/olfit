@@ -1,7 +1,7 @@
 /**
  * @file ScentGuideSection.tsx
- * @description 향기에 대한 종합적인 교육 정보를 제공하는 섹션입니다.
- * 부향률, 향기 계열, 그리고 주요 원료 사전을 포함합니다.
+ * @description 향기에 대한 심도 있는 교육 정보와 가이드를 제공하는 섹션입니다.
+ * 부향률 체계, 향기 계열(Family), 그리고 주요 향기 노트 사전을 유기적으로 배치합니다.
  */
 
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -10,7 +10,13 @@ import FamilyCarousel from "@/components/guide/FamilyCarousel";
 import NoteGlossary from "@/components/guide/NoteGlossary";
 import { scentFamilies, concentrations } from "@/data/scentData";
 
-export default function ScentGuideSection({ onNotesChange }: { onNotesChange?: (notes: string[]) => void }) {
+interface ScentGuideSectionProps {
+  /** 사용자가 노트를 선택했을 때 상태를 부모 컴포넌트로 전달하는 콜백 */
+  onNotesChange?: (notes: string[]) => void;
+}
+
+export default function ScentGuideSection({ onNotesChange }: ScentGuideSectionProps) {
+  /** 뷰포트 진입 감지 */
   const { ref, isVisible } = useIntersectionObserver();
 
   return (
@@ -18,7 +24,7 @@ export default function ScentGuideSection({ onNotesChange }: { onNotesChange?: (
       <div className="max-w-[1440px] mx-auto px-6 md:px-8">
         <div ref={ref} className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           
-          {/* 섹션 헤더 */}
+          {/* 도입부 헤더 영역 */}
           <div className="max-w-3xl mb-16 md:mb-20">
             <p className="label-upper text-wood/40 mb-4">Scent Education</p>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-light tracking-tight mb-6 md:mb-8 text-wood break-keep text-wood" style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -31,18 +37,21 @@ export default function ScentGuideSection({ onNotesChange }: { onNotesChange?: (
             </p>
           </div>
 
+          {/* 지식 가이드 그리드 영역 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-stretch">
-            {/* 01. 부향률 가이드 영역 */}
+            {/* 01. 부향률(Concentration) 가이드 */}
             <ConcentrationList concentrations={concentrations} />
 
-            {/* 02. 향기 계열 심층 가이드 영역 */}
+            {/* 02. 향기 계열(Family) 가로 스크롤 가이드 */}
             <FamilyCarousel families={scentFamilies} />
           </div>
 
-          {/* 03. 향기 원료 사전 (Note Glossary) */}
+          {/* 03. 인터랙티브 향기 원료 사전 (Note Glossary) */}
           <NoteGlossary onNotesChange={onNotesChange} />
         </div>
       </div>
     </section>
   );
 }
+
+// EOF: ScentGuideSection.tsx

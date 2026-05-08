@@ -69,3 +69,5 @@ export const concentrations = [
   { type: "Eau de Toilette", koType: "오 드 뚜왈렛", ratio: "5-15%", duration: "3-4h", desc: "가볍고 산뜻하게 시작하는 하루의 기분" },
   { type: "Eau de Cologne", koType: "오 드 코롱", ratio: "2-4%", duration: "1-2h", desc: "은은하고 투명하게 스치는 향기의 흔적" },
 ];
+
+// EOF: scentData.ts

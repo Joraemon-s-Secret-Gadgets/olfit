@@ -1,6 +1,7 @@
 /**
  * @file ProductCarousel.tsx
- * @description 추천된 제품들을 1개씩 자동으로 보여주는 캐러셀 컴포넌트입니다.
+ * @description AI 분석을 통해 선정된 추천 제품들을 카드 형태로 보여주는 캐러셀 컴포넌트입니다.
+ * Embla Carousel을 기반으로 자동 전환, 수동 슬라이드, 제품 피드백(좋아요/싫어요) 기능을 제공합니다.
  */
 
 import { useCallback, useState } from "react";
@@ -11,30 +12,38 @@ import { toast } from "sonner";
 import type { Product } from "@/data/productData";
 
 interface ProductCarouselProps {
+  /** 추천된 제품 리스트 (유사도 점수 포함) */
   products: (Product & { similarity: number })[];
+  /** 제품 선택 시 호출되는 핸들러 */
   onProductClick: (product: Product) => void;
 }
 
 type Feedback = "like" | "dislike" | null;
 
 export default function ProductCarousel({ products, onProductClick }: ProductCarouselProps) {
+  /** 캐러셀 엔진 및 자동 재생 설정 (30초 간격) */
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 30000, stopOnInteraction: false })
   ]);
   
+  /** 각 제품별 피드백 상태 관리 */
   const [feedbacks, setFeedbacks] = useState<Record<number, Feedback>>({});
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
+  /**
+   * 제품에 대한 긍정/부정 피드백 처리
+   */
   const handleFeedback = (e: React.MouseEvent, productId: number, type: Feedback) => {
-    e.stopPropagation();
+    e.stopPropagation(); // 카드 클릭(모달 열기) 방지
     
     const currentFeedback = feedbacks[productId];
     const newFeedback = currentFeedback === type ? null : type;
     
     setFeedbacks(prev => ({ ...prev, [productId]: newFeedback }));
     
+    // 사용자 경험 향상을 위한 토스트 알림
     if (newFeedback === "like") {
       toast.success("이 향수를 위시리스트에 담았습니다.");
     } else if (newFeedback === "dislike") {
@@ -54,6 +63,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                   data-family={item.family}
                   className="group cursor-pointer bg-white/50 backdrop-blur-sm border border-wood/5 p-8 sm:p-12 rounded-sm hover:bg-wood hover:border-wood transition-all duration-700 overflow-hidden flex flex-col md:flex-row items-center gap-10"
                 >
+                  {/* 제품 이미지 및 유사도 배지 */}
                   <div className="w-full md:w-1/2 aspect-square overflow-hidden bg-cream/50 rounded-sm relative">
                     <img 
                       src={item.image} 
@@ -65,8 +75,9 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                     </div>
                   </div>
                   
+                  {/* 제품 정보 영역 */}
                   <div className="w-full md:w-1/2 text-left relative">
-                    {/* Feedback Buttons */}
+                    {/* 상단 피드백 버튼 그룹 */}
                     <div className="absolute top-0 right-0 flex gap-2">
                       <button
                         onClick={(e) => handleFeedback(e, item.id, "like")}
@@ -90,6 +101,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                       </button>
                     </div>
 
+                    {/* 베스트 추천 표시 */}
                     {index === 0 && (
                       <div className="inline-flex items-center justify-center px-2 py-1 bg-wood/10 border border-wood/20 rounded-sm mb-3 group-hover:bg-cream/10 group-hover:border-cream/30 transition-colors">
                         <span className="text-[9px] font-bold text-wood group-hover:text-cream tracking-[0.15em] uppercase leading-none">Best Pick</span>
@@ -100,6 +112,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                       {item.name}
                     </h4>
                     
+                    {/* 요약 상세 정보 */}
                     <div className="space-y-4 mb-8">
                       <div>
                         <span className="text-[10px] uppercase tracking-widest text-wood/30 group-hover:text-cream/30 block mb-1 transition-colors">Notes</span>
@@ -134,7 +147,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
           </div>
         </div>
 
-        {/* Navigation Buttons */}
+        {/* 좌우 이동 네비게이션 버튼 */}
         <button 
           onClick={scrollPrev}
           className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-wood/20 hover:text-wood transition-colors"
@@ -159,3 +172,5 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
     </div>
   );
 }
+
+// EOF: ProductCarousel.tsx

@@ -971,3 +971,5 @@ export const personalProducts: Product[] = [
     }
   },
 ];
+
+// EOF: personalData.ts

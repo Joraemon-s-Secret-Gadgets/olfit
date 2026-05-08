@@ -1,7 +1,7 @@
 /**
  * @file Navigation.tsx
  * @description 상단 네비게이션 바 컴포넌트입니다.
- * 메뉴 항목을 헤더에 직접 노출하여 직관적이고 안정적인 탐색을 제공합니다.
+ * 스크롤 상태에 따른 스타일 변화와 모바일 전용 전체화면 메뉴 기능을 제공합니다.
  */
 
 import { useState, useEffect } from "react";
@@ -10,10 +10,14 @@ import OlfitLogo from "@/components/common/OlfitLogo";
 import { Menu, X } from "lucide-react";
 
 export default function Navigation() {
+  /** 일정 거리(80px) 이상 스크롤 여부 */
   const isScrolled = useIsScrolled(80);
+  /** 모바일 메뉴 오픈 상태 */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 모바일 메뉴 오픈 시 스크롤 방지
+  /**
+   * 모바일 메뉴가 열려있을 때 배경 페이지 스크롤 방지
+   */
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -22,6 +26,7 @@ export default function Navigation() {
     }
   }, [isMenuOpen]);
 
+  // 네비게이션 링크 항목
   const navLinks = [
     { label: "컨셉", href: "#philosophy" },
     { label: "향기 가이드", href: "#guide" },
@@ -30,6 +35,7 @@ export default function Navigation() {
     { label: "안전성", href: "#safety" },
   ];
 
+  /** 모바일 메뉴 닫기 */
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
@@ -42,7 +48,7 @@ export default function Navigation() {
         }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-8 h-full flex items-center justify-between gap-4">
-          {/* 왼쪽 영역: 로고 */}
+          {/* 로고 영역 */}
           <div className="flex-shrink-0 z-50">
             <a
               href="#"
@@ -53,10 +59,9 @@ export default function Navigation() {
             >
               <OlfitLogo height={isScrolled ? 24 : 28} showLine={false} />
             </a>
-
           </div>
 
-          {/* 중앙 영역: 데스크탑 네비게이션 링크 */}
+          {/* 데스크탑 메뉴 영역 */}
           <nav className="hidden md:flex items-center gap-8 lg:gap-12">
             {navLinks.map((link) => (
               <a
@@ -71,7 +76,7 @@ export default function Navigation() {
             ))}
           </nav>
 
-          {/* 오른쪽 영역: 모바일 메뉴 토글 버튼 */}
+          {/* 모바일 메뉴 토글 버튼 */}
           <div className="md:hidden flex items-center z-50">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -84,12 +89,12 @@ export default function Navigation() {
             </button>
           </div>
 
-          {/* 데스크탑 우측 여백 (균형용) */}
+          {/* 레이아웃 균형을 위한 더미 공간 */}
           <div className="hidden md:block w-[60px]"></div>
         </div>
       </header>
 
-      {/* 모바일 전체화면 메뉴 오버레이 */}
+      {/* 모바일 전체화면 오버레이 메뉴 */}
       <div 
         className={`fixed inset-0 z-40 bg-cream transition-transform duration-500 ease-in-out md:hidden ${
           isMenuOpen ? "translate-y-0" : "-translate-y-full"
@@ -119,3 +124,5 @@ export default function Navigation() {
     </>
   );
 }
+
+// EOF: Navigation.tsx

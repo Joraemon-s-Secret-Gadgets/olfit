@@ -1,7 +1,7 @@
 /**
  * @file NoteGlossary.tsx
- * @description 향수의 주요 원료들에 대한 설명을 카드 형태로 보여주는 컴포넌트입니다.
- * 사용자가 선호하는 원료를 선택하면 부모 컴포넌트로 전달합니다.
+ * @description 향수의 주요 원료(Note) 정보를 카드 형태로 시각화하고, 사용자의 선호 원료를 수집하는 인터랙티브 컴포넌트입니다.
+ * 탑, 미들, 베이스 노트별 분류를 제공하며, 최대 3개의 원료를 선택할 수 있는 기능을 포함합니다.
  */
 
 import { useState } from "react";
@@ -10,20 +10,31 @@ import { Check, RefreshCw } from "lucide-react";
 import type { ScentNote } from "@/data/noteData";
 
 interface NoteGlossaryProps {
+  /** 선택된 노드들이 변경될 때 부모 컴포넌트로 전달하는 콜백 */
   onNotesChange?: (notes: string[]) => void;
 }
 
 export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
+  /** 현재 마우스가 올라가 있는 노트 ID */
   const [hoveredNote, setHoveredNote] = useState<string | null>(null);
+  /** 현재 사용자가 선택한 노트 객체 리스트 (최대 3개) */
   const [selectedNotes, setSelectedNotes] = useState<ScentNote[]>([]);
 
+  /**
+   * 노트를 선택하거나 해제하는 핸들러
+   */
   const toggleNote = (note: ScentNote) => {
     let newNotes;
+    // 이미 선택된 경우 제거
     if (selectedNotes.find((n) => n.enName === note.enName)) {
       newNotes = selectedNotes.filter((n) => n.enName !== note.enName);
-    } else if (selectedNotes.length < 3) {
+    } 
+    // 선택되지 않았고 3개 미만인 경우 추가
+    else if (selectedNotes.length < 3) {
       newNotes = [...selectedNotes, note];
-    } else {
+    } 
+    // 3개 초과 선택 시 무시
+    else {
       return;
     }
     
@@ -33,11 +44,17 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
     }
   };
 
+  /**
+   * 선택된 모든 노트를 초기화
+   */
   const resetNotes = () => {
     setSelectedNotes([]);
     if (onNotesChange) onNotesChange([]);
   };
 
+  /**
+   * 개별 노트 카드를 렌더링합니다.
+   */
   const renderNoteCard = (note: ScentNote) => {
     const isSelected = selectedNotes.find((n) => n.enName === note.enName);
     return (
@@ -52,14 +69,14 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
         onMouseEnter={() => setHoveredNote(note.enName)}
         onMouseLeave={() => setHoveredNote(null)}
       >
-        {/* 선택 표시 */}
+        {/* 선택 완료 체크 아이콘 */}
         {isSelected && (
           <div className="absolute top-3 right-3 text-cream animate-in zoom-in duration-300">
             <Check size={14} strokeWidth={3} />
           </div>
         )}
 
-        {/* 기본 노출: 원료 이름 */}
+        {/* 기본 정보 레이어 */}
         <div className={`flex flex-col justify-between h-full transition-all duration-300 ${hoveredNote === note.enName && !isSelected ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
           <span className={`text-[9px] uppercase tracking-widest ${isSelected ? 'text-cream/40' : 'text-wood/40'}`}>
             {note.category} Note
@@ -74,7 +91,7 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
           </div>
         </div>
 
-        {/* 호버 시 노출: 상세 설명 (선택되지 않았을 때만) */}
+        {/* 호버 정보 레이어 (설명 및 원산지) */}
         {!isSelected && (
           <div className={`absolute inset-0 p-4 flex flex-col justify-center transition-all duration-500 ${hoveredNote === note.enName ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
             <p className="text-[11px] leading-relaxed text-wood/80 break-keep mb-3">
@@ -109,6 +126,7 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
           )}
         </div>
         
+        {/* 상단 컨트롤 바: 선택 수 지표 및 초기화 버튼 */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             {[1, 2, 3].map((num) => (
@@ -130,6 +148,7 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
         </div>
       </div>
 
+      {/* 카테고리별 노트 그리드 영역 */}
       <div className="space-y-12">
         {categories.map(category => {
           const notes = scentNotes.filter(n => n.category === category);
@@ -151,3 +170,5 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
     </div>
   );
 }
+
+// EOF: NoteGlossary.tsx

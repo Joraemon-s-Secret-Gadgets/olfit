@@ -1,7 +1,7 @@
 /**
  * @file InsightReportSection.tsx
  * @description AI 인터뷰 결과를 바탕으로 사용자의 향기 아우라를 분석하여 시각화해 주는 섹션입니다.
- * 비주얼 분석 결과와 추천 제품 리스트를 포함합니다.
+ * 정밀한 레이더 차트 분석 결과와 함께 개인화된 향수 추천 리스트를 제공하며, 리포트 저장 기능을 포함합니다.
  */
 
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -9,14 +9,16 @@ import RadarChart from "@/components/common/RadarChart";
 import ProductCarousel from "@/components/report/ProductCarousel";
 import { radarData } from "@/data/reportData";
 import { getRecommendedProducts } from "@/services/recommendationEngine";
+import { captureReportBlob, shareOrDownloadImage } from "@/services/reportCapture";
 import { Share2, Check } from "lucide-react";
-import html2canvas from "html2canvas";
 import { useRef, useMemo, useState } from "react";
 import type { AnalysisResults } from "@/types";
 import type { Product } from "@/data/productData";
 
 interface InsightReportSectionProps {
+  /** 분석 결과 데이터 */
   results: AnalysisResults | null;
+  /** 제품 클릭 시 상세 정보를 보여주기 위한 콜백 */
   onProductClick: (product: Product) => void;
 }
 
@@ -26,15 +28,17 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
   const { ref: ref3, isVisible: vis3 } = useIntersectionObserver();
   const reportRef = useRef<HTMLDivElement>(null);
 
-  // 정렬 상태 추가
+  /** 정렬 상태 (추천순 / 가격순) */
   const [sortBy, setSortBy] = useState<"recommended" | "price">("recommended");
+  /** 리포트 이미지 생성 중 상태 */
   const [isSaving, setIsSaving] = useState(false);
-  const [isShared, setIsShared] = useState(false);
+  /** 공유 완료 피드백 상태 */
+  const [feedback, setFeedback] = useState<string | null>(null);
 
-  // 다이내믹 데이터 계산
+  // 추천 제품 데이터 메모이제이션
   const baseRecommendations = useMemo(() => getRecommendedProducts(results), [results]);
 
-  // 정렬된 추천 리스트 계산
+  // 정렬 옵션이 적용된 최종 추천 리스트
   const recommendations = useMemo(() => {
     const sorted = [...baseRecommendations];
     if (sortBy === "price") {
@@ -44,11 +48,10 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
         return priceA - priceB;
       });
     }
-    // 기본은 이미 similarity 순으로 정렬되어 있음
     return sorted;
   }, [baseRecommendations, sortBy]);
 
-  // 사용자의 선택에 따른 가변적인 로직 생성
+  // 분석 로직 단계 설명 데이터
   const dynamicLogicSteps = [
     `업로드된 이미지에서 추출된 #현대적 #시크 무드 분석`,
     `사용자가 선택한 원료(${results?.analysisMetadata?.selectedNotes.join(", ") || "선택 없음"})와의 조화 계산`,
@@ -56,7 +59,9 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
     "시각적 무드와 후각적 취향의 완벽한 밸런스 완성",
   ];
 
-  // 인터뷰 결과에 따른 레이더 차트 데이터 동적 계산
+  /**
+   * 인터뷰 결과에 따른 레이더 차트 수치를 시뮬레이션합니다.
+   */
   const getDynamicRadarData = () => {
     if (!results) return radarData;
     const baseData = [
@@ -74,280 +79,35 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
   };
 
   const currentRadarData = getDynamicRadarData();
+  const theme = { bg: "bg-cream", accent: "text-wood", border: "border-wood/10" };
 
-  // 결과에 따른 다이내믹 테마 결정
-  const getThemeColors = () => ({ bg: "bg-cream", accent: "text-wood", border: "border-wood/10" });
-  const theme = getThemeColors();
-
-  // 공통 고해상도 캡처 로직 (Blob 반환 - 안정성 최우선 버전)
-  const captureReportBlob = async (): Promise<Blob | null> => {
-    if (!reportRef.current) return null;
-
-    // 15초 전체 타임아웃 설정
-    const overallTimeout = new Promise<null>((_, reject) => 
-      setTimeout(() => reject(new Error("캡처 시간 초과")), 15000)
-    );
-
-    const captureProcess = (async () => {
-      // 1. 리소스 로딩 대기
-      if (document.fonts) await document.fonts.ready;
-      
-      const images = reportRef.current?.querySelectorAll("img") || [];
-      await Promise.all(Array.from(images).map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise(resolve => {
-          img.onload = resolve;
-          img.onerror = resolve;
-          setTimeout(resolve, 5000); // 개별 이미지 최대 5초
-        });
-      }));
-
-      // 2. 렌더링 안착 대기
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // 3. html2canvas 실행
-      const reportElement = reportRef.current;
-      if (!reportElement) throw new Error("리포트 요소를 찾을 수 없습니다.");
-
-      const canvas = await html2canvas(reportElement, {
-        backgroundColor: "#FDFCF0",
-        scale: 2, // 1.5에서 2로 상향하여 선명도 복구
-        useCORS: true, // 외부 이미지를 위해 필요
-        allowTaint: true, // CORS 정책이 엄격할 경우 캔버스 오염을 허용해서라도 이미지를 그림
-        logging: false,
-        imageTimeout: 15000,
-        scrollX: 0,
-        scrollY: -window.scrollY,
-        onclone: async (clonedDoc) => {
-          const el = clonedDoc.getElementById("report-content");
-          if (!el) return;
-          
-          // 클론된 DOM의 이미지를 스타일리시한 플레이스홀더로 교체 (CORS 방지)
-          const clonedImages = el.querySelectorAll("img");
-          clonedImages.forEach((img) => {
-            // 사용자 업로드 이미지(data:)는 아예 숨김 처리
-            if (img.src.startsWith("data:")) {
-              img.style.display = "none";
-              return;
-            }
-
-            const parent = img.parentElement;
-            if (!parent) return;
-
-            // 계열 정보 획득 (Carousel 카드에 주입한 data-family 활용)
-            const family = img.closest("[data-family]")?.getAttribute("data-family") || "기본";
-            
-            // 계열별 테마 및 배경 이미지 설정
-            const themes: Record<string, { bg: string; color: string; image: string }> = {
-              "플로랄": { bg: "#FAE8EF", color: "#A03060", image: "/product_1.jpg" }, // 깔끔/플로럴
-              "우디": { bg: "#EDE8E0", color: "#7A5C3A", image: "/product_2.jpg" },   // 우디
-              "머스크": { bg: "#E8EAF0", color: "#4A5070", image: "/product_1.jpg" }, // 깔끔/머스크
-              "시트러스": { bg: "#FEF5E0", color: "#8A6010", image: "/product_4.jpg" }, // 화려/시트러스
-              "앰버": { bg: "#F5EAD8", color: "#8A5520", image: "/product_3.jpg" },   // 남자다운/앰버
-              "프레쉬": { bg: "#E4F2EC", color: "#2A6B4A", image: "/product_4.jpg" },  // 화려/프레쉬
-              "기본": { bg: "#F0EDE8", color: "#6B4423", image: "/product_1.jpg" },
-            };
-            const theme = themes[family] || themes["기본"];
-
-            // 플레이스홀더 컨테이너 생성
-            const placeholder = clonedDoc.createElement("div");
-            placeholder.style.cssText = `
-              width: 100%;
-              height: 100%;
-              background-color: ${theme.bg};
-              color: ${theme.color};
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              position: relative;
-              overflow: hidden;
-              border-radius: 2px;
-            `;
-
-            // 실제 img 태그를 배경으로 삽입 (html2canvas 캡처 안정성 향상)
-            const bgImg = clonedDoc.createElement("img");
-            bgImg.src = window.location.origin + theme.image;
-            bgImg.style.cssText = `
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-              z-index: 0;
-            `;
-            placeholder.appendChild(bgImg);
-
-            // 이미지 위에 가독성을 위한 오버레이 레이어 추가
-            const overlay = clonedDoc.createElement("div");
-            overlay.style.cssText = `
-              position: absolute;
-              top: 0; left: 0; right: 0; bottom: 0;
-              background: ${theme.bg};
-              opacity: 0.8;
-              z-index: 1;
-            `;
-            placeholder.appendChild(overlay);
-
-            // 사선 패턴 추가
-            const pattern = clonedDoc.createElement("div");
-            pattern.style.cssText = `
-              position: absolute;
-              top: 0; left: 0; right: 0; bottom: 0;
-              background-image: repeating-linear-gradient(45deg, ${theme.color} 0, ${theme.color} 1px, transparent 1px, transparent 8px);
-              opacity: 0.05;
-              z-index: 2;
-            `;
-            placeholder.appendChild(pattern);
-
-            // 계열명 배지
-            const badge = clonedDoc.createElement("div");
-            badge.textContent = family;
-            badge.style.cssText = `
-              font-size: 11px;
-              font-weight: 600;
-              letter-spacing: 0.15em;
-              border: 1px solid ${theme.color};
-              border-radius: 999px;
-              padding: 5px 14px;
-              background-color: rgba(255, 255, 255, 0.2);
-              position: relative;
-              z-index: 3;
-              text-transform: uppercase;
-              margin-top: auto;
-              margin-bottom: 24px;
-            `;
-            placeholder.appendChild(badge);
-
-            // 기존 img 제거 및 교체
-            img.style.display = "none";
-            parent.appendChild(placeholder);
-          });
-          
-          el.style.width = "1000px";
-          el.style.maxWidth = "1000px";
-          el.style.minWidth = "1000px";
-          el.style.padding = "60px";
-          el.style.boxSizing = "border-box";
-          el.style.filter = "none";
-          el.style.transform = "none";
-
-          const allElements = el.querySelectorAll("*");
-          allElements.forEach((node) => {
-            const target = node as HTMLElement;
-            target.style.boxSizing = "border-box";
-            
-            target.style.setProperty("opacity", "1", "important");
-            target.style.setProperty("visibility", "visible", "important");
-            target.style.setProperty("transform", "none", "important");
-            target.style.setProperty("animation", "none", "important");
-            target.style.setProperty("transition", "none", "important");
-
-            if (target.tagName === "BUTTON" || target.innerText?.includes("Explore") || target.classList.contains("sr-only")) {
-              target.style.display = "none";
-            }
-          });
-
-          const texts = el.querySelectorAll("p, h2, h3, span, div");
-          texts.forEach((node) => {
-            const target = node as HTMLElement;
-            target.style.wordBreak = "keep-all";
-            target.style.whiteSpace = "normal";
-          });
-
-          const header = clonedDoc.createElement("div");
-          header.style.cssText = "display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:60px; border-bottom:1px solid rgba(107,68,35,0.1); padding-bottom:20px;";
-          
-          header.innerHTML = `
-            <div style="display: flex; align-items: center;">
-              <div>
-                <div style="font-family: 'Playfair Display', serif; font-size:28px; font-weight: 300; letter-spacing: 0.25em; color:#6B4423; text-transform: uppercase; line-height: 1;">OLFIT</div>
-                <div style="font-size: 10px; color: #6B4423; margin-top: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;">Visual Identity Matching</div>
-              </div>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-size: 11px; font-weight: 600; color: #6B4423; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Precision Analysis Report</div>
-              <div style="font-size:10px; color:rgba(107, 68, 35, 0.5); letter-spacing: 0.05em;">${new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-            </div>
-          `;
-          el.prepend(header);
-        }
-      });
-
-      return new Promise<Blob | null>((resolve) => {
-        canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
-      });
-    })();
-
-    return Promise.race([captureProcess, overallTimeout]);
-  };
-
-  // 결과 공유 함수 (이미지 캡처 및 공유/다운로드 하이브리드)
-  const shareResults = async () => {
+  /**
+   * 분석 결과 공유 및 저장 핸들러
+   */
+  const handleShareResults = async () => {
     if (isSaving) return;
     setIsSaving(true);
 
     try {
-      // 1. 고화질 이미지 추출 (2초 이상의 시간이 걸림)
-      const blob = await captureReportBlob();
-      if (!blob) throw new Error("이미지 생성 실패");
+      const blob = await captureReportBlob(reportRef.current);
+      if (!blob) throw new Error("Blob creation failed");
 
-      const file = new File([blob], `Olfit_Analysis_${Date.now()}.png`, { type: "image/png" });
-
-      // 2. 모바일 등 네이티브 공유 API 지원 환경 시도
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: "Olfit Scent Analysis Report",
-            text: "나만의 고유한 향기 아우라 분석 결과를 확인해보세요.",
-          });
-          return; // 공유 성공 시 여기서 함수 깔끔하게 종료
-        } catch (shareErr) {
-          // 사용자가 공유 창을 그냥 닫은 경우(AbortError)는 무시하고 종료
-          if ((shareErr as Error).name === "AbortError") return; 
-          console.warn("공유하기 실패, 클립보드 복사로 넘어갑니다.", shareErr);
-        }
+      const result = await shareOrDownloadImage(blob);
+      
+      if (result === "shared") {
+        // 네이티브 공유 완료
+      } else if (result === "copied") {
+        setFeedback("이미지 복사 완료!");
+        setTimeout(() => setFeedback(null), 2000);
+      } else if (result === "downloaded") {
+        setFeedback("이미지 저장 완료!");
+        setTimeout(() => setFeedback(null), 2000);
       }
-
-      // 3. 데스크탑 등에서 클립보드 이미지 복사 시도
-      let clipboardSuccess = false;
-      try {
-        if (navigator.clipboard && window.ClipboardItem) {
-          const item = new ClipboardItem({ "image/png": blob });
-          await navigator.clipboard.write([item]);
-          clipboardSuccess = true;
-          setIsShared(true); // "이미지 복사 완료!" 표시
-          setTimeout(() => setIsShared(false), 2000);
-          return; // 복사 성공 시 함수 종료
-        }
-      } catch (clipboardErr) {
-        // 보안 정책으로 인해 클립보드 복사 실패 시 (예: 비동기 작업 지연)
-        console.warn("보안 정책으로 클립보드 복사 실패. 다운로드로 안전하게 우회합니다.", clipboardErr);
-      }
-
-      // 4. 최후의 보루: 공유도 실패, 복사도 실패했다면 -> 즉시 파일 직접 다운로드!
-      if (!clipboardSuccess) {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `Olfit_Analysis_${Date.now()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => window.URL.revokeObjectURL(url), 100);
-        
-        // 다운로드가 실행되어도 유저에게 긍정적인 피드백(체크마크)을 보여줌
-        setIsShared(true); 
-        setTimeout(() => setIsShared(false), 2000);
-      }
-
     } catch (err) {
-      console.error("이미지 처리 중 치명적 오류:", err);
+      console.error("Report processing error:", err);
       alert("결과를 처리하던 중 문제가 발생했습니다.");
     } finally {
-      setIsSaving(false); // 로딩 스피너 종료
+      setIsSaving(false);
     }
   };
 
@@ -382,12 +142,12 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
               
               <div className="flex justify-center">
                 <button 
-                  onClick={shareResults}
+                  onClick={handleShareResults}
                   disabled={isSaving}
                   className={`group flex items-center gap-3 px-8 py-3.5 border rounded-full text-[11px] sm:text-[12px] uppercase tracking-[0.2em] transition-all duration-300 ${
                     isSaving 
                       ? "bg-wood/5 text-wood/30 border-wood/10 cursor-not-allowed" 
-                      : isShared 
+                      : feedback 
                         ? "bg-green-50 text-green-600 border-green-200" 
                         : "bg-wood text-cream border-wood hover:bg-wood/90 hover:shadow-lg active:scale-95"
                   }`}
@@ -395,14 +155,13 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
                   {isSaving ? (
                     <>
                       <div className="w-3 h-3 border-2 border-wood/20 border-t-wood rounded-full animate-spin" />
-                      {/* 긴 텍스트는 모바일에서 깨질 수 있으므로 간결하게 조정 */}
                       <span className="hidden sm:inline">고화질 리포트 정밀 생성 중...</span>
                       <span className="sm:hidden">생성 중...</span>
                     </>
-                  ) : isShared ? (
+                  ) : feedback ? (
                     <>
                       <Check size={16} />
-                      이미지 복사 완료!
+                      {feedback}
                     </>
                   ) : (
                     <>
@@ -415,7 +174,6 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
             </div>
 
             <div ref={reportRef} id="report-content" className="p-4 md:p-8 rounded-lg bg-[#FDFCF0]">
-              {/* 01. Aura Analysis */}
               <div className="mb-32 animate-in fade-in duration-1000">
                 <div className="flex items-center gap-4 mb-12">
                   <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-wood/30">Visual Analysis</span>
@@ -465,7 +223,6 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
                       <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-wood/30 mb-2">Matching Selection</p>
                       <h3 className="text-2xl font-light tracking-tight text-wood">당신의 스타일을 닮은 향기</h3>
                       
-                      {/* 추천 근거(Match Reason) 노출 - 첫 번째 추천 제품 기준 */}
                       {recommendations.length > 0 && (
                         <div className="mt-6 max-w-lg mx-auto px-6 py-4 bg-wood/[0.03] border border-wood/10 rounded-sm">
                           <p className="text-[13px] text-wood/70 leading-relaxed italic break-keep text-balance">
@@ -489,3 +246,5 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
     </section>
   );
 }
+
+// EOF: InsightReportSection.tsx

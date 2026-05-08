@@ -1,6 +1,7 @@
 /**
  * @file AIInterviewSection.tsx
- * @description 사용자의 취향을 분석하기 위한 AI 채팅 인터뷰 섹션입니다.
+ * @description 사용자의 스타일(OOTD) 이미지를 분석하여 맞춤형 향기를 추천하기 위한 인터뷰 섹션입니다.
+ * 30초 간의 정교한 시뮬레이션 애니메이션을 통해 AI 분석 과정을 시각적으로 전달합니다.
  */
 
 import { useState } from "react";
@@ -10,18 +11,24 @@ import ImageUploader from "@/components/common/ImageUploader";
 import type { AnalysisResults } from "@/types";
 
 interface AIInterviewSectionProps {
+  /** 분석 완료 시 결과 데이터를 전달하는 콜백 */
   onComplete?: (results: AnalysisResults) => void;
-  selectedNotes?: string[]; // NoteGlossary 에서 선택된 노트들
+  /** ScentGuideSection에서 선택된 향기 노트 리스트 */
+  selectedNotes?: string[];
 }
 
 export default function AIInterviewSection({ onComplete, selectedNotes = [] }: AIInterviewSectionProps) {
   const { ref, isVisible } = useIntersectionObserver();
+  /** AI 분석 진행 상태 */
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  /** 분석 완료 여부 */
   const [isComplete, setIsComplete] = useState(false);
+  /** 현재 진행 중인 분석 단계 텍스트 */
   const [analysisStatus, setAnalysisStatus] = useState("");
+  /** 프로그레스 바 수치 (0-100) */
   const [progress, setProgress] = useState(0);
   
-  // 분석 단계 시나리오 (30초 동안 순차적 노출)
+  // 분석 단계별 시나리오 정의
   const getSteps = () => [
     { threshold: 10, text: "이미지 픽셀 데이터 추출 중..." },
     { threshold: 30, text: "스타일 실루엣 및 텍스처 분석..." },
@@ -33,15 +40,15 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
   ];
 
   /**
-   * 이미지 처리 핸들러 (30초 시뮬레이션)
+   * 이미지 업로드 완료 시 호출되는 핸들러
+   * 30초 동안의 프로그레스 애니메이션과 함께 분석 시뮬레이션을 수행합니다.
    */
   const handleImageProcessed = (base64: string) => {
     setIsAnalyzing(true);
     setProgress(0);
     
     const analysisSteps = getSteps();
-    // 30초 동안 프로그레스 바 및 상태 업데이트
-    const duration = 30000; // 30 seconds
+    const duration = 30000; // 시뮬레이션 전체 시간 (30초)
     const interval = 100;
     const step = (interval / duration) * 100;
 
@@ -49,7 +56,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
       setProgress((prev) => {
         const next = prev + step;
         
-        // 현재 퍼센트에 맞는 텍스트 업데이트
+        // 프로그레스 수치에 맞는 상태 메시지 업데이트
         const currentStep = analysisSteps.find(s => next <= s.threshold) || analysisSteps[analysisSteps.length - 1];
         setAnalysisStatus(currentStep.text);
 
@@ -63,7 +70,6 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
               type: "personal", 
               personalMood: "이미지 분석 기반 무드", 
               fashionStyle: "이미지 분석 기반 스타일",
-              // 선택된 이미지와 노트를 기반으로 한 분석 결과임을 명시
               analysisMetadata: {
                 base64Image: base64,
                 selectedNotes: selectedNotes
@@ -91,6 +97,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
               당신만의 고유한 향기 아우라를 정교하게 분석합니다.
             </p>
 
+            {/* 상태 힌트: 노트 선택 여부 알림 */}
             {!isComplete && !isAnalyzing && selectedNotes.length === 0 && (
               <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 bg-cream/5 border border-cream/10 rounded-full animate-pulse">
                 <span className="text-[10px] text-cream/60 uppercase tracking-widest font-medium">
@@ -111,8 +118,10 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
           <div className="max-w-2xl mx-auto">
             {!isComplete ? (
               <div className="relative">
+                {/* 이미지 업로더 컴포넌트 */}
                 <ImageUploader onImageProcessed={handleImageProcessed} isAnalyzing={isAnalyzing} />
                 
+                {/* 분석 진행바 및 상태 메시지 */}
                 {isAnalyzing && (
                   <div className="mt-12 space-y-6">
                     <div className="h-px bg-cream/10 w-full relative overflow-hidden">
@@ -132,6 +141,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
                 )}
               </div>
             ) : (
+              /* 분석 완료 후 결과 이동 카드 */
               <div className="flex flex-col items-center py-12 animate-in fade-in zoom-in duration-1000">
                 <div className="w-20 h-20 rounded-full bg-cream/10 flex items-center justify-center mb-8 border border-cream/20">
                   <CheckCircle2 className="text-cream w-10 h-10" strokeWidth={1} />
@@ -161,3 +171,5 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
     </section>
   );
 }
+
+// EOF: AIInterviewSection.tsx

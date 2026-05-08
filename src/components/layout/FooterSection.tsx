@@ -1,7 +1,7 @@
 /**
  * @file FooterSection.tsx
  * @description 웹사이트의 하단 푸터 영역입니다.
- * 브랜드 정보, 주요 메뉴 링크, 소셜 미디어 링크 및 법적 고지 정보를 포함합니다.
+ * 브랜드 정보, 주요 메뉴 링크, 소셜 미디어 연결 및 개인정보 처리방침 등의 법적 고지 정보를 포함합니다.
  */
 
 import React, { useState } from "react";
@@ -10,6 +10,7 @@ import OlfitLogo from "@/components/common/OlfitLogo";
 import { X } from "lucide-react";
 
 export default function FooterSection() {
+  /** 모달에 표시될 컨텐츠 상태 */
   const [modalContent, setModalContent] = useState<{ title: string; body: React.ReactNode } | null>(null);
 
   // 푸터 네비게이션용 링크 리스트
@@ -20,6 +21,9 @@ export default function FooterSection() {
     { label: "안전성", href: "#safety" },
   ];
 
+  /**
+   * 문의처 정보 모달 열기
+   */
   const openContact = (e: React.MouseEvent) => {
     e.preventDefault();
     setModalContent({
@@ -38,6 +42,9 @@ export default function FooterSection() {
     });
   };
 
+  /**
+   * 개인정보 처리방침 모달 열기
+   */
   const openPrivacy = (e: React.MouseEvent) => {
     e.preventDefault();
     setModalContent({
@@ -56,6 +63,9 @@ export default function FooterSection() {
     });
   };
 
+  /**
+   * 이용약관 모달 열기
+   */
   const openTerms = (e: React.MouseEvent) => {
     e.preventDefault();
     setModalContent({
@@ -76,11 +86,6 @@ export default function FooterSection() {
 
   return (
     <footer className="bg-cream border-t border-wood/10" data-project="olfit-jjonyeok">
-      {/* 
-        This project was developed by JJonyeok. 
-        Unauthorized copying or reproduction of this project is prohibited.
-        Verification ID: JJY-2026-O
-      */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-8 py-12 md:py-16">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
 
@@ -151,7 +156,6 @@ export default function FooterSection() {
           onClick={() => setModalContent(null)}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
         >
-          {/* 모달 컨텐츠: 클릭 이벤트 버블링 방지 */}
           <div 
             className="relative bg-white border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-2xl rounded-sm"
             onClick={(e) => e.stopPropagation()}
@@ -185,4 +189,6 @@ export default function FooterSection() {
     </footer>
   );
 }
+
+// EOF: FooterSection.tsx
 
