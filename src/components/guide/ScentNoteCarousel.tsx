@@ -89,8 +89,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
 
   return (
     <div className="w-full bg-cream/30 rounded-sm border border-wood/5 p-8 md:p-16 flex flex-col items-center mt-12 relative overflow-hidden">
-      {/* 배경 장식 (모든 슬롯이 채워졌을 때 우아한 광채 효과) */}
-      <div className={`absolute inset-0 bg-wood/[0.03] transition-opacity duration-[2000ms] ${isAllSelected ? 'opacity-100' : 'opacity-0'}`} />
+      {/* 배경 장식 제거됨 (텍스트 온리 무드) */}
 
       {/* 상단 섹션: 텍스트 가이드와 비주얼 피라미드 */}
       <div className="relative z-10 w-full flex flex-col lg:flex-row items-center justify-between mb-20 gap-12 lg:gap-24">
@@ -122,45 +121,22 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
           </div>
         </div>
 
-        {/* 비주얼 피라미드 슬롯 */}
+        {/* 비주얼 피라미드 슬롯 (텍스트 온리 버전) */}
         <div className="relative w-80 h-80 md:w-96 md:h-96 flex flex-col items-center order-1 lg:order-2 group">
           
-          {/* ⭐️ [완벽 해결] 배경 하이라이트를 선(Line)을 그리는 SVG 안으로 합쳤습니다! */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-sm" viewBox="0 0 100 100">
-            {/* 전체 피라미드 베이스 (연한 반투명 배경) */}
-            <path d="M50 5 L95 90 L5 90 Z" fill="currentColor" className="text-wood/[0.03]" />
+            {/* 전체 피라미드 베이스 (배경색 제거) */}
             
-            {/* --- [추가된 정확한 하이라이트 폴리곤(다각형)] --- */}
-            {/* Top 영역 색칠 */}
-            <polygon 
-              points="50,5 67,33 33,33" 
-              fill="currentColor"
-              className={`transition-all duration-1000 ${slots.Top ? 'text-wood/15 opacity-100' : 'opacity-0'}`} 
-            />
-            {/* Middle 영역 색칠 (고깔모자 완벽 해결!) */}
-            <polygon 
-              points="33,33 67,33 84,62 16,62" 
-              fill="currentColor"
-              className={`transition-all duration-1000 ${slots.Middle ? 'text-wood/15 opacity-100' : 'opacity-0'}`} 
-            />
-            {/* Base 영역 색칠 */}
-            <polygon 
-              points="16,62 84,62 95,90 5,90" 
-              fill="currentColor"
-              className={`transition-all duration-1000 ${slots.Base ? 'text-wood/15 opacity-100' : 'opacity-0'}`} 
-            />
-            {/* -------------------------------------- */}
-
-            {/* 외곽선 및 수평 분할선 */}
+            {/* 외곽선 및 수평 분할선 (최소한의 가이드만 유지) */}
             <path d="M50 5 L95 90 L5 90 Z" fill="none" stroke="currentColor" strokeWidth="0.2" className="text-wood/20" />
             <line x1="33" y1="33" x2="67" y2="33" stroke="currentColor" strokeWidth="0.15" className="text-wood/10" />
             <line x1="16" y1="62" x2="84" y2="62" stroke="currentColor" strokeWidth="0.15" className="text-wood/10" />
           </svg>
 
-          {/* 슬롯 레이어들 (클릭 영역 및 텍스트만 남기고 배경색 div는 모두 제거) */}
+          {/* 슬롯 레이어들 (하이라이트 없이 텍스트만 표시) */}
           <div className="w-full h-full flex flex-col items-center pt-2 pb-8">
             
-            {/* TOP SLOT 텍스트 영역 */}
+            {/* TOP SLOT */}
             <div 
               onClick={() => handleTabChange('Top')}
               className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-end pb-4 cursor-pointer transition-all duration-700 ${
@@ -168,12 +144,12 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
               } ${activeTab === 'Top' ? 'scale-105' : 'hover:scale-102'}`}
             >
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Top</span>
-              <span className="text-[11px] md:text-[12px] font-medium tracking-tight truncate max-w-[80px] text-center px-2">
+              <span className={`text-[11px] md:text-[12px] font-medium tracking-tight truncate max-w-[80px] text-center px-2 transition-colors duration-500 ${slots.Top ? 'text-wood' : 'text-wood/40 italic opacity-50'}`}>
                 {slots.Top ? slots.Top.name : "Select"}
               </span>
             </div>
 
-            {/* MIDDLE SLOT 텍스트 영역 */}
+            {/* MIDDLE SLOT */}
             <div 
               onClick={() => handleTabChange('Middle')}
               className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-center cursor-pointer transition-all duration-700 ${
@@ -181,12 +157,12 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
               } ${activeTab === 'Middle' ? 'scale-105' : 'hover:scale-102'}`}
             >
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Middle</span>
-              <span className="text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2">
+              <span className={`text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2 transition-colors duration-500 ${slots.Middle ? 'text-wood' : 'text-wood/40 italic opacity-50'}`}>
                 {slots.Middle ? slots.Middle.name : "Select"}
               </span>
             </div>
 
-            {/* BASE SLOT 텍스트 영역 */}
+            {/* BASE SLOT */}
             <div 
               onClick={() => handleTabChange('Base')}
               className={`relative z-10 w-full h-[34%] flex flex-col items-center justify-start pt-6 cursor-pointer transition-all duration-700 ${
@@ -194,7 +170,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
               } ${activeTab === 'Base' ? 'scale-105' : 'hover:scale-102'}`}
             >
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Base</span>
-              <span className="text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2">
+              <span className={`text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2 transition-colors duration-500 ${slots.Base ? 'text-wood' : 'text-wood/40 italic opacity-50'}`}>
                 {slots.Base ? slots.Base.name : "Select"}
               </span>
             </div>
