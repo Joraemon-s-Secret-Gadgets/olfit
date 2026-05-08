@@ -60,6 +60,21 @@
     font-feature-settings: "kern" 1, "liga" 1; /* 자간 및 합자 설정 최적화 */
     text-rendering: optimizeLegibility;
   }
+
+  /* 커스텀 스크롤바 스타일링 */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #6B4423;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4A2B0F;
+  }
 }
 
 @layer components {
