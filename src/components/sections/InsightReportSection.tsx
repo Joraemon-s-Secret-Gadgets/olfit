@@ -84,31 +84,37 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
     setIsSaving(true);
     
     try {
-      // 1. 폰트 로딩 대기
-      if (document.fonts) {
-        await document.fonts.ready;
-      }
+      // 1. 모든 리소스(폰트, 이미지)가 100% 로드될 때까지 무조건 대기
+      const waitForResources = async () => {
+        // 웹 폰트 로딩 대기
+        if (document.fonts) {
+          await document.fonts.ready;
+        }
 
-      // 2. 이미지 디코딩 확인 (완전히 로드되어 메모리에 올라왔는지 체크)
-      const images = reportRef.current.querySelectorAll("img");
-      const imagePromises = Array.from(images).map((img) => {
-        if (img.complete) return img.decode().catch(() => Promise.resolve());
-        return new Promise((resolve) => {
-          img.onload = () => img.decode().then(resolve).catch(resolve);
-          img.onerror = resolve;
-          // 개별 이미지 로딩에 최대 5초 제한
-          setTimeout(resolve, 5000);
+        // 모든 이미지 로딩 및 디코딩 완료 대기
+        const images = reportRef.current?.querySelectorAll("img") || [];
+        const imagePromises = Array.from(images).map((img) => {
+          if (img.complete) {
+            return img.decode().catch(() => Promise.resolve());
+          }
+          return new Promise((resolve) => {
+            img.onload = () => img.decode().then(resolve).catch(resolve);
+            img.onerror = resolve;
+          });
         });
-      });
-      await Promise.all(imagePromises);
+        await Promise.all(imagePromises);
+      };
 
-      // 3. 모든 로딩이 끝난 후 미세한 렌더링 오차 방지를 위한 강제 지연 (1000ms)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await waitForResources();
 
-      // 4. html2canvas를 이용한 고해상도 캡처 시작
+      // 2. 모든 로딩 신호 완료 후, 브라우저 레이아웃 안착을 위한 강제 지연 (2000ms)
+      // 선명도와 정확도를 위해 속도를 희생하고 완벽한 렌더링을 기다립니다.
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 3. 초고해상도 캡처 (Scale 4: 아주 작은 텍스트까지 선명하게 출력)
       const canvas = await html2canvas(reportRef.current, {
         backgroundColor: "#FDFCF0",
-        scale: 3, // 고해상도 (최소 300 DPI 수준)를 위해 3배 설정
+        scale: 4, // 400 DPI 이상의 선명도를 위해 4배로 설정
         useCORS: true,
         logging: false,
         allowTaint: false,
@@ -117,7 +123,7 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
         onclone: (clonedDoc) => {
           const el = clonedDoc.getElementById("report-content");
           if (el) {
-            // 출력용 고정 레이아웃 설정
+            // 출력용 정밀 레이아웃 강제 설정
             el.style.width = "1000px";
             el.style.maxWidth = "1000px";
             el.style.minWidth = "1000px";
@@ -128,7 +134,6 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
             (el.style as any).webkitFontSmoothing = "antialiased";
             (el.style as any).mozOsxFontSmoothing = "grayscale";
 
-            // 모든 요소에 폰트 스무딩 적용
             const allElements = el.querySelectorAll("*");
             allElements.forEach((node) => {
               const target = node as HTMLElement;
@@ -136,11 +141,10 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
               (target.style as any).webkitFontSmoothing = "antialiased";
             });
             
-            // 텍스트 크기 및 간격 최적화 (출력물 전용)
             const texts = el.querySelectorAll("p, h2, h3, span, div, text");
             texts.forEach((node) => {
               const target = node as HTMLElement;
-              target.style.lineHeight = "1.5";
+              target.style.lineHeight = "1.6";
               target.style.letterSpacing = "-0.01em";
               target.style.wordBreak = "keep-all";
               target.style.whiteSpace = "normal";
@@ -158,16 +162,6 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
               }
             });
 
-            // 섹션 간격 조정
-            const spacingElements = el.querySelectorAll(".mb-32, .mt-32, .mb-20, .mb-12, .mb-16");
-            spacingElements.forEach((node) => {
-              const target = node as HTMLElement;
-              if (target.classList.contains("mb-32")) target.style.marginBottom = "80px";
-              if (target.classList.contains("mt-32")) target.style.marginTop = "80px";
-              if (target.classList.contains("mb-20")) target.style.marginBottom = "60px";
-            });
-
-            // 공식 리포트 헤더 삽입
             const header = clonedDoc.createElement("div");
             header.style.display = "flex";
             header.style.justifyContent = "space-between";
@@ -179,7 +173,7 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
             header.innerHTML = `
               <div style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 300; letter-spacing: 0.25em; color: #6B4423; text-transform: uppercase;">OLFIT</div>
               <div style="text-align: right;">
-                <div style="font-size: 11px; font-weight: 600; color: #6B4423; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Analysis Report</div>
+                <div style="font-size: 11px; font-weight: 600; color: #6B4423; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Precision Analysis Report</div>
                 <div style="font-size: 10px; color: rgba(107, 68, 35, 0.5); letter-spacing: 0.05em;">${new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</div>
               </div>
             `;
@@ -188,16 +182,16 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
         }
       });
 
-      // 5. 최종 이미지 생성 및 다운로드
+      // 4. 최종 고해상도 이미지 다운로드
       const image = canvas.toDataURL("image/png", 1.0);
       const link = document.createElement("a");
       link.href = image;
-      link.download = `Olfit_Analysis_Report_${Date.now()}.png`;
+      link.download = `Olfit_Precision_Report_${Date.now()}.png`;
       link.click();
 
     } catch (err) {
-      console.error("리포트 저장 실패:", err);
-      alert("고화질 리포트를 생성하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+      console.error("리포트 정밀 생성 실패:", err);
+      alert("고화질 리포트 생성 중 문제가 발생했습니다. 브라우저 메모리가 부족할 수 있으니 탭을 정리한 후 다시 시도해 주세요.");
     } finally {
       setIsSaving(false);
     }
@@ -242,7 +236,7 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
                 {isSaving ? (
                   <>
                     <div className="w-3 h-3 border-2 border-wood/20 border-t-wood rounded-full animate-spin" />
-                    Generating High-Quality Report...
+                    고화질 리포트를 정밀하게 생성 중입니다. 잠시만 기다려 주세요 (약 3~5초 소요)
                   </>
                 ) : (
                   <>
