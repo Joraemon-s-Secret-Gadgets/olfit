@@ -9,13 +9,15 @@ interface OlfitLogoProps {
   width?: number | string;
   height?: number | string;
   color?: string;
+  showLine?: boolean;
 }
 
 export default function OlfitLogo({ 
   className, 
   width = "auto", 
   height = "1.2em", 
-  color = "currentColor" 
+  color = "currentColor",
+  showLine = true
 }: OlfitLogoProps) {
   return (
     <svg 
@@ -43,12 +45,14 @@ export default function OlfitLogo({
         Olfit
       </text>
       {/* 단순 텍스트를 넘어선 로고 느낌을 위한 데코레이션 라인 */}
-      <path 
-        d="M25 32 H95" 
-        stroke={color} 
-        strokeWidth="0.5" 
-        strokeOpacity="0.3" 
-      />
+      {showLine && (
+        <path 
+          d="M25 32 H95" 
+          stroke={color} 
+          strokeWidth="0.5" 
+          strokeOpacity="0.3" 
+        />
+      )}
     </svg>
   );
 }

@@ -51,8 +51,9 @@ export default function Navigation() {
                 isScrolled || isMenuOpen ? "text-wood" : "text-cream"
               }`}
             >
-              <OlfitLogo height={isScrolled ? 24 : 28} />
+              <OlfitLogo height={isScrolled ? 24 : 28} showLine={false} />
             </a>
+
           </div>
 
           {/* 중앙 영역: 데스크탑 네비게이션 링크 */}

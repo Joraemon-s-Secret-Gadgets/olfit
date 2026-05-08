@@ -21,7 +21,7 @@ export default function PrivacyConsentModal({ onAgree }: PrivacyConsentModalProp
       <div className="relative w-full max-w-[480px] bg-cream border border-wood/10 shadow-editorial p-8 md:p-12 animate-in fade-in zoom-in duration-500">
         <div className="flex flex-col items-center text-center">
           <div className="mb-8">
-            <OlfitLogo height={32} color="#6B4423" />
+            <OlfitLogo height={32} color="#6B4423" showLine={false} />
           </div>
           
           <h2 className="text-2xl font-light tracking-tight text-wood mb-6">

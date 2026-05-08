@@ -27,7 +27,7 @@ export default function FooterSection() {
           
           {/* 브랜드 영역 (좌측) */}
           <div className="flex flex-col items-start">
-            <OlfitLogo height={24} color="#6B4423" />
+            <OlfitLogo height={24} color="#6B4423" showLine={false} />
             <p className="text-[10px] text-wood/40 mt-1 tracking-[0.2em] uppercase">AI Scent Stylist</p>
           </div>
 
