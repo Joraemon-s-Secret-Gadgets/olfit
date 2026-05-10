@@ -146,7 +146,7 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
                     {/* 추가 블록 2: 매칭 근거 텍스트 (Why This Scent) */}
                     <div className="mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
                       <p className="text-cream/60 text-xs italic break-keep">
-                        당신이 설계한 '{slots.Base?.name || "선택된"}' 베이스가 이 향수의 {item.family} 분위기를 완성해 줍니다
+                        당신이 설계한 '{slots.Base?.name || slots.Middle?.name || slots.Top?.name || "선택된"}' 향기가 이 향수의 {item.family} 분위기를 완성해 줍니다
                       </p>
                     </div>
 

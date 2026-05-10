@@ -40,7 +40,13 @@ export default function ScentBlueprint({ isVisible, slots, matchPercent, accentC
             {hasNoNotes ? (
               "선택하신 향기 정보가 없어, 업로드하신 이미지의 색채와 실루엣 분석 데이터만을 바탕으로 당신에게 가장 잘 어울리는 향기 밸런스를 도출했습니다."
             ) : (
-              <>선택하신 {slots.Top?.name}, {slots.Middle?.name}, {slots.Base?.name} 노트를 바탕으로 당신의 시각적 아우라와 가장 조화로운 향기 밸런스를 찾았습니다.</>
+              <>
+                선택하신 {
+                  [slots.Top?.name, slots.Middle?.name, slots.Base?.name]
+                    .filter(Boolean)
+                    .join(", ")
+                } 노트를 바탕으로 당신의 시각적 아우라와 가장 조화로운 향기 밸런스를 찾았습니다.
+              </>
             )}
           </p>
         </div>

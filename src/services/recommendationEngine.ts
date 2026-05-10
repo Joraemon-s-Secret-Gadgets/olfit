@@ -19,8 +19,8 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
   if (!results) return [];
 
   // 분석 메타데이터에서 사용자 선택 정보 추출
-  const selectedNotes = results.analysisMetadata?.selectedNotes || [];
-  const perfumeKeywords = results.perfumeKeywords || [];
+  const selectedNotes = (results.analysisMetadata?.selectedNotes || []).filter(Boolean);
+  const perfumeKeywords = (results.perfumeKeywords || []).filter(Boolean);
   const mood = results.personalMood || "";
   
   // 전체 제품군에 대하여 개별 유사도 점수 산출
@@ -31,6 +31,7 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
     
     // 1. 후각적 매칭: 선택된 노트와 제품 성분 간의 교차 검증 (가중치 2)
     selectedNotes.forEach((userNote) => {
+      if (!userNote) return;
       const targetText = `
         ${product.notes.toLowerCase()} 
         ${product.details.topNotes.toLowerCase()} 
@@ -46,6 +47,7 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
 
     // 2. 백엔드 키워드 매칭: 변환된 향수 키워드와 제품 정보 매칭 (가중치 2)
     perfumeKeywords.forEach((keyword) => {
+      if (!keyword) return;
       const cleanKeyword = keyword.replace("#", "").toLowerCase();
       const targetText = `${product.notes} ${product.family} ${product.details.story}`.toLowerCase();
       
