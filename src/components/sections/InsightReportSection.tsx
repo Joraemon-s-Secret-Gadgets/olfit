@@ -63,9 +63,9 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
 
   const dynamicLogicSteps = [
     `업로드된 이미지에서 추출된 ${results?.personalMood || "#현대적 #시크"} 무드 분석`,
-    results?.perfumeKeywords && results.perfumeKeywords.length > 0 
-      ? `분석된 무드를 향수 키워드로 변환: ${results.perfumeKeywords.join(", ")}`
-      : `사용자가 선택한 원료(${results?.analysisMetadata?.selectedNotes.join(", ") || "선택 없음"})와의 조화 계산`,
+    results?.analysisMetadata?.selectedNotes && results.analysisMetadata.selectedNotes.length > 0
+      ? `사용자가 선택한 원료(${results.analysisMetadata.selectedNotes.join(", ")})와의 조화 계산`
+      : "이미지의 색채 심리학적 데이터 기반 향기 맵 생성",
     `최적의 향기 아우라 매칭: ${recommendations[0]?.name || "분석 중"}`,
     "시각적 무드와 후각적 취향의 완벽한 밸런스 완성",
   ];
