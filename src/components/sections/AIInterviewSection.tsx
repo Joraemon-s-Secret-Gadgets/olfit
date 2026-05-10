@@ -33,7 +33,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
     { threshold: 90, text: "최적의 향기 아우라 생성 완료" },
   ];
 
-  const handleImageProcessed = (base64: string) => {
+  const handleImageProcessed = (base64: string, remoteUrl: string) => {
     setLastProcessedBase64(base64);
     setLoading(true);
     setError(null);
@@ -67,6 +67,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
                 radarScores: { "플로랄": 0.2, "우디": 0.8, "오리엔탈": 0.4, "프레시": 0.6, "구르망": 0.1 }
               }
             });
+            console.log("Analysis triggered with remote URL:", remoteUrl);
           }
           return 100;
         }
@@ -77,7 +78,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
 
   const handleRetry = () => {
     if (lastProcessedBase64) {
-      handleImageProcessed(lastProcessedBase64);
+      handleImageProcessed(lastProcessedBase64, "retry-mock-url");
     }
   };
 
