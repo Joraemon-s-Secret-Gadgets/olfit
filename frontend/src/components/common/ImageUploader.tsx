@@ -6,10 +6,11 @@
 
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
 import { Upload, X, ImageIcon, Loader2, AlertCircle } from "lucide-react";
+import { uploadToCloudStorage } from "@/services/uploadService";
 
 interface ImageUploaderProps {
-  /** 이미지 처리가 완료되었을 때 호출되는 콜백 (Base64 문자열 전달) */
-  onImageProcessed: (base64: string) => void;
+  /** 이미지 처리가 완료되었을 때 호출되는 콜백 (Base64 및 원격 URL 전달) */
+  onImageProcessed: (base64: string, remoteUrl: string) => void;
   /** 현재 AI 분석이 진행 중인지 여부 */
   isAnalyzing: boolean;
 }
@@ -17,15 +18,14 @@ interface ImageUploaderProps {
 export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   /**
-   * 이미지 리사이징 및 Base64 변환 로직
-   * 브라우저 성능을 위해 캔버스를 이용하여 적정 해상도로 리사이징합니다.
+   * 이미지 리사이징 및 클라우드 업로드 시뮬레이션
    */
-  const processImage = (file: File) => {
-    // 이미지 파일 형식 검증
+  const processImage = async (file: File) => {
     if (!file.type.startsWith("image/")) {
       setError("이미지 파일만 업로드 가능합니다.");
       return;
@@ -34,26 +34,16 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     setError(null);
     const reader = new FileReader();
     
-    reader.onerror = () => {
-      setError("파일을 읽는 중 오류가 발생했습니다.");
-    };
-
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const img = new Image();
-      img.onerror = () => {
-        setError("이미지를 로드할 수 없습니다.");
-      };
-
-      img.onload = () => {
+      img.onload = async () => {
         try {
           const canvas = document.createElement("canvas");
           const MAX_WIDTH = 1200; 
           const MAX_HEIGHT = 1200;
-          
           let width = img.width;
           let height = img.height;
 
-          // 가로/세로 비율 유지하며 리사이징
           if (width > height) {
             if (width > MAX_WIDTH) {
               height *= MAX_WIDTH / width;
@@ -69,21 +59,21 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext("2d");
-          
-          if (!ctx) {
-            setError("캔버스 컨텍스트를 생성할 수 없습니다.");
-            return;
-          }
-
+          if (!ctx) return;
           ctx.drawImage(img, 0, 0, width, height);
           
-          // JPEG 포맷 품질 0.9로 변환
           const base64 = canvas.toDataURL("image/jpeg", 0.9);
           setPreview(base64);
-          onImageProcessed(base64);
+          
+          // 클라우드 업로드 시뮬레이션 시작
+          setIsUploading(true);
+          const remoteUrl = await uploadToCloudStorage(base64);
+          setIsUploading(false);
+          
+          onImageProcessed(base64, remoteUrl);
         } catch (err) {
-          console.error("Image processing error:", err);
           setError("이미지 처리 중 오류가 발생했습니다.");
+          setIsUploading(false);
         }
       };
       img.src = event.target?.result as string;
@@ -174,6 +164,15 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
               >
                 <X size={20} />
               </button>
+            </div>
+          )}
+
+          {/* 업로드 중 상태 표시 */}
+          {isUploading && (
+            <div className="absolute inset-0 bg-gold/40 backdrop-blur-sm flex flex-col items-center justify-center text-wood">
+              <Loader2 className="w-8 h-8 animate-spin mb-4" />
+              <p className="text-[13px] font-bold tracking-widest uppercase">Uploading to S3...</p>
+              <p className="text-[11px] opacity-70 mt-2">안전한 서버로 이미지를 전송 중입니다</p>
             </div>
           )}
 
