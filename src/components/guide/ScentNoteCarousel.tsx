@@ -16,6 +16,12 @@ interface ScentNoteCarouselProps {
   onNotesChange?: (notes: string[]) => void;
 }
 
+type ScentSlots = {
+  Top: ScentNote | null;
+  Middle: ScentNote | null;
+  Base: ScentNote | null;
+};
+
 export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselProps) {
   const [activeTab, setActiveTab] = useState<"Top" | "Middle" | "Base">('Top');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -23,7 +29,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
   /** 
    * 슬롯 기반 선택 상태 관리 
    */
-  const [slots, setSlots] = useState<Record<string, ScentNote | null>>({
+  const [slots, setSlots] = useState<ScentSlots>({
     Top: null,
     Middle: null,
     Base: null
@@ -60,7 +66,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
       const newSlots = {
         ...prev,
         [note.category]: isAlreadySelected ? null : note
-      } as Record<string, ScentNote | null>;
+      };
 
       if (onNotesChange) {
         const selectedNames = Object.values(newSlots)
@@ -74,7 +80,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
   };
 
   const resetNotes = () => {
-    const emptySlots = { Top: null, Middle: null, Base: null };
+    const emptySlots: ScentSlots = { Top: null, Middle: null, Base: null };
     setSlots(emptySlots);
     if (onNotesChange) onNotesChange([]);
   };
@@ -104,7 +110,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
             {/* 비주얼 피라미드 슬롯 */}
             <div className="flex justify-center mb-10">
               <ScentPyramid 
-                slots={slots as any} 
+                slots={slots}
                 activeTab={activeTab} 
                 onTabChange={handleTabChange}
                 className="w-72 h-72 md:w-80 md:h-80"
@@ -122,7 +128,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
               </p>
             </div>
 
-            <p className="text-[13px] md:text-[14px] text-wood/60 leading-relaxed break-keep mb-8 font-light text-center lg:text-left">
+            <p className="text-[13px] md:text-[14px] text-wood leading-relaxed break-keep mb-8 font-light text-center lg:text-left">
               {isAllSelected 
                 ? "완벽한 향의 삼각형이 완성되었습니다. 당신의 감각이 조화롭게 정렬되었습니다. 이제 아래 분석 버튼을 눌러 당신만의 향수를 찾아보세요." 
                 : "탑, 미들, 베이스 노트에서 각각 가장 마음에 드는 원료를 하나씩 골라 조화를 완성하세요. 완성된 피라미드는 당신의 페르소나와 결합됩니다."}
@@ -131,7 +137,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6">
               <button 
                 onClick={resetNotes}
-                className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-wood/30 hover:text-wood transition-colors group"
+                className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-wood transition-all group hover:font-bold"
               >
                 <RefreshCw size={12} className="group-hover:rotate-180 transition-transform duration-700" />
                 Reset Pyramid
@@ -155,7 +161,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
                 key={tab}
                 onClick={() => handleTabChange(tab)}
                 className={`relative pb-3 text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${
-                  activeTab === tab ? 'text-wood' : 'text-wood/30 hover:text-wood/50'
+                  activeTab === tab ? 'text-wood' : 'text-wood/50 hover:text-wood hover:font-black'
                 }`}
               >
                 {tab} Note
@@ -178,7 +184,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
             <div className="flex items-center justify-between w-full mb-10 gap-4">
               <button
                 onClick={handlePrev}
-                className="p-2 text-wood/20 hover:text-wood transition-colors flex-shrink-0"
+                className="p-2 text-wood hover:font-bold transition-all flex-shrink-0"
                 aria-label="Previous note"
               >
                 <ChevronLeft size={24} strokeWidth={1} />
@@ -190,7 +196,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
                 onClick={() => toggleNote(currentNote)}
               >
                 <div className="relative inline-block mb-4">
-                  <h3 className={`text-3xl md:text-5xl font-light tracking-tight transition-all duration-700 ${isSelected ? 'text-wood scale-105' : 'text-wood/80'} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                  <h3 className={`text-3xl md:text-5xl tracking-tight transition-all duration-700 ${isSelected ? 'text-wood scale-105 font-medium' : 'text-wood font-light group-hover/card:font-medium'} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>
                     {currentNote?.name}
                   </h3>
                   {isSelected && (
@@ -202,20 +208,20 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
                 <p className="text-[10px] uppercase tracking-[0.4em] text-wood/30 mb-8">{currentNote?.enName}</p>
                 
                 <div className="max-w-md mx-auto space-y-8">
-                  <p className="text-[15px] md:text-[17px] leading-relaxed text-wood/70 break-keep font-light transition-colors group-hover/card:text-wood/90 italic">
+                  <p className="text-[15px] md:text-[17px] leading-relaxed text-wood/90 break-keep font-light transition-all group-hover/card:font-medium italic">
                     "{currentNote?.description}"
                   </p>
                   
-                  <div className="flex flex-col items-center gap-1.5 opacity-60 group-hover/card:opacity-100 transition-opacity">
-                    <span className="text-[8px] uppercase tracking-[0.2em] text-wood/40">Scent Origin</span>
-                    <p className="text-[12px] text-wood/60 font-medium tracking-wide">{currentNote?.origin}</p>
+                  <div className="flex flex-col items-center gap-1.5 transition-all group-hover/card:font-semibold">
+                    <span className="text-[8px] uppercase tracking-[0.2em] text-wood/60">Scent Origin</span>
+                    <p className="text-[12px] text-wood font-medium tracking-wide">{currentNote?.origin}</p>
                   </div>
                 </div>
               </div>
 
               <button
                 onClick={handleNext}
-                className="p-2 text-wood/20 hover:text-wood transition-colors flex-shrink-0"
+                className="p-2 text-wood hover:font-bold transition-all flex-shrink-0"
                 aria-label="Next note"
               >
                 <ChevronRight size={24} strokeWidth={1} />
@@ -227,7 +233,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
               className={`px-12 py-4 rounded-full text-[11px] uppercase tracking-[0.2em] transition-all duration-500 border ${
                 isSelected 
                   ? 'bg-wood text-cream border-wood shadow-xl scale-105' 
-                  : 'bg-transparent text-wood/60 border-wood/20 hover:border-wood/40 hover:text-wood hover:bg-wood/5'
+                  : 'bg-transparent text-wood border-wood/40 hover:border-wood hover:bg-wood/5 hover:font-bold'
               }`}
             >
               {isSelected ? 'Placed in Pyramid' : `Place as ${activeTab} Note`}

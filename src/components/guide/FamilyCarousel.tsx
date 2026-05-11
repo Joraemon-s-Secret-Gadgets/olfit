@@ -68,20 +68,20 @@ export default function FamilyCarousel({ families }: FamilyCarouselProps) {
                 </div>
                 <div>
                   <h4 className="text-xl md:text-2xl font-light tracking-tight">{f.title}</h4>
-                  <p className="text-[9px] md:text-[11px] text-wood/40 uppercase tracking-[0.2em]">{f.subtitle}</p>
+                  <p className="text-[9px] md:text-[11px] text-wood/70 uppercase tracking-[0.2em]">{f.subtitle}</p>
                 </div>
               </div>
 
               {/* 본문 설명 */}
-              <p className="text-[13.5px] sm:text-[16px] leading-[1.7] md:leading-[1.8] text-wood/70 mb-8 md:mb-12 font-light break-keep tracking-tight text-left">
+              <p className="text-[13.5px] sm:text-[16px] leading-[1.7] md:leading-[1.8] text-wood mb-8 md:mb-12 font-light break-keep tracking-tight text-left">
                 {f.description}
               </p>              
               {/* 하단 성분 상세 목록 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-10 pt-6 md:pt-10 border-t border-wood/10 mt-auto">
                 {f.details.map((d) => (
                   <div key={d.name}>
-                    <p className="text-[12px] md:text-[14px] font-semibold mb-1 md:mb-2 tracking-wide uppercase text-wood/80">{d.name}</p>
-                    <div className="text-[12px] md:text-[13px] leading-relaxed text-wood/60 break-keep">
+                    <p className="text-[12px] md:text-[14px] font-semibold mb-1 md:mb-2 tracking-wide uppercase text-wood">{d.name}</p>
+                    <div className="text-[12px] md:text-[13px] leading-relaxed text-wood/90 break-keep">
                       {d.desc}
                     </div>
                   </div>
