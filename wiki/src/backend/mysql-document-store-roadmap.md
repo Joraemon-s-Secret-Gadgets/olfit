@@ -6,7 +6,11 @@ Deferred. 현재 단계에서는 Django ORM 기반의 RDB 모델을 유지하고
 
 ## Context
 
+<<<<<<< HEAD
 현재 백엔드는 MySQL의 관계형 테이블을 중심으로 향수 데이터를 관리한다. `Perfume` 모델은 브랜드, 상품명, 계열, 출시년도처럼 검색과 무결성이 중요한 값은 정규 컬럼으로 두고, 가격, 노트, 설명, 아우라 프로필, 임베딩 문서 등 유동적인 상세 정보는 `PerfumeDetail.data` JSON 컬럼에 저장한다. 원본 크롤링 문서는 `PerfumeRawData.raw_json`에 보존하고, 이미지 원본 URL과 처리 경로, Base64 데이터는 `PerfumeImage`에 분리한다.
+=======
+현재 백엔드는 MySQL의 관계형 테이블을 중심으로 향수 데이터를 관리한다. `Perfume` 모델은 브랜드, 상품명, 계열, 출시년도처럼 검색과 무결성이 중요한 값은 정규 컬럼으로 두고, 가격, 노트, 설명, 이미지 URL, 아우라 프로필, 임베딩 문서 등 유동적인 상세 정보는 `data` JSON 컬럼에 저장한다.
+>>>>>>> 88e65b6 (docs(wiki): document mysql document store roadmap)
 
 이 구조는 현재 800여 개 향수 데이터와 추천 MVP에는 충분하다. 다만 JSON 내부 값이 검색, 정렬, 추천, RAG 파이프라인의 핵심 조건으로 확장되면 JSON 컬럼 하나에 원본 문서와 파생 데이터를 모두 넣는 방식은 관리가 어려워질 수 있다.
 
@@ -85,4 +89,8 @@ class PerfumeDocument(models.Model):
 
 ## Current Recommendation
 
+<<<<<<< HEAD
 현재는 `PerfumeDetail.data` JSON 컬럼과 `PerfumeRawData`, `PerfumeImage` 분리 구조를 유지한다. 다음 단계에서 바로 해야 할 일은 물리 DB 분리가 아니라, JSON 안에 남아 있는 추천용 파생 데이터의 스키마를 테스트와 로더에서 더 엄격하게 검증하는 것이다.
+=======
+현재는 `Perfume.data` JSON 컬럼을 유지한다. 다음 단계에서 바로 해야 할 일은 물리 DB 분리가 아니라, JSON 안에 섞인 원본 문서와 추천용 파생 데이터를 분리할 수 있도록 `PerfumeDocument` 같은 문서 테이블을 설계하는 것이다.
+>>>>>>> 88e65b6 (docs(wiki): document mysql document store roadmap)
