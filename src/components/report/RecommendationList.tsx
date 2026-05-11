@@ -21,21 +21,25 @@ export default function RecommendationList({
   sortBy, 
   onSortChange 
 }: RecommendationListProps) {
+  const sortButtonClass = "h-8 min-w-[72px] px-5 inline-flex items-center justify-center rounded-full text-[10px] leading-none font-medium uppercase tracking-widest [text-indent:0.15em] transition-all";
+
   return (
     <div className="mt-32 pt-24 border-t border-wood/10">
       <div className="flex flex-col items-center mb-16 gap-8">
-        <div className="flex items-center gap-2 p-1 bg-wood/5 rounded-full border border-wood/10">
+        <div className="inline-flex h-10 items-center gap-1 p-1 bg-wood/5 rounded-full border border-wood/10">
           <button
+            type="button"
             onClick={() => onSortChange("recommended")}
-            className={`px-6 py-2 rounded-full text-[10px] font-medium uppercase tracking-widest transition-all ${
+            className={`${sortButtonClass} ${
               sortBy === "recommended" ? "bg-wood text-cream shadow-md" : "text-wood/40 hover:text-wood"
             }`}
           >
             추천순
           </button>
           <button
+            type="button"
             onClick={() => onSortChange("price")}
-            className={`px-6 py-2 rounded-full text-[10px] font-medium uppercase tracking-widest transition-all ${
+            className={`${sortButtonClass} ${
               sortBy === "price" ? "bg-wood text-cream shadow-md" : "text-wood/40 hover:text-wood"
             }`}
           >

@@ -77,7 +77,7 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
                       alt={item.name} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
                     />
-                    <div className="absolute top-4 right-4 bg-wood/80 text-cream px-3 py-1 rounded-full text-[10px] font-mono group-hover:bg-cream group-hover:text-wood transition-colors">
+                    <div className="absolute top-4 right-4 h-7 min-w-[74px] px-3 inline-flex items-center justify-center rounded-full bg-wood/80 text-cream text-[10px] leading-none font-mono group-hover:bg-cream group-hover:text-wood transition-colors">
                       {item.similarity}% Match
                     </div>
                   </div>
@@ -87,8 +87,9 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
                     {/* 상단 피드백 버튼 그룹 */}
                     <div className="absolute top-0 right-0 flex gap-2">
                       <button
+                        type="button"
                         onClick={(e) => handleFeedback(e, item.id, "like")}
-                        className={`p-2 rounded-full transition-all duration-300 ${
+                        className={`w-8 h-8 inline-flex items-center justify-center rounded-full transition-all duration-300 ${
                           feedbacks[item.id] === "like"
                             ? "bg-wood text-cream group-hover:bg-cream group-hover:text-wood scale-110"
                             : "bg-wood/5 text-wood/40 group-hover:bg-cream/10 group-hover:text-cream/40 hover:scale-110"
@@ -97,8 +98,9 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
                         <ThumbsUp size={14} fill={feedbacks[item.id] === "like" ? "currentColor" : "none"} />
                       </button>
                       <button
+                        type="button"
                         onClick={(e) => handleFeedback(e, item.id, "dislike")}
-                        className={`p-2 rounded-full transition-all duration-300 ${
+                        className={`w-8 h-8 inline-flex items-center justify-center rounded-full transition-all duration-300 ${
                           feedbacks[item.id] === "dislike"
                             ? "bg-red-900/80 text-cream scale-110"
                             : "bg-wood/5 text-wood/40 group-hover:bg-cream/10 group-hover:text-cream/40 hover:scale-110 hover:text-red-400"
@@ -110,8 +112,8 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
 
                     {/* 베스트 추천 표시 */}
                     {index === 0 && (
-                      <div className="inline-flex items-center justify-center px-2 py-1 bg-wood/10 border border-wood/20 rounded-sm mb-3 group-hover:bg-cream/10 group-hover:border-cream/30 transition-colors">
-                        <span className="text-[9px] font-bold text-wood group-hover:text-cream tracking-[0.15em] uppercase leading-none">Best Pick</span>
+                      <div className="h-6 min-w-[78px] px-2 inline-flex items-center justify-center bg-wood/10 border border-wood/20 rounded-sm mb-3 group-hover:bg-cream/10 group-hover:border-cream/30 transition-colors">
+                        <span className="text-[9px] leading-none font-bold text-wood group-hover:text-cream tracking-[0.15em] uppercase [text-indent:0.15em]">Best Pick</span>
                       </div>
                     )}
                     <p className="text-[11px] uppercase tracking-[0.2em] text-wood/40 group-hover:text-cream/40 mb-2 transition-colors">{item.brand}</p>
