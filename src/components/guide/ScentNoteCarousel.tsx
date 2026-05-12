@@ -62,7 +62,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
    */
   const toggleNote = (note: ScentNote) => {
     setSlots(prev => {
-      const isAlreadySelected = prev[note.category]?.enName === note.enName;
+      const isAlreadySelected = prev[note.category]?.id === note.id;
       const newSlots = {
         ...prev,
         [note.category]: isAlreadySelected ? null : note
@@ -93,7 +93,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
     return () => clearInterval(timer);
   }, [activeTab, currentIndex, handleNext]);
 
-  const isSelected = slots[activeTab]?.enName === currentNote?.enName;
+  const isSelected = slots[activeTab]?.id === currentNote?.id;
   const isAllSelected = slots.Top && slots.Middle && slots.Base;
 
   return (
@@ -205,16 +205,30 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
                     </div>
                   )}
                 </div>
-                <p className="text-[10px] uppercase tracking-[0.4em] text-wood/30 mb-8">{currentNote?.enName}</p>
+                <div className="flex items-center justify-center gap-2 mb-8">
+                  <span className="px-2 py-0.5 border border-wood/20 text-[9px] uppercase tracking-widest text-wood/60 rounded-full">
+                    {currentNote?.family}
+                  </span>
+                </div>
                 
-                <div className="max-w-md mx-auto space-y-8">
+                <div className="max-w-md mx-auto space-y-10">
                   <p className="text-[15px] md:text-[17px] leading-relaxed text-wood/90 break-keep font-light transition-all group-hover/card:font-medium italic">
                     "{currentNote?.description}"
                   </p>
                   
-                  <div className="flex flex-col items-center gap-1.5 transition-all group-hover/card:font-semibold">
-                    <span className="text-[8px] uppercase tracking-[0.2em] text-wood/60">Scent Origin</span>
-                    <p className="text-[12px] text-wood font-medium tracking-wide">{currentNote?.origin}</p>
+                  <div className="grid grid-cols-2 gap-8 pt-6 border-t border-wood/10">
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-[8px] uppercase tracking-[0.2em] text-wood/40">Representative</span>
+                      <p className="text-[11px] text-wood/80 font-medium tracking-tight break-keep leading-tight">
+                        {currentNote?.representative.join(", ")}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-[8px] uppercase tracking-[0.2em] text-wood/40">Scent Origin</span>
+                      <p className="text-[11px] text-wood/80 font-medium tracking-tight break-keep leading-tight">
+                        {currentNote?.origin}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -243,7 +257,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
           {/* 3. 하단 점 인디케이터 */}
           <div className="flex gap-2 mt-12 mb-10">
             {currentNotes.map((note, idx) => {
-              const isNoteSelected = Object.values(slots).some(n => n?.enName === note.enName);
+              const isNoteSelected = Object.values(slots).some(n => n?.id === note.id);
               return (
                 <button
                   key={idx}

@@ -126,10 +126,14 @@ const normalizeCapturePills = (root: ParentNode) => {
 
     const label = pill.firstElementChild;
     if (label instanceof HTMLElement) {
-      label.style.display = "inline-block";
+      label.style.display = "inline-flex";
+      label.style.alignItems = "center";
+      label.style.justifyContent = "center";
+      label.style.height = "100%";
       label.style.lineHeight = "1";
       label.style.position = "relative";
-      label.style.top = "1px";
+      label.style.top = "0";
+      label.style.transform = type === "best" ? "translateY(1px)" : "translateY(1.5px)";
       if (type !== "match") {
         label.style.textIndent = "0.15em";
       }

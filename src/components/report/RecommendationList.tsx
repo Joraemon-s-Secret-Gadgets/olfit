@@ -22,7 +22,7 @@ export default function RecommendationList({
   onSortChange 
 }: RecommendationListProps) {
   const sortButtonClass = "h-8 min-w-[72px] px-5 inline-flex items-center justify-center rounded-full text-[10px] leading-none font-medium uppercase tracking-widest [text-indent:0.15em] transition-all hover:font-bold";
-  const sortLabelClass = "inline-block leading-none translate-y-px";
+  const sortLabelClass = "inline-block leading-none translate-y-[1.5px]";
 
   return (
     <div className="mt-32 pt-24 border-t border-wood/10">

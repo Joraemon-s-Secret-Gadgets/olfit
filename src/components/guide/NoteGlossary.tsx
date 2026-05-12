@@ -26,8 +26,8 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
   const toggleNote = (note: ScentNote) => {
     let newNotes;
     // 이미 선택된 경우 제거
-    if (selectedNotes.find((n) => n.enName === note.enName)) {
-      newNotes = selectedNotes.filter((n) => n.enName !== note.enName);
+    if (selectedNotes.find((n) => n.id === note.id)) {
+      newNotes = selectedNotes.filter((n) => n.id !== note.id);
     } 
     // 선택되지 않았고 3개 미만인 경우 추가
     else if (selectedNotes.length < 3) {
@@ -56,17 +56,17 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
    * 개별 노트 카드를 렌더링합니다.
    */
   const renderNoteCard = (note: ScentNote) => {
-    const isSelected = selectedNotes.find((n) => n.enName === note.enName);
+    const isSelected = selectedNotes.find((n) => n.id === note.id);
     return (
       <div
-        key={note.enName}
+        key={note.id}
         className={`group relative h-40 md:h-44 border rounded-sm p-4 cursor-pointer transition-all duration-500 overflow-hidden ${
           isSelected 
             ? 'bg-wood border-wood shadow-lg' 
             : 'bg-white/40 border-wood/5 hover:border-wood/20'
         }`}
         onClick={() => toggleNote(note)}
-        onMouseEnter={() => setHoveredNote(note.enName)}
+        onMouseEnter={() => setHoveredNote(note.id)}
         onMouseLeave={() => setHoveredNote(null)}
       >
         {/* 선택 완료 체크 아이콘 */}
@@ -77,7 +77,7 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
         )}
 
         {/* 기본 정보 레이어 */}
-        <div className={`flex flex-col justify-between h-full transition-all duration-300 ${hoveredNote === note.enName && !isSelected ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+        <div className={`flex flex-col justify-between h-full transition-all duration-300 ${hoveredNote === note.id && !isSelected ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
           <span className={`text-[9px] uppercase tracking-widest ${isSelected ? 'text-cream/40' : 'text-wood/40'}`}>
             {note.category} Note
           </span>
@@ -86,14 +86,14 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
               {note.name}
             </h4>
             <p className={`text-[9px] uppercase tracking-tighter ${isSelected ? 'text-cream/30' : 'text-wood/20'}`}>
-              {note.enName}
+              {note.family}
             </p>
           </div>
         </div>
 
         {/* 호버 정보 레이어 (설명 및 원산지) */}
         {!isSelected && (
-          <div className={`absolute inset-0 p-4 flex flex-col justify-center transition-all duration-500 ${hoveredNote === note.enName ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+          <div className={`absolute inset-0 p-4 flex flex-col justify-center transition-all duration-500 ${hoveredNote === note.id ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
             <p className="text-[11px] leading-relaxed text-wood/80 break-keep mb-3">
               {note.description}
             </p>

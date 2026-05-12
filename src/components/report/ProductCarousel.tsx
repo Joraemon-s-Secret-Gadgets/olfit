@@ -82,7 +82,7 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
                       className="absolute top-4 right-4 h-7 min-w-[74px] px-3 inline-flex items-center justify-center rounded-full bg-wood/80 text-cream text-[10px] leading-none font-mono group-hover:bg-cream group-hover:text-wood transition-colors"
                       data-capture-pill="match"
                     >
-                      <span className="inline-block leading-none translate-y-px">{item.similarity}% Match</span>
+                      <span className="inline-block leading-none translate-y-[1.5px]">{item.similarity}% Match</span>
                     </div>
                   </div>
                   
@@ -120,7 +120,7 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
                         className="h-6 min-w-[78px] px-2 inline-flex items-center justify-center bg-wood/10 border border-wood/20 rounded-sm mb-3 group-hover:bg-cream/10 group-hover:border-cream/30 transition-colors"
                         data-capture-pill="best"
                       >
-                        <span className="text-[9px] leading-none font-bold text-wood group-hover:text-cream tracking-[0.15em] uppercase [text-indent:0.15em]">Best Pick</span>
+                        <span className="inline-block translate-y-px text-[9px] leading-none font-bold text-wood group-hover:text-cream tracking-[0.15em] uppercase [text-indent:0.15em]">Best Pick</span>
                       </div>
                     )}
                     <p className="text-[11px] uppercase tracking-[0.2em] text-wood/70 group-hover:text-cream/70 group-hover:font-semibold mb-2 transition-all">{item.brand}</p>
