@@ -39,7 +39,17 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  const baseRecommendations = useMemo(() => getRecommendedProducts(results), [results]);
+  /**
+   * 추천 제품 로직 최적화:
+   * 1. 백엔드에서 직접 내려준 recommendations가 있다면 그것을 우선 사용 (연동 데이터)
+   * 2. 없다면 프론트엔드 엔진(recommendationEngine)을 통한 로컬 매칭 결과 사용 (디자인/테스트용)
+   */
+  const baseRecommendations = useMemo(() => {
+    if (results?.recommendations && results.recommendations.length > 0) {
+      return results.recommendations;
+    }
+    return getRecommendedProducts(results);
+  }, [results]);
 
   const slots = useMemo(() => {
     const selected = results?.analysisMetadata?.selectedNotes || [];

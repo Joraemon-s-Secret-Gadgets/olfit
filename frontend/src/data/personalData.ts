@@ -1120,7 +1120,7 @@ export const personalProducts: Product[] = [
       topNotes: ["시나몬", "카다멈"],
       heartNotes: ["당근", "오리스 버터", "생강"],
       baseNotes: ["파출리", "파피루스"],
-      bestFor: "따스한 위로와 무한한 사랑의 감정을 담고 싶을 때"
+      bestFor: "따스하고 위로와 무한한 사랑의 감정을 담고 싶을 때"
     }
   },
 ];
