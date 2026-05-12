@@ -61,6 +61,8 @@ export interface AnalysisResults {
     /** 백엔드에서 계산된 레이더 차트 수치 */
     radarScores?: Record<string, number>;
   };
+  /** 백엔드에서 전달된 추천 제품 리스트 */
+  recommendations?: (Product & { similarity: number; matchReason: string })[];
 }
 
 // EOF: types.ts
