@@ -277,8 +277,4 @@ class RecommendationService:
             return f"선택하신 #{match_str} 성분이 포함되어 있으며, 당신의 #{main_family} 아우라와 완벽하게 조화됩니다."
         return f"당신의 분위기를 결정짓는 #{main_family} 계열의 베스트 추천 향수입니다."
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 12b8384 (feat(backend): migrate django fragrance apiAdds the Django REST backend, scent engine services, perfume data loaders, raw fragrance datasets, and API endpoints needed for image-aura analysis and recommendation workflows.)
 # EOF: recommendation_service.py
