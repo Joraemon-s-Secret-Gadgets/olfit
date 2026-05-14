@@ -30,6 +30,7 @@ export default function App() {
     selectedNotes, 
     hasConsented, 
     selectedProduct,
+    restartToken,
     setAnalysisResults,
     setSelectedNotes,
     setHasConsented,
@@ -83,13 +84,14 @@ export default function App() {
 
           <Suspense fallback={<SectionSkeleton />}>
             <ErrorBoundary fallbackMessage="가이드 섹션을 불러오지 못했습니다.">
-              <ScentGuideSection onNotesChange={setSelectedNotes} />
+              <ScentGuideSection key={restartToken} onNotesChange={setSelectedNotes} />
             </ErrorBoundary>
           </Suspense>
           
           <Suspense fallback={<SectionSkeleton />}>
             <ErrorBoundary fallbackMessage="인터뷰 섹션을 불러오지 못했습니다.">
               <AIInterviewSection 
+                key={restartToken}
                 onComplete={(results: AnalysisResults) => setAnalysisResults(results)} 
                 selectedNotes={selectedNotes}
               />

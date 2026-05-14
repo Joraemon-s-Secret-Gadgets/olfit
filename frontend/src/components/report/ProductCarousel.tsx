@@ -111,7 +111,7 @@ const ProductCard = memo(({
         <div className="space-y-4 mb-8">
           <div>
             <span className="text-[10px] uppercase tracking-widest text-wood/60 group-hover:text-cream/60 group-hover:font-semibold block mb-1 transition-all">Notes</span>
-            <p className="text-sm text-wood group-hover:text-cream group-hover:font-semibold line-clamp-2 break-keep text-balance transition-all">
+            <p className="text-sm leading-relaxed text-wood group-hover:text-cream group-hover:font-semibold break-keep text-pretty transition-all">
               {item.notes}
             </p>
           </div>

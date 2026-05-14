@@ -5,7 +5,7 @@
  */
 
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
-import { Upload, X, ImageIcon, AlertCircle } from "lucide-react";
+import { Upload, X, ImageIcon, AlertCircle, Sparkles } from "lucide-react";
 import { uploadToCloudStorage } from "@/services/uploadService";
 
 interface ImageUploaderProps {
@@ -17,6 +17,7 @@ interface ImageUploaderProps {
 
 export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
+  const [processedImage, setProcessedImage] = useState<{ base64: string; remoteUrl: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +84,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     }
 
     setError(null);
+    setProcessedImage(null);
     const reader = new FileReader();
     
     reader.onload = async (event) => {
@@ -126,8 +128,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           // 클라우드 업로드 시뮬레이션 시작
           setIsUploading(true);
           const remoteUrl = await uploadToCloudStorage(base64);
-          
-          await onImageProcessed(base64, remoteUrl); // 🚨 FIX: POST 중복 요청 방지
+          setProcessedImage({ base64, remoteUrl });
           setIsUploading(false); // 🚨 FIX: POST 중복 요청 방지
         } catch {
           setError("이미지 처리 중 오류가 발생했습니다.");
@@ -153,7 +154,6 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault(); // 🚨 FIX: POST 중복 요청 방지
     if (e.target.files && e.target.files[0]) {
       processImage(e.target.files[0]);
     }
@@ -161,19 +161,19 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
 
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // 🚨 FIX: POST 중복 요청 방지
+    e.stopPropagation();
     setIsDragging(true);
   };
 
   const handleDragLeave = (e: DragEvent) => {
-    e.preventDefault(); // 🚨 FIX: POST 중복 요청 방지
-    e.stopPropagation(); // 🚨 FIX: POST 중복 요청 방지
+    e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
   };
 
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // 🚨 FIX: POST 중복 요청 방지
+    e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       processImage(e.dataTransfer.files[0]);
@@ -181,11 +181,20 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
   };
 
   const removeImage = (e: React.MouseEvent) => {
-    e.preventDefault(); // 🚨 FIX: POST 중복 요청 방지
-    e.stopPropagation(); // 🚨 FIX: POST 중복 요청 방지
+    e.preventDefault();
+    e.stopPropagation();
     setPreview(null);
+    setProcessedImage(null);
+    setIsUploading(false);
     setError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const startAnalysis = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!processedImage || isUploading || isAnalyzing) return;
+    onImageProcessed(processedImage.base64, processedImage.remoteUrl);
   };
 
   return (
@@ -198,11 +207,10 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
       )}
 
       {!preview ? (
-        <div
+        <label
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); fileInputRef.current?.click(); }} // 🚨 FIX: POST 중복 요청 방지
           className={`relative aspect-video flex flex-col items-center justify-center border-2 border-dashed transition-all duration-300 cursor-pointer rounded-sm ${
             isDragging ? "border-wood bg-cream/20" : "border-cream/20 bg-white/10 hover:bg-white/20"
           }`}
@@ -220,55 +228,78 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
             </div>
             <div className="text-center">
               <p className="text-[13px] font-medium text-cream mb-1">
-                오늘의 스타일(OOTD) 사진을 업로드하세요
+                이곳을 클릭하여 OOTD 사진을 업로드하세요
               </p>
               <p className="text-[11px] text-cream/40 uppercase tracking-wider">
-                Drag & Drop or Click to browse
+                Click to browse or Drag & Drop
               </p>
             </div>
           </div>
-        </div>
+        </label>
       ) : (
-        <div className="relative aspect-video bg-black/5 rounded-sm overflow-hidden group">
-          <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-          
-          {/* 오버레이 컨트롤 (분석 중이 아닐 때만 삭제 버튼 노출) */}
+        <div className="space-y-5">
+          <div className="relative aspect-video bg-black/5 rounded-sm overflow-hidden group">
+            <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+            
+            {/* 오버레이 컨트롤 (분석 중이 아닐 때만 삭제 버튼 노출) */}
+            {!isAnalyzing && (
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="p-3 bg-cream text-wood rounded-full hover:scale-110 shadow-lg transition-transform"
+                  title="이미지 제거"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            )}
+
+            {/* 업로드 중 상태 표시 */}
+            {isUploading && (
+              <div className="absolute inset-0 bg-gold/40 backdrop-blur-sm flex flex-col items-center justify-center text-wood">
+                <div className="flex items-center gap-1.5 mb-6">
+                  <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.3s]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.15s]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                </div>
+                <p className="text-[13px] font-bold tracking-widest uppercase">Uploading to S3...</p>
+                <p className="text-[11px] opacity-70 mt-2">안전한 서버로 이미지를 전송 중입니다</p>
+              </div>
+            )}
+
+            {/* 분석 중 상태 표시 */}
+            {isAnalyzing && (
+              <div className="absolute inset-0 bg-wood/60 backdrop-blur-sm flex flex-col items-center justify-center text-cream">
+                <div className="flex items-center gap-1.5 mb-6">
+                  <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.3s]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.15s]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                </div>
+                <p className="text-[13px] font-medium tracking-widest uppercase">Analyzing your style...</p>
+                <p className="text-[11px] text-cream/60 mt-2">AI가 당신의 무드를 해석하고 있습니다</p>
+              </div>
+            )}
+          </div>
+
           {!isAnalyzing && (
-            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
               <button
-                type="button" // 🚨 FIX: POST 중복 요청 방지
-                onClick={removeImage}
-                className="p-3 bg-cream text-wood rounded-full hover:scale-110 shadow-lg transition-transform"
-                title="이미지 제거"
+                type="button"
+                onClick={startAnalysis}
+                disabled={isUploading || !processedImage}
+                className="h-12 inline-flex items-center justify-center gap-3 rounded-sm bg-wood px-8 text-[11px] font-bold uppercase tracking-widest text-cream border border-cream/15 shadow-[0_12px_30px_rgba(33,24,18,0.24)] transition-all duration-300 hover:bg-cream hover:text-wood disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-wood disabled:hover:text-cream"
               >
-                <X size={20} />
+                <Sparkles size={14} />
+                <span>{isUploading ? "업로드 중" : "분석 시작"}</span>
               </button>
-            </div>
-          )}
-
-          {/* 업로드 중 상태 표시 */}
-          {isUploading && (
-            <div className="absolute inset-0 bg-gold/40 backdrop-blur-sm flex flex-col items-center justify-center text-wood">
-              <div className="flex items-center gap-1.5 mb-6">
-                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.3s]" />
-                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.15s]" />
-                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-              </div>
-              <p className="text-[13px] font-bold tracking-widest uppercase">Uploading to S3...</p>
-              <p className="text-[11px] opacity-70 mt-2">안전한 서버로 이미지를 전송 중입니다</p>
-            </div>
-          )}
-
-          {/* 분석 중 상태 표시 */}
-          {isAnalyzing && (
-            <div className="absolute inset-0 bg-wood/60 backdrop-blur-sm flex flex-col items-center justify-center text-cream">
-              <div className="flex items-center gap-1.5 mb-6">
-                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.3s]" />
-                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.15s]" />
-                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-              </div>
-              <p className="text-[13px] font-medium tracking-widest uppercase">Analyzing your style...</p>
-              <p className="text-[11px] text-cream/60 mt-2">AI가 당신의 무드를 해석하고 있습니다</p>
+              <button
+                type="button"
+                onClick={removeImage}
+                className="h-12 inline-flex items-center justify-center rounded-sm border border-cream/20 px-8 text-[11px] font-medium uppercase tracking-widest text-cream/70 transition-all duration-300 hover:bg-cream/10 hover:text-cream"
+              >
+                초기화
+              </button>
             </div>
           )}
         </div>
