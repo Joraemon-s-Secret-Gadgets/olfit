@@ -3,10 +3,10 @@
 @module Perfumes/Views
 @description
 Olfít Connect의 핵심 비즈니스 로직을 API 엔드포인트로 노출합니다.
-사용자의 요청을 받아 VLM 분석, 아우라 스코어링, 추천 프로세스를 오케스트레이션합니다.
+사용자의 요청을 받아 VLM 분석, 아우라 스코어링, 하이브리드 추천 프로세스를 오케스트레이션합니다.
 
 @author Olfít AI Team
-@version 4.0.0
+@version 4.9.0
 """
 
 from rest_framework.views import APIView
@@ -32,15 +32,17 @@ class AnalyzeView(APIView):
     """
     [Main Analysis Endpoint]
     POST /api/analyze/
-    이미지와 취향 노트를 받아 최종 향수 추천 리포트를 생성합니다.
+    사용자가 업로드한 이미지와 선택한 향 노트를 기반으로 통합 향수 추천 리포트를 생성합니다.
     """
 
     @extend_schema(
         operation_id="analyzePersonalScent",
         summary="이미지와 선호 노트 기반 향수 추천 분석",
         description=(
-            "사용자가 업로드한 이미지와 선택한 향 노트를 분석해 아우라 점수, "
-            "향수 키워드, Top 5 추천 향수와 상세 표시 정보를 반환합니다."
+            "1. VLM을 통한 이미지 시각 감성 분석\n"
+            "2. 5축 아우라 점수 산출 및 L2 정규화\n"
+            "3. RAG + Aura Re-ranking 기반 하이브리드 추천\n"
+            "4. 개인화된 추천 사유 및 리포트 데이터 반환"
         ),
         request=AnalyzeRequestSerializer,
         parameters=[
@@ -59,106 +61,16 @@ class AnalyzeView(APIView):
                 description="세션 ID 누락 또는 잘못된 요청입니다.",
             ),
         },
-        examples=[
-            OpenApiExample(
-                "Analyze request",
-                value={
-                    "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB...",
-                    "selectedNotes": ["베르가못", "샌달우드"],
-                },
-                request_only=True,
-            ),
-            OpenApiExample(
-                "Analyze response",
-                value={
-                    "type": "personal",
-                    "personalMood": "#세련된 #차분한 #모던한",
-                    "perfumeKeywords": ["#베르가못", "#시더우드"],
-                    "fashionStyle": "검은색 슈트를 입은 세련된 남성",
-                    "analysisMetadata": {
-                        "base64Image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB...",
-                        "selectedNotes": ["베르가못", "샌달우드"],
-                        "radarScores": {
-                            "플로럴": 0.1,
-                            "우디": 0.5,
-                            "오리엔탈": 0.1,
-                            "프레시": 0.2,
-                            "구르망": 0.1,
-                        },
-                        "readableQuery": "세련된 분위기의 베르가못, 시더우드 향이 느껴지는 우디 계열 향수.",
-                    },
-                    "recommendations": [
-                        {
-                            "id": 1,
-                            "name": "옴니아 크리스탈린",
-                            "brand": "BVLGARI",
-                            "price": "$150",
-                            "price_krw": 207000,
-                            "size": "65ml",
-                            "image": "/static/perfumes/images/bvlgari/omnia.jpg",
-                            "perfume": {
-                                "id": 1,
-                                "brand": "BVLGARI",
-                                "koreanName": "옴니아 크리스탈린",
-                                "englishName": "omnia crystalline",
-                                "productType": "perfume",
-                                "family": "프레시",
-                                "releaseYear": 2005,
-                                "price": {
-                                    "raw": "$150",
-                                    "amount": 150,
-                                    "currency": "USD",
-                                },
-                                "description": "옴니아 크리스탈린 설명",
-                                "ingredientsRaw": "",
-                                "notes": ["대나무", "서양배", "연꽃"],
-                                "representativeNotes": ["대나무", "서양배"],
-                                "notesPyramid": {
-                                    "top": ["대나무"],
-                                    "middle": ["서양배"],
-                                    "base": ["연꽃"],
-                                },
-                                "accords": ["우디", "플로럴"],
-                                "keywords": {"ko": ["상쾌한", "우아한"]},
-                                "auraProfile": {"프레시": 0.6},
-                                "volume": "65ml",
-                                "meta": {},
-                            },
-                            "imageDetail": {
-                                "url": "/static/perfumes/images/bvlgari/omnia.jpg",
-                                "originalUrl": "https://img.example.com/omnia.jpg",
-                                "backendPath": "/backend/app/static/perfumes/images/bvlgari/omnia.jpg",
-                                "base64": "base64-image",
-                            },
-                            "imageAsset": {},
-                            "tags": ["우디", "플로럴"],
-                            "notes": "대나무, 서양배",
-                            "family": "프레시",
-                            "category": "Personal",
-                            "similarity": 90,
-                            "matchReason": "선택하신 #대나무 성분이 포함되어 있으며, 당신의 #프레시 아우라와 완벽하게 조화됩니다.",
-                            "details": {
-                                "story": "옴니아 크리스탈린 설명",
-                                "topNotes": "대나무",
-                                "middleNotes": "서양배",
-                                "baseNotes": "연꽃",
-                                "bestFor": "상쾌한, 우아한",
-                            },
-                        }
-                    ],
-                },
-                response_only=True,
-            ),
-        ],
     )
     def post(self, request):
+        """
+        분석 요청을 처리하고 추천 결과를 반환합니다.
+        """
         # [Security] 익명 세션 ID 확인 (Handshake 검증)
         session_id = request.headers.get("X-Session-ID")
-        print(f"\n🚨 [CRITICAL DEBUG] ANALYZE API CALLED IN Unified Repo!")
-        print(f"   > Session ID: {session_id}")
+        print(f"\n🚨 [Analyze API] Session: {session_id}")
 
         if not session_id:
-            print("❌ [DEBUG] Rejected: Missing Session ID")
             return Response(
                 {
                     "error": "세션 ID가 누락되었습니다. 개인정보 동의 후 다시 시도해주세요."
@@ -166,32 +78,40 @@ class AnalyzeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # 요청 데이터 추출
+        # 요청 데이터 추출 (Base64 이미지 및 선택된 노트 목록)
         image_base64 = request.data.get("image")
         selected_notes = request.data.get("selectedNotes", [])
 
+        # --------------------------------------------------------
         # 1. 서비스 엔진 초기화
-        vl_engine = VLEngine()  # Vision-Language Engine
-        aura_service = AuraService()  # Scoring & Query Service
-        recommend_service = RecommendationService()  # DB-based Ranking Service
+        # --------------------------------------------------------
+        vl_engine = VLEngine()  # Vision-Language Engine (NVIDIA NIM)
+        aura_service = AuraService()  # Scoring & Query Generation Service
+        recommend_service = RecommendationService()  # Hybrid Recommendation Engine
 
-        # 2. [VLM Stage] 실시간 시각 감성 분석 실행
-        # NVIDIA NIM API 호출 및 이미지 키워드 추출
-        print(f"[STEP 1] 🚀 Starting Live VLM Analysis using {vl_engine.model}...")
+        # --------------------------------------------------------
+        # 2. [VLM Stage] 실시간 시각 감성 분석
+        # 이미지에서 색상, 사물, 무드 등 핵심 키워드를 추출합니다.
+        # --------------------------------------------------------
+        print(f"[STEP 1] 🚀 Starting Live VLM Analysis...")
         vl_result = vl_engine.analyze_image(image_base64)
-        print(f"[STEP 2] 📝 VLM Result Summary: {vl_result.get('visual_summary')}")
+        print(f"[STEP 2] 📝 VLM Summary: {vl_result.get('visual_summary')}")
 
+        # --------------------------------------------------------
         # 3. [Scoring Stage] 5축 아우라 계산 및 대칭 쿼리 생성
-        # 이미지 키워드 + 사용자 선택 노트를 통합하여 5차원 벡터 산출
+        # 시각 분석 결과와 사용자 취향을 융합하여 수치적 아우라와 RAG 쿼리를 생성합니다.
+        # --------------------------------------------------------
         print("[STEP 3] 📊 Calculating Aura Scores & Generating Query...")
-        radar_scores, fragrance_mapping, query_text, readable_query, aura_vectors = (
+        # (v4.9 수정): readable_query 통합으로 4개 요소만 언패킹
+        radar_scores, fragrance_mapping, query_text, aura_vectors = (
             aura_service.calculate_combined_aura(vl_result, selected_notes)
         )
-        print(f"       > Primary Family: {max(aura_vectors, key=aura_vectors.get)}")
 
+        # --------------------------------------------------------
         # 4. [Recommendation Stage] 하이브리드 재랭킹 추천 (Top 5)
-        # 5축 유사도(70%) + 성분 가산점(30%)을 적용하여 DB에서 제품 추출
-        print("[STEP 4] 🎯 Fetching Recommendations from DB...")
+        # RAG 검색 결과에 아우라 유사도와 노트 가산점을 더해 최적의 향수를 선정합니다.
+        # --------------------------------------------------------
+        print("[STEP 4] 🎯 Fetching Hybrid Recommendations...")
         recommendations = recommend_service.recommend(
             aura_vectors, query_text, selected_notes
         )
@@ -200,7 +120,10 @@ class AnalyzeView(APIView):
         print(f"[STEP 5] ✅ Final Recommendations: {', '.join(rec_names)}")
         print(f"--- Analysis for Session {session_id} Complete ---\n")
 
-        # 5. [Mapping] 프론트엔드 UI 규격에 맞게 명칭 치환 (오리엔탈 -> 앰버, 플로럴 -> 플로랄)
+        # --------------------------------------------------------
+        # 5. [UI Mapping] 프론트엔드 명칭 치환 및 데이터 가공
+        # 도메인 명칭(오리엔탈)을 UI 명칭(앰버)으로 변환합니다.
+        # --------------------------------------------------------
         ui_radar_scores = {
             "플로랄": radar_scores.get("플로럴", 0),
             "우디": radar_scores.get("우디", 0),
@@ -209,17 +132,16 @@ class AnalyzeView(APIView):
             "구르망": radar_scores.get("구르망", 0),
         }
 
-        # UI용 무드 키워드 및 쿼리 문구 치환
+        # 개인 무드 태그 생성 및 치환
         personal_mood = f"#{' #'.join(fragrance_mapping.get('descriptors', [])[:3])}"
-        personal_mood = personal_mood.replace("오리엔탈", "앰버").replace(
-            "플로럴", "플로랄"
-        )
+        personal_mood = personal_mood.replace("오리엔탈", "앰버").replace("플로럴", "플로랄")
 
-        final_readable_query = readable_query.replace("오리엔탈", "앰버").replace(
-            "플로럴", "플로랄"
-        )
+        # 최종 쿼리 문구 치환 (UI 표시용)
+        final_readable_query = query_text.replace("오리엔탈", "앰버").replace("플로럴", "플로랄")
 
-        # 6. [Response] 프론트엔드 규격에 맞춘 최종 결과 응답
+        # --------------------------------------------------------
+        # 6. [Response] 최종 리포트 데이터 응답
+        # --------------------------------------------------------
         response_data = {
             "type": "personal",
             "personalMood": personal_mood,
@@ -231,11 +153,15 @@ class AnalyzeView(APIView):
                 "base64Image": image_base64,
                 "selectedNotes": selected_notes,
                 "radarScores": ui_radar_scores,
-                "readableQuery": final_readable_query,
+                "readableQuery": final_readable_query, # RAG 쿼리와 통합된 문구 사용
             },
             "recommendations": recommendations,
         }
 
         return Response(response_data)
 
-# EOF: views.py
+
+# ----------------------------------------------------------------
+# Last Modified: 2026-05-15
+# Modified By: Olfít AI Team (Gemini CLI)
+# ----------------------------------------------------------------
