@@ -1,3 +1,9 @@
+/**
+ * @file ErrorFallback.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 import { AlertCircle, RefreshCw } from "lucide-react";
 
 interface ErrorFallbackProps {
@@ -31,3 +37,5 @@ export default function ErrorFallback({ message, onRetry, className = "" }: Erro
     </div>
   );
 }
+
+// EOF: ErrorFallback.tsx

@@ -1,3 +1,9 @@
+/**
+ * @file uploadService.test.ts
+ * @description 회귀 방지를 위한 테스트 파일입니다.
+ * @lastModified 2026-05-15
+ */
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { uploadToCloudStorage } from "./uploadService";
 
@@ -22,3 +28,5 @@ describe("uploadToCloudStorage", () => {
     );
   });
 });
+
+// EOF: uploadService.test.ts

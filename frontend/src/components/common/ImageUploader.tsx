@@ -2,6 +2,7 @@
  * @file ImageUploader.tsx
  * @description 이미지를 업로드하고 리사이징하여 Base64로 변환하는 컴포넌트입니다.
  * 사용자의 OOTD 사진을 받아 AI 분석이 가능한 형태로 전처리합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
@@ -40,7 +41,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
   };
 
   /**
-   * 🛠️ REFACTOR (보안 강화): 파일의 바이너리 헤더(Magic Number)를 확인하여 
+   * 🛠️ REFACTOR (보안 강화): 파일의 바이너리 헤더(Magic Number)를 확인하여
    * 위조된 확장자를 가진 악성 파일(Web Shell 등)의 업로드를 차단합니다.
    */
   const validateFileSignature = async (file: File): Promise<boolean> => {
@@ -76,7 +77,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     if (uploadProcessingRef.current || isUploading || isAnalyzing) return; // 🚨 FIX: POST 중복 요청 방지
 
     uploadProcessingRef.current = true;
-    
+
     // 🛡️ SECURITY FIX: 허용된 이미지 MIME 타입 및 확장자 엄격 검사
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
@@ -111,7 +112,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     setError(null);
     setProcessedImage(null);
     const reader = new FileReader();
-    
+
     reader.onload = async (event) => {
       if (!event.target?.result || typeof event.target.result !== "string") {
         failUpload("파일을 읽는 중 오류가 발생했습니다.");
@@ -129,7 +130,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           }
 
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 1200; 
+          const MAX_WIDTH = 1200;
           const MAX_HEIGHT = 1200;
           let width = img.width;
           let height = img.height;
@@ -154,10 +155,10 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
             return;
           }
           ctx.drawImage(img, 0, 0, width, height);
-          
+
           const base64 = canvas.toDataURL("image/jpeg", 0.9);
           setPreview(base64);
-          
+
           // 클라우드 업로드 시뮬레이션 시작
           setIsUploading(true);
           const remoteUrl = await uploadToCloudStorage(base64);
@@ -167,7 +168,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           failUpload("이미지 처리 중 오류가 발생했습니다.");
         }
       };
-      
+
       // 🛡️ SECURITY FIX: onerror 핸들러 추가하여 이미지 로딩 실패 시 자원 해제
       img.onerror = () => {
         failUpload("이미지를 불러올 수 없습니다. 파일이 손상되었거나 올바른 형식이 아닙니다.");
@@ -271,7 +272,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
         <div className="space-y-5">
           <div className="relative aspect-video bg-black/5 rounded-sm overflow-hidden group">
             <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-            
+
             {/* 오버레이 컨트롤 (분석 중이 아닐 때만 삭제 버튼 노출) */}
             {!isAnalyzing && (
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -335,7 +336,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           )}
         </div>
       )}
-      
+
       <div className="mt-6 flex items-start gap-3 px-2">
         <ImageIcon size={14} className="text-cream/30 mt-0.5" />
         <p className="text-[11px] text-cream/40 leading-relaxed break-keep">

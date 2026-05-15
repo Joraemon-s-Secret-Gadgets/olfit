@@ -2,6 +2,7 @@
  * @file FamilyCarousel.tsx
  * @description 향기의 계열(Floral, Woody 등)을 상세히 설명하는 인터랙티브 캐러셀 컴포넌트입니다.
  * 30초 주기 자동 전환 및 인디케이터/버튼을 통한 수동 제어를 지원하며, 계열별 특징과 주요 노트를 소개합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useState, useEffect } from "react";
@@ -66,7 +67,7 @@ export default function FamilyCarousel({ families }: FamilyCarouselProps) {
         <h3 className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-wood/30 mb-4">
           02. Scent Family (계열의 차이)
         </h3>
-        <p 
+        <p
           className="text-[14px] md:text-[15px] text-wood/60 leading-relaxed break-keep min-h-[3rem] md:min-h-[4.5rem]"
           dangerouslySetInnerHTML={{ __html: "향기 계열은 향수의 성격과 분위기를 결정하는 가장 큰 기준입니다. <br className='hidden sm:inline' /> 비슷한 성질을 가진 향료를 그룹화하여, 향의 지도를 그리는 첫걸음이 됩니다." }}
         />
@@ -75,13 +76,13 @@ export default function FamilyCarousel({ families }: FamilyCarouselProps) {
       {/* 메인 슬라이드 영역 */}
       <div className="relative group overflow-hidden flex-1 h-[540px] sm:h-[580px] lg:h-[620px] min-h-[540px]">
         {families.map((f, idx) => (
-          <div 
-            key={f.title} 
+          <div
+            key={f.title}
             className={`absolute inset-0 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] ${
-              idx === activeFamilyIdx 
-                ? 'opacity-100 translate-x-0' 
-                : idx < activeFamilyIdx 
-                  ? 'opacity-0 -translate-x-10' 
+              idx === activeFamilyIdx
+                ? 'opacity-100 translate-x-0'
+                : idx < activeFamilyIdx
+                  ? 'opacity-0 -translate-x-10'
                   : 'opacity-0 translate-x-10'
             }`}
           >
@@ -98,7 +99,7 @@ export default function FamilyCarousel({ families }: FamilyCarouselProps) {
               </div>
 
               {/* 본문 설명 */}
-              <p 
+              <p
                 className="text-[13.5px] sm:text-[16px] leading-[1.7] md:leading-[1.8] text-wood mb-6 md:mb-8 font-light break-keep tracking-tight text-left"
                 dangerouslySetInnerHTML={{ __html: f.description }}
               />
@@ -150,18 +151,18 @@ export default function FamilyCarousel({ families }: FamilyCarouselProps) {
           </>
         )}
       </div>
-      
+
       {/* 하단 점 인디케이터 (수정된 위치 및 스타일) */}
       <div className="flex justify-center gap-2 mt-8">
         {families.map((_, i) => (
-          <button 
+          <button
             key={i}
             type="button"
             onClick={() => handleManualChange(i)}
             aria-label={`${families[i].title} 계열 보기`}
             className={`h-1 rounded-full transition-all duration-500 ease-in-out ${
-              activeFamilyIdx === i 
-                ? 'w-6 bg-wood' 
+              activeFamilyIdx === i
+                ? 'w-6 bg-wood'
                 : 'w-1.5 bg-wood/10 hover:bg-wood/20'
             }`}
           />

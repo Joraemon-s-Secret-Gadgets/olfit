@@ -2,6 +2,7 @@
  * @file index.css
  * @description 애플리케이션 전역 스타일 시트입니다.
  * Tailwind CSS 핵심 지시어와 함께 프로젝트 고유의 디자인 시스템(HSL 변수), 커스텀 레이어 스타일을 정의합니다.
+ * @lastModified 2026-05-15
  */
 
 @tailwind base;
@@ -31,7 +32,7 @@
     --input: 34 20% 90%;
     --ring: 24 33% 18%;
     --radius: 0rem;                /* 에디토리얼 무드를 위한 각진 모서리 */
-    
+
     /* 사이드바 전용 테마 변수 */
     --sidebar-background: 34 33% 98%;
     --sidebar-foreground: 24 33% 26%;

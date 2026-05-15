@@ -2,6 +2,7 @@
  * @file Navigation.tsx
  * @description 상단 네비게이션 바 컴포넌트입니다.
  * 스크롤 상태에 따른 스타일 변화와 모바일 전용 전체화면 메뉴 기능을 제공합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useState, useEffect } from "react";
@@ -97,7 +98,7 @@ export default function Navigation() {
       </header>
 
       {/* 모바일 전체화면 오버레이 메뉴 */}
-      <div 
+      <div
         className={`fixed inset-0 z-40 bg-cream transition-transform duration-500 ease-in-out md:hidden ${
           isMenuOpen ? "translate-y-0" : "-translate-y-full"
         }`}

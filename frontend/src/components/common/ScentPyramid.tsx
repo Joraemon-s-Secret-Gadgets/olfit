@@ -1,3 +1,9 @@
+/**
+ * @file ScentPyramid.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 import type { ScentNote } from "@/data/noteData";
 
 interface ScentPyramidProps {
@@ -12,12 +18,12 @@ interface ScentPyramidProps {
   isStatic?: boolean;
 }
 
-export default function ScentPyramid({ 
-  slots, 
-  activeTab, 
-  onTabChange, 
-  className = "", 
-  isStatic = false 
+export default function ScentPyramid({
+  slots,
+  activeTab,
+  onTabChange,
+  className = "",
+  isStatic = false
 }: ScentPyramidProps) {
   const slotTextClass = (isSelected: boolean) =>
     `inline-block max-w-[120px] overflow-visible whitespace-normal break-keep text-[11px] md:text-[12px] leading-relaxed tracking-tight text-center px-2 py-0.5 transition-all duration-300 ${
@@ -36,7 +42,7 @@ export default function ScentPyramid({
 
       <div className="w-full h-full flex flex-col items-center pt-2 pb-8">
         {/* TOP SLOT */}
-        <div 
+        <div
           onClick={() => !isStatic && onTabChange?.('Top')}
           className={`group/slot relative z-10 w-full h-[32%] flex flex-col items-center justify-end pb-4 transition-all duration-700 ${
             !isStatic ? 'cursor-pointer' : ''
@@ -49,7 +55,7 @@ export default function ScentPyramid({
         </div>
 
         {/* MIDDLE SLOT */}
-        <div 
+        <div
           onClick={() => !isStatic && onTabChange?.('Middle')}
           className={`group/slot relative z-10 w-full h-[32%] flex flex-col items-center justify-center transition-all duration-700 ${
             !isStatic ? 'cursor-pointer' : ''
@@ -62,7 +68,7 @@ export default function ScentPyramid({
         </div>
 
         {/* BASE SLOT */}
-        <div 
+        <div
           onClick={() => !isStatic && onTabChange?.('Base')}
           className={`group/slot relative z-10 w-full h-[34%] flex flex-col items-center justify-start pt-6 transition-all duration-700 ${
             !isStatic ? 'cursor-pointer' : ''
@@ -77,3 +83,5 @@ export default function ScentPyramid({
     </div>
   );
 }
+
+// EOF: ScentPyramid.tsx

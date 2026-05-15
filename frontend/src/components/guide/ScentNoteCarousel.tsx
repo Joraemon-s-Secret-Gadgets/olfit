@@ -2,6 +2,7 @@
  * @file ScentNoteCarousel.tsx
  * @description 향기의 계층(Top, Middle, Base)별로 하나의 원료를 선택하여 조화로운 향의 피라미드를 시각적으로 완성하는 캐러셀입니다.
  * SVG 피라미드 UI, 카테고리별 교체 로직, 10초 주기 자동 재생 기능을 포함합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -25,9 +26,9 @@ type ScentSlots = {
 export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselProps) {
   const [activeTab, setActiveTab] = useState<"Top" | "Middle" | "Base">('Top');
   const [currentIndex, setCurrentIndex] = useState(0);
-  
-  /** 
-   * 슬롯 기반 선택 상태 관리 
+
+  /**
+   * 슬롯 기반 선택 상태 관리
    */
   const [slots, setSlots] = useState<ScentSlots>({
     Top: null,
@@ -97,19 +98,19 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
   return (
     <div id="scent-pyramid" className="w-full scroll-mt-24 bg-cream/30 rounded-sm border border-wood/5 p-8 md:p-12 lg:p-16 mt-12 relative overflow-hidden">
       <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-        
+
         {/* LEFT COLUMN: Visual Pyramid & Guide */}
         <div className="lg:col-span-5 flex flex-col items-center lg:items-start lg:sticky lg:top-8">
           <div className="w-full max-w-sm mb-12">
             <h3 className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-wood/30 mb-6 text-center lg:text-left">
               03. Scent Pyramid (향의 구조 설계)
             </h3>
-            
+
             {/* 비주얼 피라미드 슬롯 */}
             <div className="flex justify-center mb-10">
-              <ScentPyramid 
+              <ScentPyramid
                 slots={slots}
-                activeTab={activeTab} 
+                activeTab={activeTab}
                 onTabChange={handleTabChange}
                 className="w-72 h-72 md:w-80 md:h-80"
               />
@@ -121,20 +122,20 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
                 <span className="text-[10px] font-bold text-wood uppercase tracking-widest">{activeNoteInfo?.title}</span>
                 <span className="text-[9px] text-wood/40">— {activeNoteInfo?.subtitle}</span>
               </div>
-              <p 
+              <p
                 className="text-[13px] text-wood/70 leading-relaxed break-keep font-light"
                 dangerouslySetInnerHTML={{ __html: activeNoteInfo?.description || "" }}
               />
             </div>
 
             <p className="text-[13px] md:text-[14px] text-wood leading-relaxed break-keep mb-8 font-light text-center lg:text-left">
-              {isAllSelected 
-                ? "완벽한 향의 삼각형이 완성되었습니다. 당신의 감각이 조화롭게 정렬되었습니다. 이제 아래 분석 버튼을 눌러 당신만의 향수를 찾아보세요." 
+              {isAllSelected
+                ? "완벽한 향의 삼각형이 완성되었습니다. 당신의 감각이 조화롭게 정렬되었습니다. 이제 아래 분석 버튼을 눌러 당신만의 향수를 찾아보세요."
                 : "각 노트에서 마음에 드는 원료를 하나씩 골라 조화를 완성하세요. 완성된 피라미드는 당신의 페르소나와 결합됩니다."}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6">
-              <button 
+              <button
                 onClick={resetNotes}
                 className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-wood transition-all group hover:font-bold"
               >
@@ -189,7 +190,7 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
                 <ChevronLeft size={24} strokeWidth={1} />
               </button>
 
-              <div 
+              <div
                 key={`${activeTab}-${currentIndex}`}
                 className="flex-1 text-center animate-in fade-in slide-in-from-bottom-2 duration-1000 ease-out cursor-pointer group/card"
                 onClick={() => toggleNote(currentNote)}
@@ -209,13 +210,13 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
                     {currentNote?.family}
                   </span>
                 </div>
-                
+
                 <div className="max-w-md mx-auto space-y-10">
-                  <p 
+                  <p
                     className="text-[15px] md:text-[17px] leading-relaxed text-wood/90 break-keep font-light transition-all group-hover/card:font-medium italic"
                     dangerouslySetInnerHTML={{ __html: currentNote ? `"${currentNote.description}"` : "" }}
                   />
-                  
+
                   <div className="grid grid-cols-2 gap-8 pt-6 border-t border-wood/10">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-[8px] uppercase tracking-[0.2em] text-wood/40">Representative</span>
@@ -245,8 +246,8 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
             <button
               onClick={() => toggleNote(currentNote)}
               className={`px-12 py-4 rounded-full text-[11px] uppercase tracking-[0.2em] transition-all duration-500 border ${
-                isSelected 
-                  ? 'bg-wood text-cream border-wood shadow-xl scale-105' 
+                isSelected
+                  ? 'bg-wood text-cream border-wood shadow-xl scale-105'
                   : 'bg-transparent text-wood border-wood/40 hover:border-wood hover:bg-wood/5 hover:font-bold'
               }`}
             >
@@ -263,8 +264,8 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
                   key={idx}
                   onClick={() => handleDotClick(idx)}
                   className={`h-1 rounded-full transition-all duration-500 ease-in-out relative ${
-                    currentIndex === idx 
-                      ? 'w-10 bg-wood' 
+                    currentIndex === idx
+                      ? 'w-10 bg-wood'
                       : 'w-2.5 bg-wood/10 hover:bg-wood/20'
                   }`}
                 >
@@ -285,8 +286,5 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
     </div>
   );
 }
-
-
-
 
 // EOF: ScentNoteCarousel.tsx

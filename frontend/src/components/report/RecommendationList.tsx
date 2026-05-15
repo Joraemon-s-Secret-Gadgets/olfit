@@ -1,3 +1,9 @@
+/**
+ * @file RecommendationList.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 import { memo, useCallback } from "react"; // 🛠️ REFACTOR (성능 최적화): memo, useCallback 도입
 import { Check, RotateCcw, Share2 } from "lucide-react";
 import ProductCarousel from "./ProductCarousel";
@@ -6,6 +12,7 @@ import type { ScentNote } from "@/data/noteData";
 
 interface RecommendationListProps {
   recommendations: (Product & { similarity: number, matchReason: string })[];
+  bestPickProductId?: Product["id"] | null;
   onProductClick: (product: Product) => void;
   slots: {
     Top: ScentNote | null;
@@ -20,11 +27,12 @@ interface RecommendationListProps {
   onShare: () => void;
 }
 
-function RecommendationList({ 
-  recommendations, 
-  onProductClick, 
-  slots, 
-  sortBy, 
+function RecommendationList({
+  recommendations,
+  bestPickProductId,
+  onProductClick,
+  slots,
+  sortBy,
   onSortChange,
   onRestart,
   isSaving,
@@ -72,7 +80,7 @@ function RecommendationList({
         <div className="text-center">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-wood/30 mb-2">Matching Selection</p>
           <h3 className="text-2xl font-light tracking-tight text-wood">당신의 스타일을 닮은 향기</h3>
-          
+
           {recommendations.length > 0 && (
             <div
               className="mt-6 max-w-lg mx-auto px-6 py-4 bg-wood/[0.03] border border-wood/10 rounded-sm"
@@ -86,9 +94,10 @@ function RecommendationList({
         </div>
       </div>
 
-      <ProductCarousel 
-        products={recommendations} 
-        onProductClick={onProductClick} 
+      <ProductCarousel
+        products={recommendations}
+        bestPickProductId={bestPickProductId}
+        onProductClick={onProductClick}
         slots={slots}
       />
 
@@ -145,3 +154,5 @@ function RecommendationList({
 
 // 🛠️ REFACTOR (성능 최적화): 결과 리스트 컴포넌트 메모이제이션
 export default memo(RecommendationList);
+
+// EOF: RecommendationList.tsx

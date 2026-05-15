@@ -1,3 +1,9 @@
+/**
+ * @file ErrorBoundary.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import ErrorFallback from "./ErrorFallback";
 
@@ -32,8 +38,8 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="py-20 px-6">
-          <ErrorFallback 
-            message={this.props.fallbackMessage || "이 섹션을 불러오는 중 문제가 발생했습니다."} 
+          <ErrorFallback
+            message={this.props.fallbackMessage || "이 섹션을 불러오는 중 문제가 발생했습니다."}
             onRetry={() => this.setState({ hasError: false })}
           />
         </div>
@@ -45,3 +51,5 @@ class ErrorBoundary extends Component<Props, State> {
 }
 
 export default ErrorBoundary;
+
+// EOF: ErrorBoundary.tsx

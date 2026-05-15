@@ -2,6 +2,7 @@
  * @file FooterSection.tsx
  * @description 웹사이트의 하단 푸터 영역입니다.
  * 브랜드 정보, 주요 메뉴 링크, 소셜 미디어 연결 및 개인정보 처리방침 등의 법적 고지 정보를 포함합니다.
+ * @lastModified 2026-05-15
  */
 
 import React, { useState } from "react";
@@ -133,13 +134,13 @@ export default function FooterSection() {
             © 2026 Olfit. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <button 
+            <button
               onClick={openPrivacy}
               className="text-[10px] text-wood/30 hover:text-wood/60 transition-colors duration-300 tracking-wider"
             >
               개인정보 처리방침
             </button>
-            <button 
+            <button
               onClick={openTerms}
               className="text-[10px] text-wood/30 hover:text-wood/60 transition-colors duration-300 tracking-wider"
             >
@@ -151,16 +152,16 @@ export default function FooterSection() {
 
       {/* 푸터 전용 미니 모달 오버레이 - React Portal 적용 */}
       {modalContent && createPortal(
-        <div 
+        <div
           className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           onClick={() => setModalContent(null)}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
         >
-          <div 
+          <div
             className="relative bg-white border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-2xl rounded-sm"
             onClick={(e) => e.stopPropagation()}
           >
-            <button 
+            <button
               onClick={() => setModalContent(null)}
               className="absolute top-4 right-4 p-2 text-wood/40 hover:text-wood transition-colors"
               aria-label="Close"
@@ -191,4 +192,3 @@ export default function FooterSection() {
 }
 
 // EOF: FooterSection.tsx
-

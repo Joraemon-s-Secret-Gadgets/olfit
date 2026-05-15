@@ -2,6 +2,7 @@
  * @file scentData.ts
  * @description 향기의 계열(Family) 및 농도(Concentration)에 대한 교육용 텍스트 데이터입니다.
  * 각 계열의 특징과 대표 성분, 부향률별 지속시간 정보를 포함합니다.
+ * @lastModified 2026-05-15
  */
 
 import { Leaf, Mountain, Sparkles, Wind, Cookie } from "lucide-react";
@@ -38,10 +39,10 @@ export const scentFamilies = [
     description: "나무결에서 느껴지는 따뜻하고 묵직한 향입니다. 차분하고 안정적인 무드를 조성하며, 세련되고 깊이 있는 인상을 완성합니다.",
     keyNotes: ["샌달우드", "시더우드", "베티버", "파출리", "오크우드"],
     details: [
-      { name: "Sandalwood", 
+      { name: "Sandalwood",
         desc: "부드럽고 크리미한 우유빛 나무 향이 복잡한 마음을 가라앉히고 깊은 평온을 선사합니다."
       },
-      { name: "Cedarwood", 
+      { name: "Cedarwood",
         desc: "연필심처럼 건조하고 깨끗한 뉘앙스가 현대적이고 지적인 세련미를 감각적으로 보여줍니다."
       },
     ],

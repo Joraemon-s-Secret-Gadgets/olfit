@@ -2,6 +2,7 @@
  * @file FloatingNavButton.tsx
  * @description 페이지 탐색을 돕는 플로팅 버튼 컴포넌트입니다.
  * 단일 클릭 시 이전 섹션으로, 더블 클릭 시 최상단으로 이동하는 하이브리드 기능을 제공합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -39,7 +40,7 @@ export default function FloatingNavButton() {
   const scrollToPreviousSection = () => {
     const sections = Array.from(document.querySelectorAll("main > section"));
     const currentScroll = window.scrollY;
-    
+
     const prevSection = [...sections]
       .reverse()
       .find((section) => {
@@ -92,13 +93,13 @@ export default function FloatingNavButton() {
       aria-label="Navigate upwards"
     >
       <div className="relative">
-        <ArrowUp 
-          size={20} 
-          strokeWidth={2.5} 
+        <ArrowUp
+          size={20}
+          strokeWidth={2.5}
           className="transition-transform duration-300 group-hover:-translate-y-1"
         />
       </div>
-      
+
       {/* 사용자 가이드 툴팁 */}
       <div className="absolute right-full mr-4 px-3 py-1.5 bg-wood text-cream text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded tracking-wider">
         CLICK: PREV / DBL CLICK: TOP

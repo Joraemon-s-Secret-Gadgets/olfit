@@ -1,3 +1,9 @@
+/**
+ * @file personalData.ts
+ * @description Olfit 프론트엔드 정적 데이터 정의 파일입니다.
+ * @lastModified 2026-05-15
+ */
+
 import type { Product } from '@/types';
 
 export const personalProducts: Product[] = [

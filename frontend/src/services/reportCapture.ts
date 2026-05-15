@@ -2,6 +2,7 @@
  * @file reportCapture.ts
  * @description 리포트 섹션을 고해상도 이미지로 캡처하고 저장/공유하는 기능을 담당하는 서비스입니다.
  * html2canvas를 사용하여 DOM 요소를 캔버스로 변환하며, 외부 이미지 및 스타일 예외 처리를 수행합니다.
+ * @lastModified 2026-05-15
  */
 
 import html2canvas from "html2canvas";
@@ -368,7 +369,7 @@ const prependCaptureHeader = (clonedDoc: Document, el: HTMLElement) => {
 
 /**
  * 리포트 요소를 캡처하여 Blob 형태의 고해상도 이미지를 생성합니다.
- * 
+ *
  * @param reportRef 캡처할 DOM 요소의 Ref
  * @returns {Promise<Blob | null>} 생성된 이미지 Blob
  */
@@ -376,14 +377,14 @@ export const captureReportBlob = async (reportElement: HTMLElement | null): Prom
   if (!reportElement) return null;
 
   // 원본 DOM, 클론 DOM, html2canvas 내부 이미지 로딩까지 기다릴 수 있도록 여유를 둡니다.
-  const overallTimeout = new Promise<null>((_, reject) => 
+  const overallTimeout = new Promise<null>((_, reject) =>
     setTimeout(() => reject(new Error("Capture Timeout")), CAPTURE_TIMEOUT)
   );
 
   const captureProcess = (async () => {
     // 폰트 로딩 대기
     if (document.fonts) await document.fonts.ready;
-    
+
     // 이미지 로딩 대기
     await waitForImages(reportElement);
 
@@ -406,7 +407,7 @@ export const captureReportBlob = async (reportElement: HTMLElement | null): Prom
         // 🛠️ FIX (중복 복사 해결): 반응형 구조에서 동일 ID가 여러 개 존재할 가능성을 차단하고, 캡처 전용 타겟만 남김
         const targets = clonedDoc.querySelectorAll("#report-content");
         targets.forEach((target, index) => {
-          if (index > 0) target.remove(); 
+          if (index > 0) target.remove();
         });
 
         const el = clonedDoc.getElementById("report-content");
@@ -432,7 +433,7 @@ export const captureReportBlob = async (reportElement: HTMLElement | null): Prom
           img.loading = "eager";
           img.decoding = "sync";
         });
-        
+
         el.style.width = `${CAPTURE_WIDTH}px`;
         el.style.maxWidth = "none";
         el.style.padding = "60px";
@@ -463,7 +464,7 @@ let _isSharing = false;
 
 /**
  * 생성된 이미지를 다운로드 방식으로 사용자에게 제공합니다.
- * 
+ *
  * @param blob 이미지 Blob
  */
 export const shareOrDownloadImage = async (blob: Blob): Promise<"downloaded" | "failed"> => {

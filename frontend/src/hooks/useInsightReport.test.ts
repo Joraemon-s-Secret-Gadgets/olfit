@@ -1,3 +1,9 @@
+/**
+ * @file useInsightReport.test.ts
+ * @description 회귀 방지를 위한 테스트 파일입니다.
+ * @lastModified 2026-05-15
+ */
+
 import { describe, expect, it } from "vitest";
 import { sortByPriceKrw } from "./useInsightReport";
 
@@ -30,3 +36,5 @@ describe("sortByPriceKrw", () => {
     ]);
   });
 });
+
+// EOF: useInsightReport.test.ts
