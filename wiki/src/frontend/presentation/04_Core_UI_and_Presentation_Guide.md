@@ -113,7 +113,7 @@ if (processingRef.current || isComplete) return;
 processingRef.current = true;
 ```
 
-진행률은 실제 백엔드 처리율이 아니라 사용자가 현재 어떤 단계를 기다리는지 이해할 수 있게 하는 UX용 progress입니다. 현재 구현에서는 약 5초 동안 단계 문구를 보여준 뒤 `requestAuraAnalysis()`를 1회 호출합니다.
+진행률은 실제 백엔드 처리율이 아니라 사용자가 현재 어떤 단계를 기다리는지 이해할 수 있게 하는 UX용 progress입니다. 현재 구현에서는 약 5초 동안 분석 단계 문구를 보여준 뒤, 100% 도달 시 `requestAuraAnalysis()`를 1회 호출합니다.
 
 - 이미지 픽셀 데이터 추출
 - 스타일 실루엣 및 텍스처 분석
@@ -121,15 +121,24 @@ processingRef.current = true;
 - 선택 노트와 스타일 결합
 - 향기 아우라 생성 완료
 
+100% 도달 후 API 응답을 기다리는 동안에는 랜덤 향기 팁이 아니라 고정된 마무리 상태 문구가 순환 표시됩니다.
+
+- 아우라 분석 결과를 정리하는 중
+- 추천 향수 데이터를 불러오는 중
+- 제품 이미지와 상세 정보를 준비하는 중
+- 리포트 화면을 구성하는 중
+
 발표 포인트:
 
 - 비동기 분석은 사용자가 멈춘 화면처럼 느끼기 쉬우므로, `분석 시작` 이후의 대기 상태를 시각화했다.
-- API 호출은 state callback 내부가 아니라 timer 종료 시점의 명확한 분기에서 1회만 수행한다.
+- API 호출은 state callback 내부가 아니라 progress 100% 도달 시점의 명확한 분기에서 1회만 수행한다.
+- API pending 중에는 finalizing 문구를 순환 표시해 대기 지루함을 줄인다.
 
 주의해서 말할 점:
 
 - 현재 progress는 실제 서버 처리율이 아니라 데모/UX용 대기 표현이다.
 - 현재 구현은 progress가 끝난 뒤 API를 호출하므로 사용자는 `5초 UX 대기 + 실제 API 응답 시간`을 기다릴 수 있다.
+- 랜덤 향기 팁 기능은 현재 코드에 없다. 현재는 고정 finalizing 문구 순환 방식이다.
 - 운영 개선 기준으로는 `분석 시작` 직후 API를 바로 호출하고, API pending 동안 progress 또는 loading indicator를 보여주는 구조가 더 자연스럽다.
 
 ## 5. 추천 결과와 fallback 로직

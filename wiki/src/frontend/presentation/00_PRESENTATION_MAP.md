@@ -20,6 +20,7 @@
 | 4 | 핵심 기능 구현 | `04_Core_UI_and_Presentation_Guide.md` | 이미지 처리, API 요청, 추천 결과, 리포트 캡처가 어떤 흐름으로 동작하는지 설명한다. |
 | 5 | UI 디테일과 Q&A | `05_ShadcnUI_and_TailwindCSS.md` | 브랜드 톤, 접근성 기반 UI 전략, 중복 요청 방지, 테스트 방어 포인트를 정리한다. |
 | 6 | 질문 대응 전체 리스트 | `06_FRONTEND_QA_RESPONSE_LIST.md` | 기술 선택부터 한계와 개선 방향까지 예상 질문에 짧게 답한다. |
+| 7 | 최신 UI 변경 요약 | `07_LATEST_UI_REFINEMENT_SUMMARY.md` | GitHub/발표용 최신 변경 요약을 정확한 표현으로 제공한다. |
 
 ## 발표용 한 문장 요약
 
@@ -40,6 +41,7 @@ Olfit 프론트엔드는 `TypeScript + React + Vite + Tailwind CSS`를 기반으
 | 리포트 이미지 저장 | `frontend/src/services/reportCapture.ts` |
 | Tailwind 설정과 전역 스타일 | `frontend/tailwind.config.js`, `frontend/src/index.css` |
 | 질문 대응 전체 리스트 | `wiki/src/frontend/presentation/06_FRONTEND_QA_RESPONSE_LIST.md` |
+| 최신 UI 변경 요약 | `wiki/src/frontend/presentation/07_LATEST_UI_REFINEMENT_SUMMARY.md` |
 
 ## 주의할 표현
 
