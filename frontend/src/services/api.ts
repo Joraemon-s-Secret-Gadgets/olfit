@@ -1,3 +1,9 @@
+/**
+ * @file api.ts
+ * @description Olfit 프론트엔드 서비스 로직입니다.
+ * @lastModified 2026-05-15
+ */
+
 import axios from 'axios';
 import { useOlfitStore } from '@/store/useStore';
 
@@ -19,7 +25,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const { setError } = useOlfitStore.getState();
-    
+
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.message || error.message || '서버와의 통신 중 오류가 발생했습니다.';
       setError(message);
@@ -27,7 +33,7 @@ api.interceptors.response.use(
     } else {
       setError('알 수 없는 오류가 발생했습니다.');
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -46,7 +52,7 @@ api.interceptors.request.use((config) => {
  */
 export const requestAuraAnalysis = async (base64Image: string, selectedNotes: string[]) => {
   const { setLoading, setError } = useOlfitStore.getState();
-  
+
   try {
     setLoading(true);
     setError(null);
@@ -61,3 +67,5 @@ export const requestAuraAnalysis = async (base64Image: string, selectedNotes: st
 };
 
 export default api;
+
+// EOF: api.ts

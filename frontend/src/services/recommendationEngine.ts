@@ -2,6 +2,7 @@
  * @file recommendationEngine.ts
  * @description 사용자의 인터뷰 분석 결과와 실제 향수 제품 데이터를 지능적으로 매칭하는 핵심 서비스 로직입니다.
  * 이미지 기반 무드 분석 결과와 사용자가 선택한 향기 노트를 다각도로 검토하여 유사도를 계산합니다.
+ * @lastModified 2026-05-15
  */
 
 import type { AnalysisResults } from "@/types";
@@ -11,7 +12,7 @@ import type { Product } from "@/data/productData";
 /**
  * 인터뷰 결과에 따른 최적의 추천 제품 리스트를 반환합니다.
  * 시각적 무드 가중치와 후각적 노트 매칭 가중치를 결합하여 상위 5개를 추출합니다.
- * 
+ *
  * @param results AI 인터뷰 최종 분석 결과 객체
  * @returns {Array} 유사도 및 추천 사유가 포함된 제품 리스트
  */
@@ -22,23 +23,23 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
   const selectedNotes = (results.analysisMetadata?.selectedNotes || []).filter(Boolean);
   const perfumeKeywords = (results.perfumeKeywords || []).filter(Boolean);
   const mood = results.personalMood || "";
-  
+
   // 전체 제품군에 대하여 개별 유사도 점수 산출
   const scoredProducts = personalProducts.map((product) => {
     let score = 0;
     const matchedNotes: string[] = [];
     const matchedKeywords: string[] = [];
-    
+
     // 1. 후각적 매칭: 선택된 노트와 제품 성분 간의 교차 검증 (가중치 2)
     selectedNotes.forEach((userNote) => {
       if (!userNote) return;
       const targetText = `
-        ${product.notes.toLowerCase()} 
-        ${product.details.topNotes.toLowerCase()} 
-        ${product.details.middleNotes.toLowerCase()} 
+        ${product.notes.toLowerCase()}
+        ${product.details.topNotes.toLowerCase()}
+        ${product.details.middleNotes.toLowerCase()}
         ${product.details.baseNotes.toLowerCase()}
       `.replace(/\s+/g, '');
-      
+
       if (targetText.includes(userNote.toLowerCase().replace(/\s+/g, ''))) {
         score += 2;
         matchedNotes.push(userNote);
@@ -50,7 +51,7 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
       if (!keyword) return;
       const cleanKeyword = keyword.replace("#", "").toLowerCase();
       const targetText = `${product.notes} ${product.family} ${product.details.story}`.toLowerCase();
-      
+
       if (targetText.includes(cleanKeyword)) {
         score += 2;
         matchedKeywords.push(keyword);
@@ -83,14 +84,14 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
     // 정량적 점수를 백분율(0-100%) 유사도로 변환 및 보정
     const maxPossibleScore = (selectedNotes.length * 2) + (perfumeKeywords.length * 2) || 4;
     const rawSimilarity = (score / maxPossibleScore) * 100;
-    
+
     // 데이터 쏠림 방지를 위한 안정적인 난수 보정값 추가 (시각적 다양성 확보)
     // 제품 ID를 기반으로 2~7% 정도의 추가 변동성을 주어 변별력을 높임
-    const stableRandom = (product.id % 70) / 10; 
-    
+    const stableRandom = (product.id % 70) / 10;
+
     // 변별력을 위해 기본 점수를 60으로 낮추고, 가중치를 0.35로 조정하여 수치가 더 들쭉날쭉하게 나오도록 함
     const similarity = Math.min(Math.round(rawSimilarity * 0.35 + 60 + stableRandom), 99);
-    
+
     return { ...product, similarity, matchReason };
   });
 

@@ -1,3 +1,9 @@
+/**
+ * @file ScentBlueprint.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 import ScentPyramid from "@/components/common/ScentPyramid";
 import { ArrowRight } from "lucide-react";
 import type { ScentNote } from "@/data/noteData";
@@ -51,7 +57,7 @@ export default function ScentBlueprint({ isVisible, slots, matchPercent, accentC
             )}
           </p>
           {hasNoNotes && (
-            <a 
+            <a
               href="#guide"
               className="inline-flex items-center gap-2 mt-6 text-[11px] uppercase tracking-widest text-wood/50 hover:text-wood border-b border-wood/20 hover:border-wood/60 pb-0.5 transition-all duration-300 self-start mx-auto lg:mx-0"
             >
@@ -64,3 +70,5 @@ export default function ScentBlueprint({ isVisible, slots, matchPercent, accentC
     </div>
   );
 }
+
+// EOF: ScentBlueprint.tsx

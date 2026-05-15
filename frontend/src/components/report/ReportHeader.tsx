@@ -1,3 +1,9 @@
+/**
+ * @file ReportHeader.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 interface ReportHeaderProps {
   isVisible: boolean;
 }
@@ -12,3 +18,5 @@ export default function ReportHeader({ isVisible }: ReportHeaderProps) {
     </div>
   );
 }
+
+// EOF: ReportHeader.tsx

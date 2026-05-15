@@ -1,6 +1,7 @@
 /**
  * @file useInsightReport.ts
  * @description InsightReportSection의 비즈니스 로직과 상태 관리를 담당하는 커스텀 훅입니다.
+ * @lastModified 2026-05-15
  */
 
 import { useState, useMemo, useRef } from "react";
@@ -42,7 +43,7 @@ export function useInsightReport(results: AnalysisResults | null) {
   const { ref: refRadar, isVisible: visRadar } = useIntersectionObserver();
   const { ref: refSteps, isVisible: visSteps } = useIntersectionObserver();
   const { ref: refPyramid, isVisible: visPyramid } = useIntersectionObserver();
-  
+
   const reportRef = useRef<HTMLDivElement>(null);
   const isCapturingRef = useRef(false);
 
@@ -68,6 +69,7 @@ export function useInsightReport(results: AnalysisResults | null) {
   }, [results]);
 
   const matchPercent = baseRecommendations.length > 0 ? baseRecommendations[0].similarity : 0;
+  const bestPickProductId = baseRecommendations[0]?.id ?? null;
 
   const recommendations = useMemo(() => {
     if (sortBy === "price") {
@@ -148,7 +150,9 @@ export function useInsightReport(results: AnalysisResults | null) {
     },
     reportRef,
     state: { sortBy, isSaving, feedback },
-    derived: { recommendations, slots, matchPercent, dynamicLogicSteps, currentRadarData },
+    derived: { recommendations, bestPickProductId, slots, matchPercent, dynamicLogicSteps, currentRadarData },
     actions: { setSortBy, handleShareResults }
   };
 }
+
+// EOF: useInsightReport.ts

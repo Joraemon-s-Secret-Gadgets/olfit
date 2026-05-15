@@ -2,6 +2,7 @@
  * @file ScentGuideSection.tsx
  * @description 향기에 대한 심도 있는 교육 정보와 가이드를 제공하는 섹션입니다.
  * 부향률 체계, 향기 계열(Family), 그리고 주요 향기 노트 사전을 유기적으로 배치합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -23,7 +24,7 @@ export default function ScentGuideSection({ onNotesChange }: ScentGuideSectionPr
     <section id="guide" className="bg-beige py-24 md:py-40">
       <div className="max-w-[1440px] mx-auto px-6 md:px-8">
         <div ref={ref} className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          
+
           {/* 도입부 헤더 영역 */}
           <div className="max-w-3xl mb-16 md:mb-20">
             <p className="label-upper text-wood/40 mb-4">Scent Education</p>

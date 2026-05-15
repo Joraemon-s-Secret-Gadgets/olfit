@@ -2,6 +2,7 @@
  * @file HeroSection.tsx
  * @description 사이트의 첫 인상을 결정하는 메인 히어로 섹션입니다.
  * 고해상도 배경 이미지, 브랜드 로고 애니메이션, 그리고 사용자의 여정을 시작하게 하는 CTA(Call to Action) 요소를 배치합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -13,7 +14,7 @@ export default function HeroSection() {
   const { ref, isVisible } = useIntersectionObserver({ threshold: 0.1 });
 
   return (
-    <section 
+    <section
       ref={ref}
       className="relative h-screen min-h-[600px] w-full overflow-hidden bg-wood"
     >
@@ -58,18 +59,18 @@ export default function HeroSection() {
 
       {/* 중앙 콘텐츠: 메인 로고 및 슬로건 */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 px-6">
-        <div 
+        <div
           className={`transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <OlfitLogo 
-            width="auto" 
-            height="clamp(60px, 15vw, 120px)" 
-            color="#FDFCF0" 
+          <OlfitLogo
+            width="auto"
+            height="clamp(60px, 15vw, 120px)"
+            color="#FDFCF0"
           />
         </div>
-        <p 
+        <p
           className={`text-cream/60 text-[10px] sm:text-sm md:text-base tracking-[0.2em] sm:tracking-[0.3em] uppercase mt-8 transition-all duration-1000 delay-300 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}

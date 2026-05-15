@@ -2,6 +2,7 @@
  * @file noteData.ts
  * @description 향수의 주요 원료(Notes)에 대한 상세 설명을 담은 데이터베이스입니다.
  * 향조(Note) 선택 UI(탭 + 단일 항목 캐러셀)에 사용됩니다.
+ * @lastModified 2026-05-15
  */
 
 export interface ScentNote {

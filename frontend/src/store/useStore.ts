@@ -1,3 +1,9 @@
+/**
+ * @file useStore.ts
+ * @description Olfit 프론트엔드 전역 상태 관리 파일입니다.
+ * @lastModified 2026-05-15
+ */
+
 import { create } from 'zustand';
 import type { AnalysisResults } from '@/types';
 import type { Product } from '@/data/productData';
@@ -57,3 +63,5 @@ export const useOlfitStore = create<OlfitState>((set) => ({
     restartToken: state.restartToken + 1
   })),
 }));
+
+// EOF: useStore.ts

@@ -2,6 +2,7 @@
  * @file SafetyValuesSection.tsx
  * @description 브랜드가 지향하는 핵심 가치(안전성, 윤리성, 기능성)를 시각적으로 전달하는 섹션입니다.
  * 세 가지 핵심 가치를 아이콘과 상세 설명을 통해 그리드 레이아웃으로 구성합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -56,7 +57,7 @@ export default function SafetyValuesSection() {
     <section id="safety" className="bg-wood text-cream py-24 md:py-40">
       <div className="max-w-[1440px] mx-auto px-6 md:px-8">
         <div ref={ref} className={`transition-all duration-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          
+
           <div className="text-center mb-16">
             <p className="label-upper text-cream/40 mb-4">Trust & Values</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>

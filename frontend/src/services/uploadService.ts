@@ -1,6 +1,7 @@
 /**
  * @file uploadService.ts
  * @description 이미지를 클라우드 스토리지(S3/R2)에 업로드하는 과정을 시뮬레이션하는 서비스입니다.
+ * @lastModified 2026-05-15
  */
 
 /**
@@ -21,3 +22,5 @@ export const uploadToCloudStorage = async (base64OrFile: string | File): Promise
   console.log("Cloud Storage Upload Success:", fakeUrl);
   return fakeUrl;
 };
+
+// EOF: uploadService.ts

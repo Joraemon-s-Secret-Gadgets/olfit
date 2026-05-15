@@ -2,6 +2,7 @@
  * @file ConcentrationList.tsx
  * @description 향수의 부향률(Concentration) 정보를 체계적으로 리스트업하여 사용자에게 정보를 제공하는 컴포넌트입니다.
  * 농도별 향수 타입, 비율, 지속시간 및 특징을 시각화합니다.
+ * @lastModified 2026-05-15
  */
 
 interface Concentration {
@@ -27,13 +28,13 @@ export default function ConcentrationList({ concentrations, description }: Conce
           01. Concentration (부향률)
         </h3>
         {description && (
-          <p 
+          <p
             className="text-[14px] md:text-[15px] text-wood/60 leading-relaxed break-keep min-h-[3rem] md:min-h-[4.5rem]"
             dangerouslySetInnerHTML={{ __html: description }}
           />
         )}
       </div>
-      
+
       <div className="flex-1 bg-white/40 backdrop-blur-sm p-6 sm:p-8 md:p-12 rounded-sm border border-wood/5 flex flex-col justify-center h-[540px] sm:h-[580px] lg:h-[620px]">
         <div className="space-y-8 md:space-y-10">
           {concentrations.map((c) => (

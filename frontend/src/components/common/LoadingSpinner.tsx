@@ -1,3 +1,9 @@
+/**
+ * @file LoadingSpinner.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 interface LoadingSpinnerProps {
   message?: string;
   className?: string;
@@ -17,3 +23,5 @@ export default function LoadingSpinner({ message = "Loading...", className = "" 
     </div>
   );
 }
+
+// EOF: LoadingSpinner.tsx

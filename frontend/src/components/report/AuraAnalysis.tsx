@@ -1,3 +1,9 @@
+/**
+ * @file AuraAnalysis.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 import RadarChart from "@/components/common/RadarChart";
 
 interface RadarDataPoint {
@@ -14,14 +20,14 @@ interface AuraAnalysisProps {
   borderClass: string;
 }
 
-export default function AuraAnalysis({ 
-  isRadarVisible, 
-  isStepsVisible, 
-  radarData, 
-  logicSteps, 
-  borderClass 
+export default function AuraAnalysis({
+  isRadarVisible,
+  isStepsVisible,
+  radarData,
+  logicSteps,
+  borderClass
 }: AuraAnalysisProps) {
-  
+
   const renderText = (text: string) => {
     return text.split("<br/>").map((line, i) => (
       <span key={i}>
@@ -52,3 +58,5 @@ export default function AuraAnalysis({
     </div>
   );
 }
+
+// EOF: AuraAnalysis.tsx

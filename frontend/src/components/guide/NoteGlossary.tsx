@@ -2,6 +2,7 @@
  * @file NoteGlossary.tsx
  * @description 향수의 주요 원료(Note) 정보를 카드 형태로 시각화하고, 사용자의 선호 원료를 수집하는 인터랙티브 컴포넌트입니다.
  * 탑, 미들, 베이스 노트별 분류를 제공하며, 최대 3개의 원료를 선택할 수 있는 기능을 포함합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useState } from "react";
@@ -28,16 +29,16 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
     // 이미 선택된 경우 제거
     if (selectedNotes.find((n) => n.id === note.id)) {
       newNotes = selectedNotes.filter((n) => n.id !== note.id);
-    } 
+    }
     // 선택되지 않았고 3개 미만인 경우 추가
     else if (selectedNotes.length < 3) {
       newNotes = [...selectedNotes, note];
-    } 
+    }
     // 3개 초과 선택 시 무시
     else {
       return;
     }
-    
+
     setSelectedNotes(newNotes);
     if (onNotesChange) {
       onNotesChange(newNotes.map(n => n.name));
@@ -61,8 +62,8 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
       <div
         key={note.id}
         className={`group relative h-40 md:h-44 border rounded-sm p-4 cursor-pointer transition-all duration-500 overflow-hidden ${
-          isSelected 
-            ? 'bg-wood border-wood shadow-lg' 
+          isSelected
+            ? 'bg-wood border-wood shadow-lg'
             : 'bg-white/40 border-wood/5 hover:border-wood/20'
         }`}
         onClick={() => toggleNote(note)}
@@ -94,7 +95,7 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
         {/* 호버 정보 레이어 (설명 및 원산지) */}
         {!isSelected && (
           <div className={`absolute inset-0 p-4 flex flex-col justify-center transition-all duration-500 ${hoveredNote === note.id ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-            <p 
+            <p
               className="text-[11px] leading-relaxed text-wood/80 break-keep mb-3"
               dangerouslySetInnerHTML={{ __html: note.description }}
             />
@@ -126,20 +127,20 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
             </p>
           )}
         </div>
-        
+
         {/* 상단 컨트롤 바: 선택 수 지표 및 초기화 버튼 */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             {[1, 2, 3].map((num) => (
-              <div 
-                key={num} 
+              <div
+                key={num}
                 className={`w-2.5 h-2.5 rounded-full border transition-colors duration-500 ${
                   selectedNotes.length >= num ? 'bg-wood border-wood' : 'border-wood/20'
-                }`} 
+                }`}
               />
             ))}
           </div>
-          <button 
+          <button
             onClick={resetNotes}
             className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-wood/40 hover:text-wood transition-colors"
           >
@@ -154,7 +155,7 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
         {categories.map(category => {
           const notes = scentNotes.filter(n => n.category === category);
           if (notes.length === 0) return null;
-          
+
           return (
             <div key={category}>
               <div className="flex items-center gap-3 mb-6">
