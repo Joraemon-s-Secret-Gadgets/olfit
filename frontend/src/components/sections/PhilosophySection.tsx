@@ -37,18 +37,18 @@ export default function PhilosophySection() {
               {/* 핵심 지표 (Stats) 리스트 */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 md:gap-12 pt-4">
                 <div>
-                  <p className="text-xl md:text-2xl font-light tracking-tight text-wood">50,000+</p>
-                  <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-wood/40 mt-1">향기 데이터</p>
+                  <p className="text-xl md:text-2xl font-light tracking-tight text-wood">55,717+</p>
+                  <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-wood/40 mt-1">분석 데이터</p>
                 </div>
                 <div className="hidden sm:block w-px h-8 bg-wood/10" />
                 <div>
-                  <p className="text-xl md:text-2xl font-light tracking-tight text-wood">320+</p>
-                  <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-wood/40 mt-1">스타일 아우라</p>
+                  <p className="text-xl md:text-2xl font-light tracking-tight text-wood">13+</p>
+                  <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-wood/40 mt-1">프리미엄 브랜드</p>
                 </div>
                 <div className="hidden sm:block w-px h-8 bg-wood/10" />
                 <div>
-                  <p className="text-xl md:text-2xl font-light tracking-tight text-wood">98.7%</p>
-                  <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-wood/40 mt-1">만족도</p>
+                  <p className="text-xl md:text-2xl font-light tracking-tight text-wood">1,240+</p>
+                  <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-wood/40 mt-1">향수 아카이브</p>
                 </div>
               </div>
             </div>

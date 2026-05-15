@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react"; // 🛠️ REFACTOR (성능 최적화): memo, useCallback 도입
-import { RotateCcw } from "lucide-react";
+import { Check, RotateCcw, Share2 } from "lucide-react";
 import ProductCarousel from "./ProductCarousel";
 import type { Product } from "@/data/productData";
 import type { ScentNote } from "@/data/noteData";
@@ -15,6 +15,9 @@ interface RecommendationListProps {
   sortBy: "recommended" | "price";
   onSortChange: (sort: "recommended" | "price") => void;
   onRestart: () => void;
+  isSaving: boolean;
+  feedback: string | null;
+  onShare: () => void;
 }
 
 function RecommendationList({ 
@@ -23,7 +26,10 @@ function RecommendationList({
   slots, 
   sortBy, 
   onSortChange,
-  onRestart
+  onRestart,
+  isSaving,
+  feedback,
+  onShare
 }: RecommendationListProps) {
   const sortButtonClass = "h-8 min-w-[72px] px-5 inline-flex items-center justify-center rounded-full text-[10px] leading-none font-medium uppercase tracking-widest [text-indent:0.15em] transition-all hover:font-bold";
   const sortLabelClass = "inline-block leading-none translate-y-[1.5px]";
@@ -32,6 +38,7 @@ function RecommendationList({
   const handleRecommendedSort = useCallback(() => onSortChange("recommended"), [onSortChange]);
   const handlePriceSort = useCallback(() => onSortChange("price"), [onSortChange]);
   const handleRestart = useCallback(() => onRestart(), [onRestart]);
+  const handleShare = useCallback(() => onShare(), [onShare]);
 
   return (
     <div className="mt-32 pt-24 border-t border-wood/10">
@@ -85,15 +92,52 @@ function RecommendationList({
         slots={slots}
       />
 
-      <div className="mt-16 flex justify-center px-4" data-capture-exclude="true">
-        <button
-          type="button"
-          onClick={handleRestart}
-          className="group inline-flex h-12 w-full max-w-xl items-center justify-center gap-3 rounded-sm border border-wood/20 px-8 text-[11px] font-bold uppercase tracking-widest text-wood transition-all duration-300 hover:bg-wood/[0.06] active:scale-[0.99]"
-        >
-          <RotateCcw size={14} className="transition-transform duration-300 group-hover:-rotate-45" />
-          <span>분석 리포트 다시해보기</span>
-        </button>
+      <div className="mt-16 flex flex-col items-center gap-5 px-4" data-capture-exclude="true">
+        <p className="max-w-xl text-center text-[12px] leading-relaxed text-wood/50 break-keep">
+          저장하고 싶은 향수 카드를 화면에 띄운 뒤 Share & Save Report를 눌러주세요.
+        </p>
+        <div className="grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={handleShare}
+            onDoubleClick={(e) => e.preventDefault()}
+            disabled={isSaving || !!feedback}
+            className={`group inline-flex h-12 items-center justify-center gap-3 rounded-sm border px-8 text-[11px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-[0.99] ${
+              isSaving
+                ? "border-wood/10 bg-wood/5 text-wood/30 cursor-not-allowed"
+                : feedback
+                  ? "border-green-200 bg-green-50 text-green-600"
+                  : "border-wood bg-wood text-cream hover:bg-wood/90 hover:shadow-lg"
+            }`}
+          >
+            {isSaving ? (
+              <>
+                <div className="w-3 h-3 border-2 border-wood/20 border-t-wood rounded-full animate-spin" />
+                <span className="hidden sm:inline">고화질 리포트 생성 중</span>
+                <span className="sm:hidden">생성 중</span>
+              </>
+            ) : feedback ? (
+              <>
+                <Check size={15} />
+                <span>{feedback}</span>
+              </>
+            ) : (
+              <>
+                <Share2 size={15} className="transition-transform group-hover:rotate-12" />
+                <span>Share & Save Report</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleRestart}
+            className="group inline-flex h-12 items-center justify-center gap-3 rounded-sm border border-wood/20 px-8 text-[11px] font-bold uppercase tracking-widest text-wood transition-all duration-300 hover:bg-wood/[0.06] active:scale-[0.99]"
+          >
+            <RotateCcw size={14} className="transition-transform duration-300 group-hover:-rotate-45" />
+            <span>분석 리포트 다시해보기</span>
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -61,9 +61,6 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
             <div ref={refHeader}>
               <ReportHeader 
                 isVisible={visHeader || !!results} 
-                isSaving={state.isSaving} 
-                feedback={state.feedback} 
-                onShare={actions.handleShareResults} 
               />
             </div>
 
@@ -104,6 +101,9 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
                   sortBy={state.sortBy} 
                   onSortChange={actions.setSortBy} 
                   onRestart={handleRestart}
+                  isSaving={state.isSaving}
+                  feedback={state.feedback}
+                  onShare={actions.handleShareResults}
                 />
               </div>
             </div>

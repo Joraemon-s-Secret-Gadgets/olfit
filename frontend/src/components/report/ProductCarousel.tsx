@@ -1,12 +1,11 @@
 /**
  * @file ProductCarousel.tsx
  * @description AI 분석을 통해 선정된 추천 제품들을 카드 형태로 보여주는 캐러셀 컴포넌트입니다.
- * Embla Carousel을 기반으로 자동 전환, 수동 슬라이드, 제품 피드백(좋아요/싫어요) 기능을 제공합니다.
+ * Embla Carousel을 기반으로 수동 슬라이드, 제품 피드백(좋아요/싫어요) 기능을 제공합니다.
  */
 
 import { useCallback, useState, memo } from "react"; // 🛠️ REFACTOR (성능 최적화): memo 도입
 import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
 import { ArrowRight, ThumbsUp, ThumbsDown } from "lucide-react";
 import { toast } from "sonner";
 import type { Product } from "@/data/productData";
@@ -157,10 +156,8 @@ const ProductCard = memo(({
 ));
 
 function ProductCarousel({ products, onProductClick, slots }: ProductCarouselProps) {
-  /** 캐러셀 엔진 및 자동 재생 설정 (30초 간격) */
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ delay: 30000, stopOnInteraction: false })
-  ]);
+  /** 캐러셀 엔진 설정 */
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   
   /** 각 제품별 피드백 상태 관리 */
   const [feedbacks, setFeedbacks] = useState<Record<number, Feedback>>({});
@@ -228,10 +225,6 @@ function ProductCarousel({ products, onProductClick, slots }: ProductCarouselPro
           <span className="sr-only">Next</span>
         </button>
       </div>
-      
-      <p className="text-[9px] text-wood/20 mt-12 text-center uppercase tracking-[0.3em] italic animate-pulse">
-        Automatic rotation every 30 seconds
-      </p>
     </div>
   );
 }

@@ -20,6 +20,22 @@ const waitForNextPaint = () =>
     });
   });
 
+export const getSortablePriceKrw = (priceKrw?: number) =>
+  typeof priceKrw === "number" && Number.isFinite(priceKrw) && priceKrw > 0
+    ? priceKrw
+    : Number.POSITIVE_INFINITY;
+
+export const compareByPriceKrw = <T extends { price_krw?: number }>(a: T, b: T) => {
+  const priceA = getSortablePriceKrw(a.price_krw);
+  const priceB = getSortablePriceKrw(b.price_krw);
+
+  if (priceA === priceB) return 0;
+  return priceA < priceB ? -1 : 1;
+};
+
+export const sortByPriceKrw = <T extends { price_krw?: number }>(items: readonly T[]) =>
+  [...items].sort(compareByPriceKrw);
+
 export function useInsightReport(results: AnalysisResults | null) {
   // 🛠️ REFACTOR (유지보수성): 교차 관찰자 상태 분리
   const { ref: refHeader, isVisible: visHeader } = useIntersectionObserver();
@@ -54,15 +70,10 @@ export function useInsightReport(results: AnalysisResults | null) {
   const matchPercent = baseRecommendations.length > 0 ? baseRecommendations[0].similarity : 0;
 
   const recommendations = useMemo(() => {
-    const sorted = [...baseRecommendations];
     if (sortBy === "price") {
-      return sorted.sort((a, b) => {
-        const priceA = parseInt(a.price.replace(/[^0-9]/g, "")) || 0;
-        const priceB = parseInt(b.price.replace(/[^0-9]/g, "")) || 0;
-        return priceA - priceB;
-      });
+      return sortByPriceKrw(baseRecommendations);
     }
-    return sorted;
+    return [...baseRecommendations];
   }, [baseRecommendations, sortBy]);
 
   const dynamicLogicSteps = useMemo(() => [
@@ -103,13 +114,8 @@ export function useInsightReport(results: AnalysisResults | null) {
     setIsSaving(true);
     setFeedback(null);
 
-    const previousSortBy = sortBy;
-
     try {
-      if (previousSortBy !== "recommended") {
-        setSortBy("recommended");
-        await waitForNextPaint();
-      }
+      await waitForNextPaint();
 
       const blob = await captureReportBlob(reportRef.current);
       if (!blob) throw new Error("Blob creation failed");
@@ -122,9 +128,6 @@ export function useInsightReport(results: AnalysisResults | null) {
     } catch (err) {
       console.error("Report processing error:", err);
     } finally {
-      if (previousSortBy !== "recommended") {
-        setSortBy(previousSortBy);
-      }
       isCapturingRef.current = false;
       setIsSaving(false);
     }
