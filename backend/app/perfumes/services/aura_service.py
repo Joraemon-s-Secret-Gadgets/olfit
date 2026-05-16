@@ -1,19 +1,20 @@
 """
-aura_service.py
----------------
-사용자의 시각적 결과(VLM)와 명시적 취향(Selected Notes)을 결합하여
-통합적인 '향기 아우라'를 계산하고, RAG 검색을 위한 한글 쿼리를 생성한다.
+@file aura_service.py
+@module Perfumes/Services/AuraService
+@description
+사용자의 시각적 분석 결과(VLM)와 명시적 취향(Selected Notes)을 융합하여
+통합적인 '향기 아우라(Aura)'를 계산하고, RAG 검색을 위한 한글 쿼리를 생성하는 서비스입니다.
 
-역할:
-1. 비전 분석 결과(VLM)와 사용자 선호도(Selected Notes)를 다차원 벡터 공간에서 융합.
-2. 5축(플로럴, 우디, 오리엔탈, 프레시, 구르망) 아우라 스코어 산출.
-3. UI 시각화를 위한 레이더 차트용 점수(Radar Scores) 스케일링.
-4. RAG 검색 및 UI 표시를 위한 대칭형 한글 쿼리 생성.
+핵심 역할:
+1. 시각 키워드 매핑: VLM 결과(색상, 사물 등)를 향수 도메인 키워드로 변환.
+2. 다차원 벡터 융합: 시각 벡터(60%)와 취향 벡터(40%)를 가중 결합.
+3. 이중 벡터 산출:
+   - UI용: 현실적 가청 범위(Ref Max) 기준의 레이더 차트 점수.
+   - 검색용: 코사인 유사도 연산을 위한 L2 정규화 벡터.
+4. 대칭형 쿼리 생성: 임베딩 모델의 성능 극대화를 위한 자연어 기반 쿼리 구성.
 
-중요:
-- 시각 정보(60%)와 사용자 취향(40%)의 가중치를 적용하여 벡터 융합.
-- 계열별 현실적 최대 기대 점수(Ref Max)를 사용하여 UI 레이더 차트의 선명도 확보.
-- RAG 쿼리는 태그 기반 구조화 데이터와 자연스러운 문장을 모두 포함.
+@author Olfít AI Team
+@version 4.9.0
 """
 
 import numpy as np
@@ -23,14 +24,17 @@ from scent_engine import map_image_to_fragrance_keywords
 
 class AuraService:
     """
-    [Aura Scoring & Query Generation Service]
-    비전 분석 결과와 사용자 선호도를 다차원 벡터 공간에서 융합합니다.
+    [User Aura Analysis & Mapping Engine]
+    사용자의 스타일 이미지를 수치화된 향기 프로필로 변환하는 핵심 엔진입니다.
     """
 
     def __init__(self):
+        """서비스 초기화 및 공통 매핑 데이터 로드"""
         self.master_map = load_master_map()
         self.pref_map = load_user_preference_map()
         self.axes = ["플로럴", "우디", "오리엔탈", "프레시", "구르망"]
+
+        # 내부 영문 상수와 시스템 한글 명칭 매핑
         self.family_mapping = {
             "FLORAL": "플로럴",
             "WOODY": "우디",
@@ -38,43 +42,56 @@ class AuraService:
             "FRESH": "프레시",
             "GOURMAND": "구르망",
         }
-        # 계열별 현실적 최대 기대 점수 (Ref Max)
+
+        # 계열별 현실적 최대 기대 점수 (Ref Max Scaling용)
         # 플로럴(10.0), 우디(7.0), 오리엔탈(7.0), 프레시(10.0), 구르망(4.0)
+        # 각 계열의 성분 노출 빈도와 난이도를 고려한 수치입니다.
         self.ref_max = np.array([10.0, 7.0, 7.0, 10.0, 4.0])
 
     def calculate_combined_aura(self, vl_result, selected_notes):
         """
-        비전 결과와 사용자 노트를 결합하여 통합 아우라 리포트를 생성합니다.
+        VLM 분석 결과와 사용자 선택 노트를 결합하여 최종 아우라 프로필을 생성합니다.
 
-        @param vl_result: VLEngine.analyze_image()의 결과 딕셔너리
-        @param selected_notes: 사용자가 프론트엔드에서 선택한 향기 성분 리스트
-        @return: (radar_scores, fragrance_mapping, query_text, readable_query, search_vector_dict)
+        Args:
+            vl_result (dict): VLEngine에서 생성된 시각 분석 JSON 데이터
+            selected_notes (list): 사용자가 UI에서 선택한 한글 노트 명칭 리스트
+
+        Returns:
+            tuple: (radar_scores, fragrance_mapping, query_text, search_vector_dict)
         """
-        # [Step 1] 매퍼 로직 실행: 시각 키워드를 향수 키워드로 변환
+        # [Step 1] Vision-to-Scent Mapping
+        # 시각적 키워드(예: 'blue', 'ocean')를 향수 도메인 속성으로 변환합니다.
         fragrance_mapping = map_image_to_fragrance_keywords(vl_result)
 
-        # [Step 2] 시각 벡터 산출 (60% 비중)
+        # [Step 2] Visual Score Aggregation (60% weight)
+        # 이미지 분석을 통해 도출된 원천 점수들을 5개 축으로 집계합니다.
         visual_vector = self._holistic_score_aggregation(fragrance_mapping)
 
-        # [Step 3] 취향 벡터 산출 (40% 비중)
+        # [Step 3] Preference Score Aggregation (40% weight)
+        # 사용자가 직접 선택한 향기 성분들에 대해 강력한 가중치를 부여한 벡터를 생성합니다.
         pref_vector = self._get_preference_vector(selected_notes)
 
-        # [Step 4] 벡터 융합 및 정규화
+        # [Step 4] Vector Fusion
+        # 시각적 감성(객관적 스타일)과 성분 취향(주관적 선호)을 통합합니다.
         combined_raw = (visual_vector * 0.6) + (pref_vector * 0.4)
 
-        # [Step 5] 시각화용 및 추천 연산용 벡터 분리
-        # UI 레이더 차트용 (현실적 최대치 기반 스케일링)
+        # [Step 5] Separation for UI and Search
+
+        # 5-1. UI 레이더 차트용 점수 (Ref Max Scaling)
+        # 사용자에게 직관적인 그래프를 보여주기 위해 계열별 난이도를 반영하여 스케일링합니다.
         radar_scores = self._scale_to_visualize(combined_raw)
 
-        # 추천 서비스 연산용 (L2 정규화)
+        # 5-2. 추천 엔진용 벡터 (L2 Normalization)
+        # 코사인 유사도 연산의 신뢰도를 위해 벡터 크기를 1로 맞춥니다.
         norm = np.linalg.norm(combined_raw)
         search_vector = combined_raw / norm if norm > 0 else combined_raw
         search_vector_dict = {
             axis: float(round(val, 4)) for axis, val in zip(self.axes, search_vector)
         }
 
-        # [Step 6] 대칭형 쿼리 생성 (RAG 및 UI용)
-        query_text, readable_query = self._generate_symmetric_korean_query(
+        # [Step 6] Symmetric Query Generation
+        # 향수 인덱싱 문서와 대칭을 이루는 고품질 자연어 쿼리를 생성합니다.
+        query_text = self._generate_symmetric_korean_query(
             vl_result, fragrance_mapping, search_vector_dict, selected_notes
         )
 
@@ -82,52 +99,63 @@ class AuraService:
             radar_scores,
             fragrance_mapping,
             query_text,
-            readable_query,
             search_vector_dict,
         )
 
     def _scale_to_visualize(self, vector):
         """
-        UI Radar Chart를 위한 현실적 최대치(Ref Max) 기반 스케일링.
-        개성을 선명하게 보여주면서도 절대적 강도를 보존합니다.
+        사용자 경험(UX)을 고려하여 아우라 수치를 0.1~1.0 사이로 스케일링합니다.
+
+        Args:
+            vector (np.array): 결합된 원천 점수 벡터
+
+        Returns:
+            dict: 레이더 차트 표시용 5축 점수
         """
         if np.max(vector) == 0:
             return {axis: 0.1 for axis in self.axes}
 
-        # 각 축의 현실적 최대치 대비 비율 계산
+        # 축별 현실적 최대치(ref_max) 대비 비율로 변환
         scaled = vector / self.ref_max
 
-        # 시각적 피드백을 위해 가장 큰 축이 최소 0.8 이상이 되도록 부스팅 (선택 사항)
-        # max_ratio = np.max(scaled)
-        # if 0 < max_ratio < 0.8:
-        #     scaled = scaled * (0.8 / max_ratio)
-
+        # 하한값 0.1, 상한값 1.0으로 클램핑하여 시각적 안정성 확보
         return {
             axis: float(round(np.clip(val, 0.1, 1.0), 2))
             for axis, val in zip(self.axes, scaled)
         }
 
     def _holistic_score_aggregation(self, mapping):
-        """비전 매핑 결과를 5축 점수로 집계합니다."""
+        """
+        매핑된 향수 속성(Family, Sub, Component)들을 가중 합산하여 5축 점수를 산출합니다.
+
+        Weighting Policy:
+        - Primary Families: 100% 반영
+        - Secondary Sub-accords: 70% 반영 (뉘앙스 보정)
+        - Tertiary Components: 50% 반영 (미세 보정)
+        """
         scores = {axis: 0.0 for axis in self.axes}
         raw_scores = mapping.get("scores", {})
 
-        # 계열별 가중치 합산
+        # 1. 메인 계열 점수 합산
         for item in raw_scores.get("families", []):
             std_fam = self.family_mapping.get(item["name"])
             if std_fam in scores:
                 scores[std_fam] += item["score"]
 
-        # 어코드 및 성분 기반 미세 보정
+        # 2. 서브 어코드 점수 합산 (가중치 0.7)
         for item in raw_scores.get("subs", []):
             # 영문 어코드명을 한글로 변환 (예: 'Floral' -> '플로럴')
-            ko_accord = self.master_map["accord_translations"].get(item["name"], item["name"])
+            ko_accord = self.master_map["accord_translations"].get(
+                item["name"], item["name"]
+            )
             cat = self.master_map["accord_to_category"].get(ko_accord)
             if cat in scores:
                 scores[cat] += item["score"] * 0.7
 
+        # 3. 세부 성분 점수 합산 (가중치 0.5)
         for item in raw_scores.get("components_ko", []):
             # 이미 한글로 변환된 성분명이므로 직접 어코드 매핑 확인
+            # 노트 -> 어코드 -> 카테고리 순으로 재귀적 매핑 탐색
             sub_accord = self.master_map["note_to_accord"].get(item["name"], "아로마틱")
             cat = self.master_map["accord_to_category"].get(sub_accord)
             if cat in scores:
@@ -136,38 +164,57 @@ class AuraService:
         return np.array([scores[a] for a in self.axes])
 
     def _get_preference_vector(self, selected_notes):
-        """사용자가 직접 선택한 노트를 5축 벡터로 변환합니다."""
+        """
+        사용자가 선택한 노트(취향)를 강력한 수치 데이터로 변환합니다.
+
+        Args:
+            selected_notes (list): 사용자가 직접 고른 향기 성분 리스트
+
+        Returns:
+            np.array: 취향 지향점이 반영된 5축 벡터
+        """
         scores = {axis: 0.0 for axis in self.axes}
         for note in selected_notes:
-            # 선호도 매핑에서 직접 계열(axis) 정보를 가져옴
+            # 선호도 매핑 테이블에서 해당 성분의 메인 축(axis) 정보를 직접 조회
             mapping = self.pref_map.get(note)
             if mapping and mapping["axis"] in scores:
-                scores[mapping["axis"]] += 3.0  # 명시적 선택에는 높은 가중치 부여
+                # 명시적 선택 성분에는 +3.0의 높은 가중치를 주어 추천 결과에 큰 영향을 미치게 함
+                scores[mapping["axis"]] += 3.0
+
         return np.array([scores[a] for a in self.axes])
 
     def _generate_symmetric_korean_query(
         self, vl_result, fragrance_mapping, aura_score, selected_notes
     ):
-        """RAG 검색을 위한 100% 한글 대칭형 쿼리를 생성합니다."""
+        """
+        RAG 성능을 위해 인덱싱 문서(Document)와 문장 구조가 대칭을 이루는 쿼리를 생성합니다.
+
+        Structure: [이미지 요약]. [무드] 분위기의 [통합 노트] 향이 느껴지는 [메인 계열] 계열 향수.
+        """
         summary = vl_result.get("visual_summary", "분위기 있는 이미지")
+
+        # 이미지 무드 영문 태그를 한글 번역본으로 치환
         en_moods = vl_result.get("mood", [])
         ko_moods = [self.master_map["accord_translations"].get(m, m) for m in en_moods]
 
+        # 분석된 성분과 선택한 성분을 합치고 중복 제거
         analyzed_notes = fragrance_mapping.get("components_ko", [])
         combined_notes = list(dict.fromkeys(analyzed_notes + selected_notes))
 
+        # 현재 점수 중 가장 지배적인 계열(Main Family) 추출
         main_family = max(aura_score, key=aura_score.get)
 
-        # [UI 표시용] 자연스러운 한글 문장
+        # [Symmetric RAG Strategy]
+        # 인덱싱 문서의 "std_accords 분위기의 std_notes 향이 느껴지는 family 계열 향수" 문장 구조와
+        # 동일한 구조로 임베딩 모델의 매칭 확률을 극대화합니다.
         readable = f"{summary}. {', '.join(ko_moods)} 분위기의 {', '.join(combined_notes)} 향이 느껴지는 {main_family} 계열 향수."
 
-        # [RAG 검색용] 태그 기반 구조화 쿼리
-        rag_query = f"visual_summary:{summary} "
-        rag_query += " ".join([f"visual_mood:{m}" for m in ko_moods]) + " "
-        rag_query += " ".join([f"fragrance_note_ko:{n}" for n in combined_notes]) + " "
-        rag_query += f"fragrance_family:{main_family}"
+        return readable
 
-        return rag_query, readable
 
+# ----------------------------------------------------------------
+# Last Modified: 2026-05-15
+# Modified By: Olfít AI Team (Gemini CLI)
+# ----------------------------------------------------------------
 
 # EOF: aura_service.py
