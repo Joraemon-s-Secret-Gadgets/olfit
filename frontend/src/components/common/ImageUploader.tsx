@@ -2,7 +2,7 @@
  * @file ImageUploader.tsx
  * @description 이미지를 업로드하고 리사이징하여 Base64로 변환하는 컴포넌트입니다.
  * 사용자의 OOTD 사진을 받아 AI 분석이 가능한 형태로 전처리합니다.
- * @lastModified 2026-05-15
+ * @lastModified 2026-05-16
  */
 
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
@@ -159,7 +159,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           const base64 = canvas.toDataURL("image/jpeg", 0.9);
           setPreview(base64);
 
-          // 클라우드 업로드 시뮬레이션 시작
+          // 분석 요청에 사용할 원격 URL 생성 시뮬레이션 시작
           setIsUploading(true);
           const remoteUrl = await uploadToCloudStorage(base64);
           setProcessedImage({ base64, remoteUrl });
@@ -287,7 +287,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
               </div>
             )}
 
-            {/* 업로드 중 상태 표시 */}
+            {/* 이미지 준비 중 상태 표시 */}
             {isUploading && (
               <div className="absolute inset-0 bg-gold/40 backdrop-blur-sm flex flex-col items-center justify-center text-wood">
                 <div className="flex items-center gap-1.5 mb-6">
@@ -295,8 +295,8 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
                   <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.15s]" />
                   <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
                 </div>
-                <p className="text-[13px] font-bold tracking-widest uppercase">Uploading to S3...</p>
-                <p className="text-[11px] opacity-70 mt-2">안전한 서버로 이미지를 전송 중입니다</p>
+                <p className="text-[13px] font-bold tracking-widest uppercase">Preparing Image...</p>
+                <p className="text-[11px] opacity-70 mt-2">분석에 맞게 이미지를 안전하게 처리하고 있습니다</p>
               </div>
             )}
 
@@ -323,7 +323,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
                 className="h-12 inline-flex items-center justify-center gap-3 rounded-sm bg-wood px-8 text-[11px] font-bold uppercase tracking-widest text-cream border border-cream/15 shadow-[0_12px_30px_rgba(33,24,18,0.24)] transition-all duration-300 hover:bg-cream hover:text-wood disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-wood disabled:hover:text-cream"
               >
                 <Sparkles size={14} />
-                <span>{isUploading ? "업로드 중" : "분석 시작"}</span>
+                <span>{isUploading ? "준비 중" : "분석 시작"}</span>
               </button>
               <button
                 type="button"
@@ -340,7 +340,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
       <div className="mt-6 flex items-start gap-3 px-2">
         <ImageIcon size={14} className="text-cream/30 mt-0.5" />
         <p className="text-[11px] text-cream/40 leading-relaxed break-keep">
-          정면 전신사진 혹은 의상의 질감과 색상이 잘 드러나는 사진일수록 더욱 정교한 분석이 가능합니다. <br />업로드된 이미지는 분석 즉시 경량화되어 안전하게 처리됩니다.
+          정면 전신사진 혹은 의상의 질감과 색상이 잘 드러나는 사진일수록 더욱 정교한 분석이 가능합니다. <br />선택한 이미지는 분석 전 경량화되어 안전하게 처리됩니다.
         </p>
       </div>
     </div>
