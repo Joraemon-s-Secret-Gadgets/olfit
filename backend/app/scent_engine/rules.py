@@ -1,3 +1,10 @@
+"""
+@file scent_engine/rules.py
+@role
+시각적 요소(색상, 사물, 장면 등)와 향기 속성 간의 매핑 규칙 및 가중치(Score) 데이터를 정의합니다.
+디자인된 도메인 규칙을 바탕으로 시각적 입력을 향수 도메인의 전문적인 속성으로 변환하는 기준을 제공합니다.
+"""
+
 def _mapping(
     families: dict[str, float],
     subs: dict[str, float],
@@ -179,7 +186,6 @@ VISUAL_TO_FRAGRANCE_RULES: dict[str, dict[str, dict[str, float]]] = {
             "시원한": 0.8,
         },
     ),
-
     # -----------------------------------------------------
     # objects
     # -----------------------------------------------------
@@ -379,7 +385,6 @@ VISUAL_TO_FRAGRANCE_RULES: dict[str, dict[str, dict[str, float]]] = {
             "시원한": 0.8,
         },
     ),
-
     # -----------------------------------------------------
     # scenes
     # -----------------------------------------------------
@@ -545,7 +550,6 @@ VISUAL_TO_FRAGRANCE_RULES: dict[str, dict[str, dict[str, float]]] = {
             "차분한": 0.8,
         },
     ),
-
     # -----------------------------------------------------
     # moods / raw keywords
     # -----------------------------------------------------
@@ -860,7 +864,6 @@ VISUAL_TO_FRAGRANCE_RULES: dict[str, dict[str, dict[str, float]]] = {
             "부드러운": 1.0,
         },
     ),
-
     # -----------------------------------------------------
     # season / time
     # -----------------------------------------------------
@@ -1009,14 +1012,12 @@ KOREAN_VISUAL_TRIGGERS: dict[str, str] = {
     "베이지": "beige",
     "회색": "gray",
     "그레이": "gray",
-
     "드레스": "dress",
     "핸드백": "handbag",
     "가방": "handbag",
     "손가방": "handbag",
     "목걸이": "necklace",
     "주얼리": "necklace",
-
     "나무": "wood",
     "목재": "wood",
     "가죽": "leather",
@@ -1028,7 +1029,6 @@ KOREAN_VISUAL_TRIGGERS: dict[str, str] = {
     "책": "book",
     "천": "fabric",
     "패브릭": "fabric",
-
     "숲": "forest",
     "해변": "beach",
     "카페": "cafe",
@@ -1041,7 +1041,6 @@ KOREAN_VISUAL_TRIGGERS: dict[str, str] = {
     "실내": "indoor",
     "오피스": "office",
     "사무실": "office",
-
     "현대적인": "modern",
     "모던": "modern",
     "패션": "fashion",
@@ -1054,7 +1053,6 @@ KOREAN_VISUAL_TRIGGERS: dict[str, str] = {
     "세련": "contemporary",
     "럭셔리": "luxury",
     "고급": "luxurious",
-
     "따뜻": "warm",
     "어두": "dark",
     "깨끗": "clean",
@@ -1068,7 +1066,6 @@ KOREAN_VISUAL_TRIGGERS: dict[str, str] = {
     "포근": "cozy",
     "밝": "bright",
     "부드": "soft",
-
     "봄": "spring",
     "여름": "summer",
     "가을": "autumn",
@@ -1079,3 +1076,11 @@ KOREAN_VISUAL_TRIGGERS: dict[str, str] = {
     "저녁": "evening",
     "밤": "night",
 }
+
+# ----------------------------------------------------------------
+# Update History
+# 2026-05-18: git diff 기준 @file/@role header와 파일 책임을 기록하는 Update History/EOF footer 추가. (worker: @nobrain711)
+# 2026-05-12: refactor(scent_engine): S3P-138 refactor and upload scent_engine. (author: @Gloveman)
+# ----------------------------------------------------------------
+
+# EOF: rules.py

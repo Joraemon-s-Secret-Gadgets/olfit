@@ -1,18 +1,8 @@
 """
 @file recommendation_service.py
-@module Perfumes/Services/RecommendationService
-@description
-RAG(Retrieval-Augmented Generation) 기반 검색과 5축 아우라 유사도 재정렬을 결합한 하이브리드 추천 엔진입니다.
-사용자의 시각적 분위기(이미지)와 화학적 구성(아우라/노트)을 동시에 고려하여 최적의 향수를 선정합니다.
-
-주요 알고리즘:
-1. Symmetric RAG: 인덱싱 문서와 검색 쿼리의 자연어 구조를 일치시켜 의미론적 검색 성능 극대화.
-2. L2 Re-ranking: Pinecone 후보군 내에서 정규화된 5축 아우라 벡터 간 코사인 유사도 계산.
-3. Hybrid Scoring: (Aura 50%) + (RAG 50%) + Note Bonus(+0.1) 가중 합산 체계.
-4. Robust Fallback: Pinecone 장애 시 DB 기반의 실시간 아우라 매칭 시스템 가동.
-
-@author Olfít AI Team
-@version 4.9.0
+@role
+RAG 검색과 5축 아우라 유사도 재정렬을 결합하여 최적의 향수를 선정하는 하이브리드 추천 엔진 서비스입니다.
+Pinecone 벡터 검색, L2 기반 재랭킹, 가중치 합산 스코어링을 통해 고도로 개인화된 추천 결과를 생성합니다.
 """
 
 import os
@@ -251,6 +241,9 @@ class RecommendationService:
             )
 
             # _build_final_response 규격에 맞춘 가상 메타데이터 구성
+            notes_parsed = p_data.get("notes_parsed") or split_notes_heuristic(
+                p_data.get("representative_notes", [])
+            )
             fallback_results.append(
                 {
                     "id": p.id,
@@ -283,11 +276,9 @@ class RecommendationService:
                         "accords": p_data.get("accords", []),
                         "representative_notes": p_data.get("representative_notes", []),
                         "description": p_data.get("description", ""),
-                        "top_notes": p_data.get("notes_parsed", {}).get("top", []),
-                        "middle_notes": p_data.get("notes_parsed", {}).get(
-                            "middle", []
-                        ),
-                        "base_notes": p_data.get("notes_parsed", {}).get("base", []),
+                        "top_notes": notes_parsed.get("top", []),
+                        "middle_notes": notes_parsed.get("middle", []),
+                        "base_notes": notes_parsed.get("base", []),
                         "keywords": p_data.get("keywords", []),
                         **p_data.get("aura_profile", {}),
                     },
@@ -338,6 +329,12 @@ class RecommendationService:
 
             # UI 레이더용 유사도 (0~98% 범위로 안전하게 변환)
             hybrid_sim = int(min(item["hybrid_score"] * 100, 98))
+            image_url = m["image_url"]
+            if not image_url and image_obj and image_obj.processed_path:
+                image_url = image_obj.processed_path
+                marker = "/static/"
+                if marker in image_url:
+                    image_url = marker + image_url.split(marker, 1)[1]
 
             final_results.append(
                 {
@@ -347,7 +344,13 @@ class RecommendationService:
                     "price": m["price_raw"],
                     "price_krw": int(m["price_krw"]),
                     "size": m["volume"],
-                    "image": m["image_url"],
+                    "image": image_url,
+                    "imageUrl": (
+                        f"http://localhost:8000{image_url}"
+                        if image_url.startswith("/static/")
+                        else image_url
+                    ),
+                    "imageBase64": image_obj.base64_data if image_obj else "",
                     "perfume": {
                         "id": p_id,
                         "brand": m["brand"],
@@ -377,9 +380,9 @@ class RecommendationService:
                         "volume": m["volume"],
                     },
                     "imageDetail": {
-                        "url": m["image_url"],
+                        "url": image_url,
                         "originalUrl": (
-                            image_obj.original_url if image_obj else m["image_url"]
+                            image_obj.original_url if image_obj else image_url
                         ),
                         "backendPath": image_obj.processed_path if image_obj else "",
                         "base64": image_obj.base64_data if image_obj else "",
@@ -517,10 +520,14 @@ class RecommendationService:
 
         return " ".join(reasons)
 
-
 # ----------------------------------------------------------------
-# Last Modified: 2026-05-15
-# Modified By: 이창우
+# Update History
+# 2026-05-18: git diff 기준 @file/@role header와 파일 책임을 기록하는 Update History/EOF footer 추가. (worker: @nobrain711)
+# 2026-05-18: test(perfumes): expand backend coverage and split test modules. (author: @nobrain711)
+# 2026-05-15: feat(recommendationservice): implement hybrid re-ranking search logic. (author: @Gloveman)
+# 2026-05-14: fix(backend): include perfume image payloads. (author: @nobrain711)
+# 2026-05-14: fix(recommendations): split scent pyramid notes. (author: @nobrain711)
+# 2026-05-11: feat(backend): migrate django fragrance apiAdds the Django REST backend, scent engine services, perfume data loa.... (author: @nobrain711)
 # ----------------------------------------------------------------
 
 # EOF: recommendation_service.py
