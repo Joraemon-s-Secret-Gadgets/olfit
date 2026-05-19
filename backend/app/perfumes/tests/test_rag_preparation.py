@@ -6,6 +6,8 @@ gold scenario와 experiment scenario가 AuraService의 RAG query 생성 경로�
 """
 
 import json
+import hashlib
+import types
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -15,9 +17,12 @@ from django.test import TestCase, override_settings
 
 from perfumes.models import Brand, Perfume, PerfumeDetail
 from perfumes.services.aura_service import AuraService
+from perfumes.services.recommendation_service import RecommendationService
 from perfumes.management.commands.index_to_pinecone import Command as IndexToPineconeCommand
 
 class RagPreparationTest(TestCase):
+    """RAG query, embedding document, Pinecone metadata 준비 로직을 검증한다."""
+
     RAG_GOLD_SCENARIOS = [
         {
             "brand": "BVLGARI",
@@ -254,6 +259,7 @@ class RagPreparationTest(TestCase):
         mock_preference_map,
         mock_image_mapping,
     ):
+        """AuraService가 VLM 결과와 선택 노트로 대칭형 RAG query를 생성하는지 확인한다."""
         mock_master_map.return_value = {
             "accord_translations": {"urban": "도시적인", "modern": "모던한"},
             "accord_to_category": {"시트러스": "프레시"},
@@ -289,6 +295,7 @@ class RagPreparationTest(TestCase):
 
     @patch("perfumes.management.commands.load_perfumes.load_master_map")
     def test_load_perfumes_persists_embedding_doc_for_rag(self, mock_master_map):
+        """load_perfumes가 추천 검색에 사용할 embedding_doc을 Detail JSON에 저장하는지 확인한다."""
         mock_master_map.return_value = {
             "accord_to_category": {"시트러스": "프레시", "우디": "우디"},
             "note_to_accord": {"베르가못": "시트러스", "샌달우드": "우디"},
@@ -329,6 +336,7 @@ class RagPreparationTest(TestCase):
         self.assertIn("#세련된 #자신감", embedding_doc)
 
     def test_index_to_pinecone_metadata_contains_reranking_fields(self):
+        """Pinecone metadata에 재정렬에 필요한 aura, 가격, 노트 필드가 포함되는지 확인한다."""
         brand = Brand.objects.create(name="CREED")
         perfume = Perfume.objects.create(
             brand=brand,
@@ -378,6 +386,181 @@ class RagPreparationTest(TestCase):
         self.assertEqual(metadata["base_notes"], ["샌달우드"])
         self.assertEqual(metadata["keywords"], ["세련된", "자신감"])
 
+    def test_index_to_pinecone_reuses_local_cache_when_embedding_hash_matches(self):
+        """embedding hash가 동일하면 OpenAI 호출 없이 저장된 vector를 Pinecone upsert에 재사용한다."""
+        brand = Brand.objects.create(name="CREED")
+        perfume = Perfume.objects.create(
+            brand=brand,
+            korean_name="어벤투스",
+            english_name="Aventus",
+            product_type="perfume",
+            family="프레시",
+        )
+        embedding_doc = "CREED 어벤투스. 시트러스 분위기의 베르가못 향이 느껴지는 프레시 계열 향수."
+        cached_vector = [0.1, 0.2, 0.3]
+        PerfumeDetail.objects.create(
+            perfume=perfume,
+            data={
+                "embedding_doc": embedding_doc,
+                "embedding_hash": hashlib.md5(embedding_doc.encode("utf-8")).hexdigest(),
+                "embedding_vector": cached_vector,
+                "price": {"raw": "$150", "amount": 150, "currency": "USD"},
+                "aura_profile": {"프레시": 1.0},
+                "representative_notes": ["베르가못"],
+                "notes_parsed": {"top": ["베르가못"], "middle": [], "base": []},
+            },
+        )
+        upserted_vectors = []
+
+        class FakeIndex:
+            """Pinecone index fake that records upserted vectors."""
+
+            def describe_index_stats(self):
+                """Force indexing to run by reporting an empty index."""
+                return {"total_vector_count": 0}
+
+            def upsert(self, vectors):
+                """Capture vectors that would be sent to Pinecone."""
+                upserted_vectors.extend(vectors)
+
+        class FakeIndexList:
+            """Pinecone index list fake."""
+
+            def names(self):
+                """Return the configured test index name."""
+                return ["olfit-perfumes"]
+
+        class FakePinecone:
+            """Pinecone client fake used by the management command."""
+
+            def __init__(self, api_key):
+                """Accept the API key without network setup."""
+                self.api_key = api_key
+
+            def list_indexes(self):
+                """Return a fake index collection."""
+                return FakeIndexList()
+
+            def Index(self, name):
+                """Return the fake index for any requested name."""
+                return FakeIndex()
+
+        class FakeEmbeddings:
+            """OpenAI embeddings fake that must not be called for cache hits."""
+
+            def create(self, *args, **kwargs):
+                """Fail the test if local cache is not used."""
+                raise AssertionError("OpenAI embeddings should not be called")
+
+        class FakeOpenAI:
+            """OpenAI client fake exposing only embeddings."""
+
+            def __init__(self, api_key):
+                """Accept the API key without network setup."""
+                self.api_key = api_key
+                self.embeddings = FakeEmbeddings()
+
+        openai_module = types.ModuleType("openai")
+        openai_module.OpenAI = FakeOpenAI
+        pinecone_module = types.ModuleType("pinecone")
+        pinecone_module.Pinecone = FakePinecone
+        pinecone_module.ServerlessSpec = lambda **kwargs: kwargs
+
+        with patch.dict(
+            "os.environ",
+            {"OPENAI_API_KEY": "test-openai", "PINECONE_API_KEY": "test-pinecone"},
+        ), patch.dict(
+            "sys.modules",
+            {"openai": openai_module, "pinecone": pinecone_module},
+        ):
+            call_command(
+                "index_to_pinecone",
+                "--use-local-cache",
+                "--limit",
+                "1",
+                "--batch-size",
+                "1",
+                verbosity=0,
+            )
+
+        self.assertEqual(len(upserted_vectors), 1)
+        self.assertEqual(upserted_vectors[0]["id"], str(perfume.id))
+        self.assertEqual(upserted_vectors[0]["values"], cached_vector)
+        self.assertEqual(upserted_vectors[0]["metadata"]["perfume_id"], perfume.id)
+
+    def test_recommendation_service_reranks_semantic_matches_with_aura_and_notes(self):
+        """semantic 후보군을 aura similarity와 selected note bonus로 재정렬하는지 확인한다."""
+        service = RecommendationService()
+        user_aura = {"플로럴": 0.0, "우디": 0.0, "오리엔탈": 0.0, "프레시": 1.0, "구르망": 0.0}
+        selected_notes = ["베르가못"]
+        high_rag_low_aura = types.SimpleNamespace(
+            score=0.95,
+            metadata={
+                "perfume_id": 1,
+                "brand": "WOODY",
+                "korean_name": "우디 후보",
+                "english_name": "woody candidate",
+                "family": "우디",
+                "product_type": "perfume",
+                "release_year": 2020,
+                "aura_floral": 0.0,
+                "aura_woody": 1.0,
+                "aura_amber": 0.0,
+                "aura_fresh": 0.0,
+                "aura_gourmand": 0.0,
+                "price_raw": "정보없음",
+                "price_krw": 0,
+                "price_amount": 0,
+                "price_currency": "KRW",
+                "volume": "50ml",
+                "image_url": "",
+                "accords": ["우디"],
+                "representative_notes": ["샌달우드"],
+                "description": "우디 후보 설명",
+                "top_notes": [],
+                "middle_notes": ["샌달우드"],
+                "base_notes": [],
+                "keywords": ["차분한"],
+            },
+        )
+        lower_rag_high_aura = types.SimpleNamespace(
+            score=0.75,
+            metadata={
+                "perfume_id": 2,
+                "brand": "FRESH",
+                "korean_name": "프레시 후보",
+                "english_name": "fresh candidate",
+                "family": "프레시",
+                "product_type": "perfume",
+                "release_year": 2021,
+                "aura_floral": 0.0,
+                "aura_woody": 0.0,
+                "aura_amber": 0.0,
+                "aura_fresh": 1.0,
+                "aura_gourmand": 0.0,
+                "price_raw": "정보없음",
+                "price_krw": 0,
+                "price_amount": 0,
+                "price_currency": "KRW",
+                "volume": "50ml",
+                "image_url": "",
+                "accords": ["시트러스"],
+                "representative_notes": ["베르가못"],
+                "description": "프레시 후보 설명",
+                "top_notes": ["베르가못"],
+                "middle_notes": [],
+                "base_notes": [],
+                "keywords": ["상쾌한"],
+            },
+        )
+
+        service._search_pinecone = lambda query, top_k: [high_rag_low_aura, lower_rag_high_aura]
+        result = service.recommend(user_aura, "상쾌한 이미지", selected_notes)
+
+        self.assertEqual(result[0]["id"], 2)
+        self.assertEqual(result[0]["name"], "프레시 후보")
+        self.assertGreater(result[0]["similarity"], result[1]["similarity"])
+
     @patch("perfumes.services.aura_service.map_image_to_fragrance_keywords")
     @patch("perfumes.services.aura_service.load_user_preference_map")
     @patch("perfumes.services.aura_service.load_master_map")
@@ -387,6 +570,7 @@ class RagPreparationTest(TestCase):
         mock_preference_map,
         mock_image_mapping,
     ):
+        """20개 gold scenario가 AuraService의 RAG query 생성 경로를 통과하는지 확인한다."""
         mock_master_map.return_value = {
             "accord_translations": {
                 "clean": "깨끗한",
@@ -443,6 +627,7 @@ class RagPreparationTest(TestCase):
         mock_preference_map,
         mock_image_mapping,
     ):
+        """실험 scenario 3종이 RAG query와 search vector를 생성하는지 확인한다."""
         mock_master_map.return_value = {
             "accord_translations": {
                 "luxurious": "럭셔리한",
