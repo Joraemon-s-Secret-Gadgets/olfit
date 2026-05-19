@@ -468,7 +468,11 @@ class RagPreparationTest(TestCase):
 
         with patch.dict(
             "os.environ",
-            {"OPENAI_API_KEY": "test-openai", "PINECONE_API_KEY": "test-pinecone"},
+            {
+                "OPENAI_API_KEY": "test-openai",
+                "PINECONE_API_KEY": "test-pinecone",
+                "PINECONE_INDEX_NAME": "olfit-perfumes",
+            },
         ), patch.dict(
             "sys.modules",
             {"openai": openai_module, "pinecone": pinecone_module},
