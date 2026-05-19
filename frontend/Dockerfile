@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM node:24-alpine AS build
 
 WORKDIR /frontend
 
@@ -8,6 +8,16 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-EXPOSE 3000
+ARG VITE_API_URL=http://localhost:8000
+ENV VITE_API_URL=${VITE_API_URL}
 
-CMD ["yarn", "dev", "--host", "0.0.0.0"]
+RUN yarn build
+
+FROM nginx:1.29-alpine AS runtime
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /frontend/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
