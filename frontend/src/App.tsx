@@ -59,9 +59,11 @@ export default function App() {
     // 고유 익명 세션 ID 생성
     const newSessionId = createSessionId();
 
-    // 영속성 유지를 위한 로컬 스토리지 저장
-    localStorage.setItem("olfit_consent", "true");
-    localStorage.setItem("olfit_session_id", newSessionId);
+    // 브라우저 세션 동안만 유지되도록 세션 스토리지에 저장
+    localStorage.removeItem("olfit_consent");
+    localStorage.removeItem("olfit_session_id");
+    sessionStorage.setItem("olfit_consent", "true");
+    sessionStorage.setItem("olfit_session_id", newSessionId);
 
     setHasConsented(true);
   };

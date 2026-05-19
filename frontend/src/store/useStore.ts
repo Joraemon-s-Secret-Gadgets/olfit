@@ -39,8 +39,8 @@ export const useOlfitStore = create<OlfitState>((set) => ({
   selectedNotes: [],
   hasConsented: (() => {
     if (typeof window === "undefined") return false;
-    const consented = localStorage.getItem("olfit_consent") === "true";
-    const sessionId = localStorage.getItem("olfit_session_id");
+    const consented = sessionStorage.getItem("olfit_consent") === "true";
+    const sessionId = sessionStorage.getItem("olfit_session_id");
     return !!(consented && sessionId);
   })(),
   selectedProduct: null,

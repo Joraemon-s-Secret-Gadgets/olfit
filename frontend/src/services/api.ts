@@ -40,7 +40,7 @@ api.interceptors.response.use(
 
 // Request Interceptor: 세션 ID 및 공통 헤더 주입
 api.interceptors.request.use((config) => {
-  const sessionId = localStorage.getItem("olfit_session_id");
+  const sessionId = sessionStorage.getItem("olfit_session_id");
   if (sessionId) {
     config.headers['X-Session-ID'] = sessionId;
   }

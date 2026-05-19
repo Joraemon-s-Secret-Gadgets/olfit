@@ -15,6 +15,7 @@ const originalCrypto = globalThis.crypto;
 describe("App consent flow", () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     useOlfitStore.setState({
       analysisResults: null,
       selectedNotes: [],
@@ -32,6 +33,7 @@ describe("App consent flow", () => {
       configurable: true,
     });
     localStorage.clear();
+    sessionStorage.clear();
     vi.restoreAllMocks();
   });
 
@@ -47,8 +49,10 @@ describe("App consent flow", () => {
       screen.getByRole("button", { name: /agree and continue/i }),
     );
 
-    expect(localStorage.getItem("olfit_consent")).toBe("true");
-    expect(localStorage.getItem("olfit_session_id")).toMatch(/^session-/);
+    expect(sessionStorage.getItem("olfit_consent")).toBe("true");
+    expect(sessionStorage.getItem("olfit_session_id")).toMatch(/^session-/);
+    expect(localStorage.getItem("olfit_consent")).toBeNull();
+    expect(localStorage.getItem("olfit_session_id")).toBeNull();
     expect(
       screen.queryByRole("button", { name: /agree and continue/i }),
     ).not.toBeInTheDocument();

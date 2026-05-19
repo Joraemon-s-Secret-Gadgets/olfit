@@ -7,36 +7,35 @@
 
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
 import { Upload, X, ImageIcon, AlertCircle, Sparkles } from "lucide-react";
-import { uploadToCloudStorage } from "@/services/uploadService";
 
 interface ImageUploaderProps {
-  /** 이미지 처리가 완료되었을 때 호출되는 콜백 (Base64 및 원격 URL 전달) */
-  onImageProcessed: (base64: string, remoteUrl: string) => void;
+  /** 이미지 처리가 완료되었을 때 호출되는 콜백 */
+  onImageProcessed: (base64: string) => void;
   /** 현재 AI 분석이 진행 중인지 여부 */
   isAnalyzing: boolean;
 }
 
 export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
-  const [processedImage, setProcessedImage] = useState<{ base64: string; remoteUrl: string } | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isPreparing, setIsPreparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const uploadProcessingRef = useRef(false);
+  const imageProcessingRef = useRef(false);
 
   const resetFileInput = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const releaseUploadLock = () => {
-    uploadProcessingRef.current = false;
-    setIsUploading(false);
+  const releaseProcessingLock = () => {
+    imageProcessingRef.current = false;
+    setIsPreparing(false);
   };
 
   const failUpload = (message: string) => {
     setError(message);
-    releaseUploadLock();
+    releaseProcessingLock();
     resetFileInput();
   };
 
@@ -71,12 +70,12 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
   };
 
   /**
-   * 이미지 리사이징 및 클라우드 업로드 시뮬레이션
+   * 이미지 리사이징 및 Base64 분석 입력 준비
    */
   const processImage = async (file: File) => {
-    if (uploadProcessingRef.current || isUploading || isAnalyzing) return; // 🚨 FIX: POST 중복 요청 방지
+    if (imageProcessingRef.current || isPreparing || isAnalyzing) return; // 🚨 FIX: POST 중복 요청 방지
 
-    uploadProcessingRef.current = true;
+    imageProcessingRef.current = true;
 
     // 🛡️ SECURITY FIX: 허용된 이미지 MIME 타입 및 확장자 엄격 검사
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
@@ -111,6 +110,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
 
     setError(null);
     setProcessedImage(null);
+    setIsPreparing(true);
     const reader = new FileReader();
 
     reader.onload = async (event) => {
@@ -159,11 +159,8 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           const base64 = canvas.toDataURL("image/jpeg", 0.9);
           setPreview(base64);
 
-          // 분석 요청에 사용할 원격 URL 생성 시뮬레이션 시작
-          setIsUploading(true);
-          const remoteUrl = await uploadToCloudStorage(base64);
-          setProcessedImage({ base64, remoteUrl });
-          releaseUploadLock(); // 🚨 FIX: POST 중복 요청 방지
+          setProcessedImage(base64);
+          releaseProcessingLock(); // 🚨 FIX: POST 중복 요청 방지
         } catch {
           failUpload("이미지 처리 중 오류가 발생했습니다.");
         }
@@ -217,7 +214,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     e.stopPropagation();
     setPreview(null);
     setProcessedImage(null);
-    releaseUploadLock();
+    releaseProcessingLock();
     setError(null);
     resetFileInput();
   };
@@ -225,8 +222,8 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
   const startAnalysis = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!processedImage || isUploading || isAnalyzing) return;
-    onImageProcessed(processedImage.base64, processedImage.remoteUrl);
+    if (!processedImage || isPreparing || isAnalyzing) return;
+    onImageProcessed(processedImage);
   };
 
   return (
@@ -288,7 +285,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
             )}
 
             {/* 이미지 준비 중 상태 표시 */}
-            {isUploading && (
+            {isPreparing && (
               <div className="absolute inset-0 bg-gold/40 backdrop-blur-sm flex flex-col items-center justify-center text-wood">
                 <div className="flex items-center gap-1.5 mb-6">
                   <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.3s]" />
@@ -319,11 +316,11 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
               <button
                 type="button"
                 onClick={startAnalysis}
-                disabled={isUploading || !processedImage}
+                disabled={isPreparing || !processedImage}
                 className="h-12 inline-flex items-center justify-center gap-3 rounded-sm bg-wood px-8 text-[11px] font-bold uppercase tracking-widest text-cream border border-cream/15 shadow-[0_12px_30px_rgba(33,24,18,0.24)] transition-all duration-300 hover:bg-cream hover:text-wood disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-wood disabled:hover:text-cream"
               >
                 <Sparkles size={14} />
-                <span>{isUploading ? "준비 중" : "분석 시작"}</span>
+                <span>{isPreparing ? "준비 중" : "분석 시작"}</span>
               </button>
               <button
                 type="button"

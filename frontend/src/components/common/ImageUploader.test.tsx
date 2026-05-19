@@ -4,14 +4,11 @@
  * @lastModified 2026-05-16
  */
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ImageUploader from "./ImageUploader";
 
-vi.mock("@/services/uploadService", () => ({
-  uploadToCloudStorage: vi.fn(() => new Promise(() => {})),
-}));
 
 const originalImage = globalThis.Image;
 
@@ -56,19 +53,25 @@ describe("ImageUploader", () => {
       { type: "image/jpeg" },
     );
 
+    const onImageProcessed = vi.fn();
     const { container } = render(
-      <ImageUploader onImageProcessed={vi.fn()} isAnalyzing={false} />,
+      <ImageUploader onImageProcessed={onImageProcessed} isAnalyzing={false} />,
     );
     const input = container.querySelector<HTMLInputElement>('input[type="file"]');
 
     expect(input).not.toBeNull();
     await userEvent.upload(input!, file);
 
-    expect(await screen.findByText("Preparing Image...")).toBeInTheDocument();
-    expect(
-      screen.getByText("분석에 맞게 이미지를 안전하게 처리하고 있습니다"),
-    ).toBeInTheDocument();
     expect(screen.queryByText(/s3/i)).not.toBeInTheDocument();
+
+    const startButton = await screen.findByRole("button", { name: /분석 시작/i });
+    await waitFor(() => expect(startButton).toBeEnabled());
+    await userEvent.click(startButton);
+
+    expect(onImageProcessed).toHaveBeenCalledTimes(1);
+    expect(onImageProcessed).toHaveBeenCalledWith(
+      "data:image/jpeg;base64,processed",
+    );
   });
 });
 

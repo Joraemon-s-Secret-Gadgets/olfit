@@ -88,8 +88,8 @@ const analysisResponse = {
 
 async function prepareApp(page: Page, apiRequests: string[]) {
   await page.addInitScript(() => {
-    window.localStorage.setItem("olfit_consent", "true");
-    window.localStorage.setItem("olfit_session_id", "test-session");
+    window.sessionStorage.setItem("olfit_consent", "true");
+    window.sessionStorage.setItem("olfit_session_id", "test-session");
   });
 
   await page.route("**/api/analyze/", async (route) => {
@@ -117,7 +117,7 @@ async function uploadValidImage(page: Page, fileName = "one.png") {
   await analyzeButton.click();
 }
 
-test("single file selection uploads once and requests analysis once", async ({ page }) => {
+test("single file selection prepares once and requests analysis once", async ({ page }) => {
   const logs: string[] = [];
   const apiRequests: string[] = [];
   page.on("console", (message) => logs.push(message.text()));
@@ -126,7 +126,7 @@ test("single file selection uploads once and requests analysis once", async ({ p
   await uploadValidImage(page);
 
   await expect.poll(() => apiRequests.length, { timeout: 15_000 }).toBe(1);
-  expect(logs.filter((line) => line.includes("Uploading image to cloud storage")).length).toBe(1);
+  expect(logs.filter((line) => line.includes("Uploading image to cloud storage")).length).toBe(0);
 });
 
 test("rapid double drop keeps the current duplicate prevention behavior", async ({ page }) => {
@@ -162,7 +162,7 @@ test("rapid double drop keeps the current duplicate prevention behavior", async 
   await analyzeButton.click();
 
   await expect.poll(() => apiRequests.length, { timeout: 15_000 }).toBe(1);
-  expect(logs.filter((line) => line.includes("Uploading image to cloud storage")).length).toBe(1);
+  expect(logs.filter((line) => line.includes("Uploading image to cloud storage")).length).toBe(0);
 });
 
 test("invalid file upload does not request analysis", async ({ page }) => {
