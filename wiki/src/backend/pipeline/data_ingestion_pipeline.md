@@ -3,8 +3,9 @@
 외부 소스에서 수집된 향수 데이터를 시스템 표준 스키마로 변환하고 아우라 프로필을 생성하여 데이터베이스 및 검색 엔진에 적재하는 오프라인 공정을 정의합니다.
 
 ## 1. 데이터 파이프라인 흐름
-
-![data_ingestion_pipeline](../../assets/backend/pipeline/data_ingestion_pipeline.png)
+<div align="center">
+<img src="../../assets/backend/pipeline/data_ingestion_pipeline.png" style="width: 65%;">
+</div>
 
 1. **Raw Data Ingestion**: JSON 형태의 브랜드별 원본 데이터 수집
 2. **Schema Standardizing**: 브랜드마다 다른 필드명을 표준 필드(Name, Brand, Notes 등)로 매핑

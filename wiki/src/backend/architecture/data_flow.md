@@ -6,7 +6,9 @@
 
 Olfít의 데이터는 **[시각 분석] -> [아우라 융합] -> [시맨틱 검색] -> [하이브리드 재정렬]**의 단계를 거치며, 외부 서비스 장애 시 MySQL 기반의 로컬 폴백 경로를 활성화합니다.
 
-![data_flow](../../assets/backend/architecture/data_flow.png)
+<div align="center">
+<img src="../../assets/backend/architecture/data_flow.png" style="width: 65%;">
+</div>
 
 ### 1.1 데이터 이동 경로 상세
 1. **Request**: 프론트엔드에서 Base64 이미지와 선호 노트를 `/api/analyze/` 엔드포인트로 전송합니다.
