@@ -1,15 +1,26 @@
+"""
+@file index_to_pinecone.py
+@role
+Defines Django migration package state and schema transition code.
+
+"""
+
 import os
 import time
 from django.core.management.base import BaseCommand
 from perfumes.models import Perfume
 
 class Command(BaseCommand):
+    """구버전 migration package에 남아 있는 Pinecone 인덱싱 command snapshot."""
+
     help = 'Batch index perfumes into Pinecone Vector DB'
 
     def add_arguments(self, parser):
+        """배치 크기 옵션을 등록한다."""
         parser.add_argument('--batch-size', type=int, default=50)
 
     def handle(self, *args, **options):
+        """향수 데이터를 배치 단위로 임베딩하고 Pinecone에 업서트한다."""
         # 1. API Keys & Configuration (Recommended to use .env)
         OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
         PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
@@ -85,3 +96,12 @@ class Command(BaseCommand):
                 time.sleep(1) # Simple retry delay
 
         self.stdout.write(self.style.SUCCESS("Pinecone batch indexing complete."))
+
+# ----------------------------------------------------------------
+# Update History
+# 2026-05-18: git diff 기준 @file/@role header와 파일 책임을 기록하는 Update History/EOF footer 추가. (worker: @nobrain711)
+# 2026-05-12: chore(management): restore deleted management/commands. (author: @Gloveman)
+# 2026-05-11: feat(backend): migrate django fragrance apiAdds the Django REST backend, scent engine services, perfume data loa.... (author: @nobrain711)
+# ----------------------------------------------------------------
+
+# EOF: index_to_pinecone.py

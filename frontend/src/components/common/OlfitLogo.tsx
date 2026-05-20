@@ -2,7 +2,10 @@
  * @file OlfitLogo.tsx
  * @description Olfit 브랜드의 SVG 로고 컴포넌트입니다.
  * 벡터 포맷을 사용하여 어떠한 해상도에서도 선명하게 렌더링되며, 프로젝트 전역에서 브랜딩 요소로 사용됩니다.
+ * @lastModified 2026-05-15
  */
+
+import type { CSSProperties } from "react";
 
 interface OlfitLogoProps {
   /** 추가적인 CSS 클래스 */
@@ -17,21 +20,30 @@ interface OlfitLogoProps {
   showLine?: boolean;
 }
 
-export default function OlfitLogo({ 
-  className, 
-  width = "auto", 
-  height = "1.2em", 
+export default function OlfitLogo({
+  className,
+  width = "auto",
+  height = "1.2em",
   color = "currentColor",
   showLine = true
 }: OlfitLogoProps) {
+  const svgWidth = width === "auto" ? undefined : width;
+  const svgHeight = height === "auto" ? undefined : height;
+  const svgStyle: CSSProperties = {
+    aspectRatio: "3 / 1",
+    ...(width === "auto" ? { width: "auto" } : {}),
+    ...(height === "auto" ? { height: "auto" } : {}),
+  };
+
   return (
-    <svg 
-      width={width} 
-      height={height} 
-      viewBox="0 0 120 40" 
-      fill="none" 
+    <svg
+      width={svgWidth}
+      height={svgHeight}
+      viewBox="0 0 120 40"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      style={svgStyle}
     >
       <text
         x="50%"
@@ -39,10 +51,10 @@ export default function OlfitLogo({
         dominantBaseline="middle"
         textAnchor="middle"
         fill={color}
-        style={{ 
-          fontFamily: "'Playfair Display', serif", 
-          fontWeight: 300, 
-          fontSize: "26px", 
+        style={{
+          fontFamily: "'Playfair Display', serif",
+          fontWeight: 300,
+          fontSize: "26px",
           letterSpacing: "0.28em",
           textTransform: "uppercase"
         }}
@@ -51,11 +63,11 @@ export default function OlfitLogo({
       </text>
       {/* 단순 텍스트를 넘어선 로고 느낌을 위한 데코레이션 라인 */}
       {showLine && (
-        <path 
-          d="M25 32 H95" 
-          stroke={color} 
-          strokeWidth="0.5" 
-          strokeOpacity="0.3" 
+        <path
+          d="M25 32 H95"
+          stroke={color}
+          strokeWidth="0.5"
+          strokeOpacity="0.3"
         />
       )}
     </svg>

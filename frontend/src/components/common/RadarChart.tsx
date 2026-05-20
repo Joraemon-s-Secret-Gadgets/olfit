@@ -2,6 +2,7 @@
  * @file RadarChart.tsx
  * @description 사용자의 취향 분석 결과를 시각화하기 위한 방사형(레이더) 차트 컴포넌트입니다.
  * SVG를 사용하여 구현되었으며, 인터랙티브한 호버 효과와 부드러운 애니메이션을 제공합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useEffect, useState } from "react";
@@ -9,8 +10,8 @@ import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { radarData } from "@/data/reportData";
 
 interface RadarChartProps {
-  /** 
-   * 인터뷰 결과 데이터 리스트 
+  /**
+   * 인터뷰 결과 데이터 리스트
    * axis: 축 이름 (예: '시트러스', '우디')
    * value: 0~1 사이의 가중치 수치
    * description: 호버 시 노출될 상세 설명
@@ -25,7 +26,7 @@ export default function RadarChart({ data, forceDraw }: RadarChartProps) {
   const [drawn, setDrawn] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  // 데이터가 제공되지 않은 경우 기본 스켈레톤/더미 데이터 사용
+  // 데이터가 제공되지 않은 경우 기본 더미 데이터 사용
   const chartData = data || radarData;
 
   /**
@@ -144,7 +145,7 @@ export default function RadarChart({ data, forceDraw }: RadarChartProps) {
 
       {/* 툴팁: 마우스 호버 시 해당 항목의 상세 분석 결과 표시 */}
       {hoveredIndex !== null && chartData[hoveredIndex].description && (
-        <div 
+        <div
           className="absolute z-10 bg-white/95 backdrop-blur-sm border border-wood/20 px-3 py-2 rounded-lg shadow-xl pointer-events-none animate-in fade-in zoom-in duration-200"
           style={{
             top: `${(getPoint(hoveredIndex, 1.45).y / size) * 100}%`,
@@ -158,10 +159,10 @@ export default function RadarChart({ data, forceDraw }: RadarChartProps) {
             {chartData[hoveredIndex].description}
           </p>
           {/* 말풍선 꼬리 장식 */}
-          <div 
+          <div
             className={`absolute w-2 h-2 bg-white border-wood/20 rotate-45 ${
-              hoveredIndex === 0 || hoveredIndex === 1 || hoveredIndex === 4 
-                ? "bottom-[-5px] border-b border-r" 
+              hoveredIndex === 0 || hoveredIndex === 1 || hoveredIndex === 4
+                ? "bottom-[-5px] border-b border-r"
                 : "top-[-5px] border-t border-l"
             }`}
             style={{

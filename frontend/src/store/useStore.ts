@@ -1,3 +1,9 @@
+/**
+ * @file useStore.ts
+ * @description Olfit 프론트엔드 전역 상태 관리 파일입니다.
+ * @lastModified 2026-05-15
+ */
+
 import { create } from 'zustand';
 import type { AnalysisResults } from '@/types';
 import type { Product } from '@/data/productData';
@@ -15,6 +21,8 @@ interface OlfitState {
   isLoading: boolean;
   /** 에러 메시지 */
   error: string | null;
+  /** 재분석 시작 시 인터뷰 섹션을 초기화하기 위한 키 */
+  restartToken: number;
 
   // Actions
   setAnalysisResults: (results: AnalysisResults | null) => void;
@@ -31,13 +39,14 @@ export const useOlfitStore = create<OlfitState>((set) => ({
   selectedNotes: [],
   hasConsented: (() => {
     if (typeof window === "undefined") return false;
-    const consented = localStorage.getItem("olfit_consent") === "true";
-    const sessionId = localStorage.getItem("olfit_session_id");
+    const consented = sessionStorage.getItem("olfit_consent") === "true";
+    const sessionId = sessionStorage.getItem("olfit_session_id");
     return !!(consented && sessionId);
   })(),
   selectedProduct: null,
   isLoading: false,
   error: null,
+  restartToken: 0,
 
   setAnalysisResults: (results) => set({ analysisResults: results }),
   setSelectedNotes: (notes) => set({ selectedNotes: notes }),
@@ -45,10 +54,14 @@ export const useOlfitStore = create<OlfitState>((set) => ({
   setSelectedProduct: (product) => set({ selectedProduct: product }),
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error: error }),
-  resetAll: () => set({
+  resetAll: () => set((state) => ({
     analysisResults: null,
     selectedNotes: [],
     selectedProduct: null,
-    error: null
-  }),
+    isLoading: false,
+    error: null,
+    restartToken: state.restartToken + 1
+  })),
 }));
+
+// EOF: useStore.ts

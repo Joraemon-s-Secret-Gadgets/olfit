@@ -1,15 +1,21 @@
+/**
+ * @file AuraAnalysisSteps.tsx
+ * @description Olfit 프론트엔드 UI 컴포넌트입니다.
+ * @lastModified 2026-05-15
+ */
+
 interface AuraAnalysisStepsProps {
   isVisible: boolean;
   logicSteps: string[];
   borderClass: string;
 }
 
-export default function AuraAnalysisSteps({ 
-  isVisible, 
-  logicSteps, 
-  borderClass 
+export default function AuraAnalysisSteps({
+  isVisible,
+  logicSteps,
+  borderClass
 }: AuraAnalysisStepsProps) {
-  
+
   const renderText = (text: string) => {
     return text.split("<br/>").map((line, i) => (
       <span key={i}>
@@ -34,3 +40,5 @@ export default function AuraAnalysisSteps({
     </div>
   );
 }
+
+// EOF: AuraAnalysisSteps.tsx

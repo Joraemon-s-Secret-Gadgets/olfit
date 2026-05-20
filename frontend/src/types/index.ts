@@ -1,6 +1,7 @@
 /**
- * @file types.ts
+ * @file index.ts
  * @description 애플리케이션 전역에서 사용되는 인터페이스 및 공통 타입들을 정의합니다.
+ * @lastModified 2026-05-15
  */
 
 /**
@@ -16,6 +17,7 @@ export interface Product {
   name: string;
   brand: string;
   price: string;
+  price_krw?: number;
   size: string;
   image: string;
   imageUrl?: string;
@@ -73,4 +75,4 @@ export interface AnalysisResults {
   recommendations?: (Product & { similarity: number; matchReason: string })[];
 }
 
-// EOF: types.ts
+// EOF: index.ts

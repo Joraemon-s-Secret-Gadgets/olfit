@@ -1,22 +1,24 @@
-# Overview
+# 📌 Olfít Project Overview
 
-이 wiki는 SKN26 4차 프로젝트부터 최종 프로젝트까지 공통으로 사용할 템플릿 지식 기반입니다.
+**Olfít**은 사용자의 시각적 감성(OOTD, 분위기)을 분석하여 그에 어울리는 향기를 제안하는 **이미지 기반 AI 향수 추천 서비스**입니다.
 
-아직 기술 스택은 확정하지 않았으며, 프로젝트를 시작할 때 필요한 기본 디렉터리, 문서, 협업 규칙을 먼저 정리합니다.
+---
 
-## Scope
+## 🛠 Tech Stack
 
-- SKN26 4차 프로젝트
-- SKN26 최종 프로젝트
+- **Frontend**: React, Vite, Tailwind CSS
+- **Backend**: Django REST Framework, MySQL
+- **AI/ML**: NVIDIA NIM (VLM), OpenAI (Embedding), Pinecone (Vector Search)
+- **Infrastructure**: Docker Compose
 
-## Directory Policy
+---
 
-- `backend/`: 백엔드 애플리케이션 코드
-- `frontend/`: 프론트엔드 애플리케이션 코드
-- `database/`: DB schema, migration, seed, ERD 관련 파일
-- `models/`: AI 모델, 학습/추론 관련 파일
-- `docs/`: 프로젝트 산출물, 외부 공유 문서
-- `wiki/`: 팀 내부 규칙과 개발 컨벤션
-- `.github/`: GitHub template, workflow, automation 설정
+## 📚 Documentation
 
-`docs/`는 기능 문서나 산출물 문서에 사용하고, `wiki/`는 팀 내부 지식 기반으로 분리해서 관리합니다.
+- [🧰 **Tech Stack**](./tech-stack.md): 상세 기술 스택 및 라이브러리 구성
+- [📏 **Development Conventions**](./conventions.md): 협업을 위한 코드 스타일 및 커밋 규칙
+- [🖥️ **Backend Development**](./backend.md): 백엔드 아키텍처, API 명세 및 핵심 로직
+- [🎨 **Frontend Development**](./frontend/index.md): 프론트엔드 구조 및 컴포넌트 설계
+- [✅ **Testing**](./tests/index.md): 테스트 계획 및 분석 결과 리포트
+
+

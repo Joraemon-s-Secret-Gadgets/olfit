@@ -1,3 +1,10 @@
+"""
+@file scent_engine/utils.py
+@role
+Scent Engine 전반에서 공통으로 사용하는 유틸리티 함수들을 제공하는 모듈입니다.
+이미지 Base64 인코딩, JSON 파싱 정규화, 리스트 중복 제거 등 엔진 운영에 필요한 보조 기능을 수행합니다.
+"""
+
 import base64
 import json
 import re
@@ -15,6 +22,7 @@ MAX_ITEMS = {
     "time": 1,
     "raw_keywords": 8,
 }
+
 
 def encode_image_to_base64(
     image_path_or_file: Any,
@@ -34,7 +42,9 @@ def encode_image_to_base64(
     img.save(buffer, format="JPEG", quality=quality)
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
+
 def _dedupe_list(values: list[str], max_items: int | None = None) -> list[str]:
+    """문자열 리스트를 정규화하고 순서를 유지한 채 중복을 제거한다."""
     seen = set()
     result = []
     for value in values:
@@ -47,7 +57,9 @@ def _dedupe_list(values: list[str], max_items: int | None = None) -> list[str]:
             break
     return result
 
+
 def _ensure_list(value: Any, key: str) -> list[str]:
+    """VLM 필드 값을 리스트 형태로 강제 변환하고 필드별 최대 개수를 적용한다."""
     if value is None:
         values = []
     elif isinstance(value, list):
@@ -57,6 +69,7 @@ def _ensure_list(value: Any, key: str) -> list[str]:
     else:
         values = [str(value).strip().lower()] if str(value).strip() else []
     return _dedupe_list(values, MAX_ITEMS.get(key))
+
 
 def normalize_vlm_result(data: dict[str, Any]) -> dict[str, Any]:
     """
@@ -73,6 +86,7 @@ def normalize_vlm_result(data: dict[str, Any]) -> dict[str, Any]:
         "raw_keywords": _ensure_list(data.get("raw_keywords", []), "raw_keywords"),
     }
 
+
 def extract_json_from_text(text: str) -> dict[str, Any]:
     """
     텍스트에서 JSON을 추출하고 실패 시 부분 복구를 시도한다.
@@ -81,7 +95,7 @@ def extract_json_from_text(text: str) -> dict[str, Any]:
     # 1. Clean markdown blocks
     text = re.sub(r"```json\s*", "", text)
     text = re.sub(r"```\s*", "", text)
-    
+
     # 2. Try direct load
     try:
         return json.loads(text)
@@ -100,12 +114,16 @@ def extract_json_from_text(text: str) -> dict[str, Any]:
     # 4. Fallback: Robust field extraction
     return _fallback_parse_partial_json(text)
 
+
 def _extract_string_field(text: str, key: str) -> str:
+    """깨진 JSON 응답 텍스트에서 단일 문자열 필드를 정규식으로 복구한다."""
     pattern = rf'"{re.escape(key)}"\s*:\s*"([^"]*)"'
     match = re.search(pattern, text, re.DOTALL)
     return match.group(1).strip() if match else ""
 
+
 def _extract_array_field(text: str, key: str, max_items: int) -> list[str]:
+    """깨진 JSON 응답 텍스트에서 문자열 배열 필드를 정규식으로 복구한다."""
     key_pattern = rf'"{re.escape(key)}"\s*:\s*'
     key_match = re.search(key_pattern, text)
     if not key_match:
@@ -117,15 +135,17 @@ def _extract_array_field(text: str, key: str, max_items: int) -> list[str]:
         return _dedupe_list([val.group(1)], max_items) if val else []
     if not remaining.startswith("["):
         return []
-    
+
     # Extract strings within brackets
-    chunk_match = re.search(r'\[(.*?)\]', remaining, re.DOTALL)
+    chunk_match = re.search(r"\[(.*?)\]", remaining, re.DOTALL)
     if chunk_match:
         values = re.findall(r'"([^"]+)"', chunk_match.group(1))
         return _dedupe_list(values, max_items)
     return []
 
+
 def _fallback_parse_partial_json(text: str) -> dict[str, Any]:
+    """JSON 파싱 실패 시 알려진 VLM schema 필드를 개별적으로 복구한다."""
     recovered = {
         "visual_summary": _extract_string_field(text, "visual_summary"),
         "colors": _extract_array_field(text, "colors", MAX_ITEMS["colors"]),
@@ -134,6 +154,16 @@ def _fallback_parse_partial_json(text: str) -> dict[str, Any]:
         "mood": _extract_array_field(text, "mood", MAX_ITEMS["mood"]),
         "season": _extract_array_field(text, "season", MAX_ITEMS["season"]),
         "time": _extract_array_field(text, "time", MAX_ITEMS["time"]),
-        "raw_keywords": _extract_array_field(text, "raw_keywords", MAX_ITEMS["raw_keywords"]),
+        "raw_keywords": _extract_array_field(
+            text, "raw_keywords", MAX_ITEMS["raw_keywords"]
+        ),
     }
     return normalize_vlm_result(recovered)
+
+# ----------------------------------------------------------------
+# Update History
+# 2026-05-18: git diff 기준 @file/@role header와 파일 책임을 기록하는 Update History/EOF footer 추가. (worker: @nobrain711)
+# 2026-05-12: refactor(scent_engine): S3P-138 refactor and upload scent_engine. (author: @Gloveman)
+# ----------------------------------------------------------------
+
+# EOF: utils.py

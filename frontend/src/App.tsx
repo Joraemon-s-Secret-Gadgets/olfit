@@ -2,12 +2,12 @@
  * @file App.tsx
  * @description 애플리케이션의 전체 레이아웃과 상태 관리를 담당하는 메인 컴포넌트입니다.
  * 개인정보 동의 프로세스, AI 분석 결과 브릿징, 그리고 각 섹션의 배치를 제어합니다.
+ * @lastModified 2026-05-15
  */
 
 import { useOlfitStore } from "@/store/useStore";
 import { lazy, Suspense } from "react";
 import Navigation from "@/components/layout/Navigation";
-import { SectionSkeleton } from "@/components/common/Skeleton";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import FooterSection from "@/components/layout/FooterSection";
 import FloatingNavButton from "@/components/common/FloatingNavButton";
@@ -24,12 +24,28 @@ const AIInterviewSection = lazy(() => import("@/components/sections/AIInterviewS
 const InsightReportSection = lazy(() => import("@/components/sections/InsightReportSection"));
 const SafetyValuesSection = lazy(() => import("@/components/sections/SafetyValuesSection"));
 
+const createSessionId = () => {
+  if (typeof globalThis.crypto?.randomUUID === "function") {
+    return globalThis.crypto.randomUUID();
+  }
+
+  const randomPart =
+    typeof globalThis.crypto?.getRandomValues === "function"
+      ? Array.from(globalThis.crypto.getRandomValues(new Uint32Array(2)), (value) =>
+          value.toString(36),
+        ).join("")
+      : Math.random().toString(36).slice(2);
+
+  return `session-${Date.now()}-${randomPart}`;
+};
+
 export default function App() {
-  const { 
-    analysisResults, 
-    selectedNotes, 
-    hasConsented, 
+  const {
+    analysisResults,
+    selectedNotes,
+    hasConsented,
     selectedProduct,
+    restartToken,
     setAnalysisResults,
     setSelectedNotes,
     setHasConsented,
@@ -41,12 +57,14 @@ export default function App() {
    */
   const handleAgree = () => {
     // 고유 익명 세션 ID 생성
-    const newSessionId = crypto.randomUUID();
-    
-    // 영속성 유지를 위한 로컬 스토리지 저장
-    localStorage.setItem("olfit_consent", "true");
-    localStorage.setItem("olfit_session_id", newSessionId);
-    
+    const newSessionId = createSessionId();
+
+    // 브라우저 세션 동안만 유지되도록 세션 스토리지에 저장
+    localStorage.removeItem("olfit_consent");
+    localStorage.removeItem("olfit_session_id");
+    sessionStorage.setItem("olfit_consent", "true");
+    sessionStorage.setItem("olfit_session_id", newSessionId);
+
     setHasConsented(true);
   };
 
@@ -62,56 +80,57 @@ export default function App() {
       {/* 01. 글로벌 네비게이션 헤더 */}
       <Navigation />
 
-      {/* 
-        02. 메인 서비스 레이어 
+      {/*
+        02. 메인 서비스 레이어
         미동의 시 블러 및 상호작용 방지 효과 적용
       */}
       <div className={`transition-all duration-700 ${!hasConsented ? "blur-xl scale-[1.02] pointer-events-none select-none" : "blur-0"}`}>
         <main>
           {/* 섹션별 독립적 Suspense/ErrorBoundary 배치로 인지 성능 및 안정성 극대화 */}
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={null}>
             <ErrorBoundary fallbackMessage="Hero 섹션을 불러오지 못했습니다.">
               <HeroSection />
             </ErrorBoundary>
           </Suspense>
 
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={null}>
             <ErrorBoundary fallbackMessage="철학 섹션을 불러오지 못했습니다.">
               <PhilosophySection />
             </ErrorBoundary>
           </Suspense>
 
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={null}>
             <ErrorBoundary fallbackMessage="가이드 섹션을 불러오지 못했습니다.">
-              <ScentGuideSection onNotesChange={setSelectedNotes} />
+              <ScentGuideSection key={restartToken} onNotesChange={setSelectedNotes} />
             </ErrorBoundary>
           </Suspense>
-          
-          <Suspense fallback={<SectionSkeleton />}>
+
+          <Suspense fallback={null}>
             <ErrorBoundary fallbackMessage="인터뷰 섹션을 불러오지 못했습니다.">
-              <AIInterviewSection 
-                onComplete={(results: AnalysisResults) => setAnalysisResults(results)} 
+              <AIInterviewSection
+                key={restartToken}
+                onComplete={(results: AnalysisResults) => setAnalysisResults(results)}
                 selectedNotes={selectedNotes}
               />
             </ErrorBoundary>
           </Suspense>
-          
-          <Suspense fallback={<SectionSkeleton />}>
+
+          <Suspense fallback={null}>
             <ErrorBoundary fallbackMessage="리포트 섹션을 불러오지 못했습니다.">
-              <InsightReportSection 
-                results={analysisResults} 
+              <InsightReportSection
+                results={analysisResults}
                 onProductClick={setSelectedProduct}
               />
             </ErrorBoundary>
           </Suspense>
-          
-          <Suspense fallback={<SectionSkeleton />}>
+
+          <Suspense fallback={null}>
             <ErrorBoundary fallbackMessage="안전 가치 섹션을 불러오지 못했습니다.">
               <SafetyValuesSection />
             </ErrorBoundary>
           </Suspense>
         </main>
-        
+
         {/* 글로벌 푸터 */}
         <FooterSection />
 
@@ -119,14 +138,14 @@ export default function App() {
         <FloatingNavButton />
       </div>
 
-      {/* 
+      {/*
         03. 개별 제품 상세 레이어 (Portal-like 배치)
         메인 콘텐츠의 블러 필터 영향을 피하기 위해 외부에 독립적으로 배치
       */}
       {selectedProduct && (
-        <ProductModal 
-          product={selectedProduct} 
-          onClose={() => setSelectedProduct(null)} 
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
         />
       )}
     </div>
