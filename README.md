@@ -549,125 +549,122 @@ Top 5 추천이 동일 계열·브랜드로 쏠리는 문제를 방지하기 위
             <td style="border: 1px solid #ddd; padding: 10px;"></td>
         </tr>
         <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전승권</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전종혁</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            few-shot 프롬포트 기법을 통해 VLM이 추출한 원시 스타일 키워드를 목적에 맞게 정제하고 고도화하는 로직을 실험해 주셨습니다. 더불어, 동물 실험 등 브랜드의 ‘윤리성’ 지표에 대해서도 조사해 주셨습니다. 비록 해당 결과가 실제 서비스에 직접 반영되지 못했지만, 할당받은 테스크를 끝까지 잘 완수해 주셨습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">조동휘</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            이번 프로젝트에서 RAG 설계·구현과 백엔드를 담당한 팀원에게 특히 감사를 전하고 싶습니다. 우리가 서비스로 전달하려던 의도를 정확히 이해하고 그 방향대로 RAG를 설계·구현해 주었습니다. 특히 리트리버 구현의 완성도가 높아, LLM의 할루시네이션을 효과적으로 억제하고 향수 추천 서비스의 답변 품질을 끌어올릴 수 있었습니다.
+            테스트를 담당한 입장에서, 검색 결과가 조건과 맞지 않거나, 관련 없는 향수가 딸려 나오거나, 정작 원하는 향수가 누락되는 문제를 발견하면 그때그때 전달했습니다. 그러면 팀원이 원인을 파악해 빠르게 수정·반영해 주었고, 이런 피드백을 여러 차례 주고받으며 검색 정확도·노이즈·재현율을 함께 다듬어 나갔습니다. 그 과정을 거치며 리트리버의 검색 성능이 점차 안정화되었고, 서비스 품질도 꾸준히 끌어올릴 수 있었습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">최수아</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            추천 엔진과 RAG 검색 파이프라인의 전 과정을 설계·구현하며 기술적으로 까다로운 과제들을 해결해 주셨습니다. 단순한 벡터 검색에 그치지 않고, Pinecone으로 Top 30 후보를 추출한 뒤 재랭킹을 거쳐 Top 5를 추리는 다단계 추천 로직을 정교하게 설계해, 사용자에게 어울리는 향수를 정확하게 제안할 수 있도록 만들어 주셨습니다. 또한 추천 근거를 설명하는 ExplainService로 결과에 설득력을 더하고, LangSmith 기반으로 RAG의 실행 속도와 검색 품질을 직접 측정·검증하며 파이프라인을 끊임없이 개선해 주셨습니다. 덕분에 추천 엔진이라는 프로젝트의 핵심 가치를 안정적으로 구현해낼 수 있게 되었습니다.
+            </td>
         </tr>
         <tr>
             <td rowspan="5" style="text-align: center; font-weight: bold; border: 1px solid #ddd; padding: 10px;">장한재</td>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">이창우</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전승권</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전종혁</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">조동휘</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">최수아</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td rowspan="5" style="text-align: center; font-weight: bold; border: 1px solid #ddd; padding: 10px;">전승권</td>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">이창우</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">장한재</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            VLM을 활용하여 사용자가 업로드한 이미지로부터 향수 관련 키워드를 자동으로 추출하고, 5축 벡터 계산을 위한 기초 점수 산정 매핑 로직을 구현해 주셨습니다. 이에 더해 RAG 기반 추천 로직의 초안을 작성하여 이후 추천 알고리즘 고도화 작업 및 백엔드 시스템으로 이식 과정에서 시행착오를 줄이고 전체적인 개발 시간을 크게 단축할 수 있었습니다. 
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전종혁</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            향수 추천에 필요한 임베딩 벡터를 구축하면서, 꼭 필요한 파트를 빠르고, 책임감 있게 해내주셔서 프로젝트 개발 속도에 박차를 가할 수 있었습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">조동휘</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            LLM 개발을 담당한 팀원의 기여도 그만큼 중요했습니다. VLM 모델을 선정해 이미지를 읽고 향수를 추천하는 파이프라인을 간결하게 구축했고, 에러로 중단되어야 할 예외 상황이 잘 방어되도록 설계해 테스트 과정에서 큰 문제가 없었습니다. 특히 NVIDIA NIM의 VLM 모델은 분당 호출 40회 제한이 있어 초과 시 일정 시간 뒤 재호출되도록 대응해야 했는데, 이 부분을 미리 견고하게 처리해 준 덕분에 관련 테스트를 한 번에 통과할 수 있었습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">최수아</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            AI 파이프라인 전반을 고도화하며 서비스의 핵심인 ‘향 추천 정확도’를 끌어올려 주셨습니다. 사용자의 옷차림 이미지를 향 특성으로 변환하는 룰셋을 고도화하고 스타일 카테고리를 확장해, 시각 정보가 향으로 정교하게 이어지도록 만들어 주셨습니다. 특히 기존 키워드 기반 검색을 Pinecone 임베딩 기반 유사도 검색으로 전환하는 큰 구조 변경을 주도하시고, 향수 문서를 직접 임베딩해 벡터로 업로드하는 과정까지 정확하게 구축해 검색 품질을 한 단계 끌어올려 주셨습니다. 프롬프트를 반복 개선하며 응답 품질을 끝까지 다듬어 주신 덕분에, AI 파이프라인이 프로젝트의 완성도를 높이는 결정적인 역할을 수행하셨습니다.
+            </td>
         </tr>
         <tr>
             <td rowspan="5" style="text-align: center; font-weight: bold; border: 1px solid #ddd; padding: 10px;">전종혁</td>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">이창우</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            Olfit 서비스의 프론트엔드 전반을 총괄하여, ‘향수 추천’ 이라는 서비스의 정체성이 직관적으로 드러나도록 UI/UX를 크게 향상해 주었습니다.  또한 UI 개발에 머무르지 않고 AWS EC2로의 배포 작업까지 성공적으로 완수해 주었습니다. 개발 초기 프로토타입에서 발생한 크고 작은 버그들을 AI 에이전트를 적극적으로 활용해 해결하고, backend에서 반환하는 데이터 스키마의 변경사항에 대해 바로 반영을 해 주는 등 긴밀한 협업을 할 수 있었습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">장한재</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전승권</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            프론트엔드 구현과 UI 구성 과정에서 사용자 흐름을 자연스럽게 연결해주었습니다. 이미지 업로드부터 추천 결과 표시까지 실제 서비스처럼 동작할 수 있도록 세부적인 화면 구성과 사용자 경험 개선에 신경 써주었습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">조동휘</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            프론트엔드를 담당한 팀원은 사용자 관점에서 UI/UX를 설계하고 개발해 주었습니다. 제가 바쁠 때는 AWS 클라우드 배포를 도맡아 처리해 주어 큰 부담을 덜 수 있었습니다. 제가 오랜만에 프론트 E2E 테스트를 맡아 막히는 부분이 있을 때마다 방향을 짚어 주었고, 제가 향수 도메인에 익숙하지 않은 부분도 어떤 데이터가 있으면 LLM이 더 잘 검색할 수 있는지 알려 주어 데이터 파이프라인 설계·구현에 큰 도움을 받았습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">최수아</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            서비스의 얼굴이 되는 프론트엔드 전 화면을 구현하고, API 실연동부터 AWS 배포까지 사용자 경험의 처음과 끝을 책임지셨습니다. 아우라 진단 결과를 Recharts 5축 레이더 차트로 시각화하고 추천 카드·정렬·로딩·오류 재시도 UI까지 촘촘하게 설계해, 막힘없이 자연스러운 사용자 경험을 만들어 주셨습니다. 특히 추천·분석 API를 실제로 연동하고 전체 플로우를 직접 QA하며 E2E 테스트에서 발견된 이슈까지 즉시 수정해 주신 덕분에, 백엔드와 프론트가 실제 환경에서 안정적으로 맞물릴 수 있었습니다. 나아가 AWS 프로덕션 배포까지 직접 챙기시며, 프로젝트가 데모를 넘어 실제로 동작하는 서비스로 완성되는 데 결정적인 역할을 수행하셨습니다.
+            </td>
         </tr>
         <tr>
             <td rowspan="5" style="text-align: center; font-weight: bold; border: 1px solid #ddd; padding: 10px;">조동휘</td>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">이창우</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            Olfit 서비스를 위한 Dockerfile을 작성하고, DB 설계를 함께 담당했습니다. 또한 Front/Back/LLM 전반에 대한 Test를 작성하여 서비스에 대한 성능 평가를 진행하고 파트별로 결과를 기록해 주었습니다. 이를 통해 우리의 시스템 파이프라인이 문제 없이 동작하며, 나아가 ‘RAG 검색 성능’과 ‘추천 성능’ 역시 검증할 수 있었습니다. 코드 리펙토링에 있어서도 Fallback 로직 등 놓친 디테일을 보완하여 완성도를 더욱 높였습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">장한재</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전승권</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            인프라 및 배포 환경 구성 과정에서 프로젝트가 안정적으로 실행될 수 있도록 많은 역할을 맡아주었습니다. Docker, AWS 환경 세팅과 배포 과정에서 발생하는 문제들을 빠르게 해결하며 전체 개발 환경 안정화에 기여했습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전종혁</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            인프라 구축과 CI/CD 로 개발 환경에 통일을 담당해주셨습니다. 저 혼자만 다른 개발 환경에서 개발했지만, 환경의 차이에서 오는 오류를 사전에 방지했습니다. 
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">최수아</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            서비스를 실제로 동작하게 만드는 백엔드 API 서버와 인프라 전반을 도맡아, 프로젝트의 토대를 단단하게 받쳐 주셨습니다. 추천·향 정보 API를 설계·구현하고 통합 테스트로 다듬은 뒤, 응답 캐싱과 Pinecone 쿼리 비동기 처리까지 최적화해 무거운 AI 연산 속에서도 사용자가 빠르고 안정적인 응답을 받을 수 있도록 만들어 주셨습니다. 특히 이미지 분석 후 즉시 삭제하는 로직을 끝까지 확인하며 개인정보 보호까지 챙겨 주신 점이 인상 깊었습니다. 나아가 전 개발 도메인의 환경 세팅부터 배포 환경 구성, ETL 정규화, E2E 통합 테스트와 문서화로 품질 기준까지 세워 주신 덕분에, 프로젝트가 실제 환경에서 끝까지 동작하는 서비스로 완성될 수 있었습니다.
+            </td>
         </tr>
         <tr>
             <td rowspan="5" style="text-align: center; font-weight: bold; border: 1px solid #ddd; padding: 10px;">최수아</td>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">이창우</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            3차 프로젝트때 경험을 바탕으로, Jira를 통한 일정 관리 및 기술 명세서 등 문서 작업, 발표를 맡아 주었습니다. 또한 Front 디자인에 대한 피드백과 표준화된 성분명 등을 조사해 주었습니다. 각자가 해야할 작업들이 명확하게 정의되어 있어 해당 jira issue를 가지고 commit을 날리며 관리할 수 있어 코드 관리도 편했던 것 같습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">장한재</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
-        </tr>
-        <tr>
-            <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전승권</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            PM 역할로 프로젝트 일정과 진행 상황을 체계적으로 관리해주었습니다. 발표 자료 구성과 전체 흐름 정리에서도 프로젝트 핵심 메시지가 잘 전달될 수 있도록 조율해주었고, 팀원 간 커뮤니케이션이 원활하게 이어질 수 있도록 중심을 잘 잡아주었습니다.
+            </td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전종혁</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+            일정 관리를 체계적으로 정리해주셔서 프로젝트 진행 중에 있어서 소통의 부재나, 팀원 간 소통을 원활하게 해주어서 프로젝트 기능 개발에만 몰두할 수 있었습니다.</td>
         </tr>
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">조동휘</td>
-            <td style="border: 1px solid #ddd; padding: 10px;"></td>
+            <td style="border: 1px solid #ddd; padding: 10px;">
+             PM을 맡은 팀원은 프로젝트에서 가장 까다로운 일정 관리를 도맡았습니다. 각 파트의 진행 상황을 지속적으로 파악하고 우선순위를 조율해, 개발이 계획한 일정에서 벗어나지 않도록 이끌어 주었습니다. 덕분에 팀원 각자가 일정 부담 없이 자신의 개발에 집중할 수 있었습니다. 또한 향수 도메인에 대한 이해를 바탕으로, 데이터 수집 단계에서 여성 사용자가 주로 찾는 향수 브랜드가 무엇인지 짚어 주어 데이터 방향을 잡는 데 도움을 주었고, 향수 데이터를 어떤 형태로 출력해야 사용자에게 올바르게 전달되는지도 알려 주었습니다. 이런 디테일 덕분에 향수 추천 서비스가 사용자 관점에서 완성도 있는 결과물이 될 수 있었습니다.
+            </td>
         </tr>
     </tbody>
 </table>
