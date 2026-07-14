@@ -571,7 +571,7 @@ Top 5 추천이 동일 계열·브랜드로 쏠리는 문제를 방지하기 위
             <td rowspan="5" style="text-align: center; font-weight: bold; border: 1px solid #ddd; padding: 10px;">장한재</td>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">이창우</td>
             <td style="border: 1px solid #ddd; padding: 10px;">
-            VLM을 활용하여 사용자가 업로드한 이미지로부터 향수 관련 키워드를 자동으로 추출하고, 5축 벡터 계산을 위한 기초 점수 산정 매핑 로직을 구현해 주셨습니다. 이에 더해 RAG 기반 추천 로직의 초안을 작성하여 이후 추천 알고리즘 고도화 작업 및 백엔드 시스템으로 이식 과정에서 시행착오를 줄이고 전체적인 개발 시간을 크게 단축할 수 있었습니다. 
+            VLM을 활용하여 사용자가 업로드한 이미지로부터 향수 관련 키워드를 자동으로 추출하고, 5축 벡터 계산을 위한 기초 점수 산정 매핑 로직을 구현해 주셨습니다. 이에 더해 RAG 기반 추천 로직의 초안을 작성하여 이후 추천 알고리즘 고도화 작업 및 백엔드 시스템으로 이식 과정에서 시행착오를 줄이고 전체적인 개발 시간을 크게 단축할 수 있었습니다.
             </td>
         </tr>
         <tr>
@@ -633,7 +633,7 @@ Top 5 추천이 동일 계열·브랜드로 쏠리는 문제를 방지하기 위
         <tr>
             <td style="text-align: center; border: 1px solid #ddd; padding: 10px;">전종혁</td>
             <td style="border: 1px solid #ddd; padding: 10px;">
-            인프라 구축과 CI/CD 로 개발 환경에 통일을 담당해주셨습니다. 저 혼자만 다른 개발 환경에서 개발했지만, 환경의 차이에서 오는 오류를 사전에 방지했습니다. 
+            인프라 구축과 CI/CD 로 개발 환경에 통일을 담당해주셨습니다. 저 혼자만 다른 개발 환경에서 개발했지만, 환경의 차이에서 오는 오류를 사전에 방지했습니다.
             </td>
         </tr>
         <tr>
